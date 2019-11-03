@@ -1,0 +1,2 @@
+7/19/2019 Beefy Game Engine now renamed as Beefy Game Studio
+*Project updated to .NET 4.7.2 and MonoGame.Forms 2.3.8
