@@ -568,7 +568,7 @@ namespace BeefyGameStudio
 
         private void AddPhysicsPropertyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MainViewport.ReturnSelected().
+            //MainViewport.ReturnSelected().
         }
 
         private void AddInputPropertyToolStripMenuItem_Click(object sender, EventArgs e)
