@@ -1,4 +1,4 @@
-# Beefy-Game-Studio
+# Beefy Game Studio
 A Game Editing Tool made for Windows written on top of the C# MonoGame Framework.
 
 This tool was built for my previous game project (https://github.com/JustRodneyLee/Unknown-Snow-Grounds) due to its sluggish development progress. I'm trying to structure out a new engine based on my experiences from the last attempt. By including GUI for game dev, I could speed up my progress.
