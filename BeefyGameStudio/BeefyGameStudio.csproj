@@ -133,6 +133,7 @@
     <Compile Include="Engine\BeefyPhysicsEngine.cs" />
     <Compile Include="Engine\BeefyRenderingEngine.cs" />
     <Compile Include="Engine\BeefyLevel.cs" />
+    <Compile Include="Engine\BeefyScript.cs" />
     <Compile Include="Engine\BeefyShape.cs" />
     <Compile Include="GameViewport.cs">
       <SubType>Component</SubType>
