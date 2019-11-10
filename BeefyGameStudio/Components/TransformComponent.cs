@@ -66,7 +66,7 @@ namespace BeefyGameStudio.Components
 
         private void TransformComponent_Load(object sender, EventArgs e)
         {
-            this.Width = Parent.Width;
+            Width = Parent.Width - 2 * Parent.Margin.Horizontal;
             valueBoxCoordsX.SetValue(ref cX);
             valueBoxCoordsY.SetValue(ref cY);
             valueBoxScaleX.SetValue(ref sX);

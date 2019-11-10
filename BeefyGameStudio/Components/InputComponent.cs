@@ -22,5 +22,25 @@ namespace BeefyGameStudio.Components
             controller = bic;
             InitializeComponent();
         }
+
+        private void enabledCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (enabledCheckBox.Checked)
+            {
+                controller.Enable();
+                inputComponentGroupBox.Enabled = true;
+            }
+            else
+            {
+                controller.Disable();
+                inputComponentGroupBox.Enabled = false;
+            }
+            enabledCheckBox.Enabled = true;
+        }
+
+        private void InputComponent_Load(object sender, EventArgs e)
+        {
+            Width = Parent.Width - 2 * Parent.Margin.Horizontal;
+        }
     }
 }

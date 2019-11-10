@@ -652,5 +652,10 @@ namespace BeefyGameStudio
         {
             Application.Exit();
         }
+
+        private void InspectorVSHierarchy_Panel2_Resize(object sender, EventArgs e)
+        {
+//            MainViewport.Inspect(MainViewport.InspectedObject);
+        }
     }
 }

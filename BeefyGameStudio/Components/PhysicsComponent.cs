@@ -43,6 +43,7 @@ namespace BeefyGameStudio.Components
                 physics.Disable();
                 physicsComponentGroupBox.Enabled = false;
             }
+            enabledCheckBox.Enabled = true;
         }
 
         private void PhysicsComponent_Load(object sender, EventArgs e)

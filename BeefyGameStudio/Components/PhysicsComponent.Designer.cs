@@ -34,8 +34,7 @@
             this.SuspendLayout();
             // 
             // physicsComponentGroupBox
-            // 
-            this.physicsComponentGroupBox.Controls.Add(this.enabledCheckBox);
+            //             
             this.physicsComponentGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.physicsComponentGroupBox.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.physicsComponentGroupBox.Location = new System.Drawing.Point(1, 1);
@@ -61,6 +60,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.enabledCheckBox);
             this.Controls.Add(this.physicsComponentGroupBox);
             this.Name = "PhysicsComponent";
             this.Padding = new System.Windows.Forms.Padding(1);

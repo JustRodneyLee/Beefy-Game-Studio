@@ -406,6 +406,7 @@
             this.InspectorVSHierarchy.Panel2.AutoScroll = true;
             this.InspectorVSHierarchy.Panel2.Controls.Add(this.InspectorSplitContainer);
             this.InspectorVSHierarchy.Panel2.Controls.Add(this.InspectorLabel);
+            this.InspectorVSHierarchy.Panel2.Resize += new System.EventHandler(this.InspectorVSHierarchy_Panel2_Resize);
             this.InspectorVSHierarchy.Size = new System.Drawing.Size(383, 712);
             this.InspectorVSHierarchy.SplitterDistance = 356;
             this.InspectorVSHierarchy.TabIndex = 1;

@@ -29,15 +29,14 @@
         private void InitializeComponent()
         {
             this.inputComponentGroupBox = new System.Windows.Forms.GroupBox();
-            this.enabledCheckBox = new System.Windows.Forms.CheckBox();
             this.addInputBindingButton = new System.Windows.Forms.Button();
+            this.enabledCheckBox = new System.Windows.Forms.CheckBox();
             this.inputComponentGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // inputComponentGroupBox
             // 
             this.inputComponentGroupBox.Controls.Add(this.addInputBindingButton);
-            this.inputComponentGroupBox.Controls.Add(this.enabledCheckBox);
             this.inputComponentGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.inputComponentGroupBox.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.inputComponentGroupBox.Location = new System.Drawing.Point(0, 0);
@@ -46,17 +45,6 @@
             this.inputComponentGroupBox.TabIndex = 0;
             this.inputComponentGroupBox.TabStop = false;
             this.inputComponentGroupBox.Text = "  Input Controller";
-            // 
-            // enabledCheckBox
-            // 
-            this.enabledCheckBox.AutoSize = true;
-            this.enabledCheckBox.Checked = true;
-            this.enabledCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.enabledCheckBox.Location = new System.Drawing.Point(3, 3);
-            this.enabledCheckBox.Name = "enabledCheckBox";
-            this.enabledCheckBox.Size = new System.Drawing.Size(15, 14);
-            this.enabledCheckBox.TabIndex = 0;
-            this.enabledCheckBox.UseVisualStyleBackColor = true;
             // 
             // addInputBindingButton
             // 
@@ -69,16 +57,30 @@
             this.addInputBindingButton.Text = "Add New Input Binding";
             this.addInputBindingButton.UseVisualStyleBackColor = true;
             // 
+            // enabledCheckBox
+            // 
+            this.enabledCheckBox.AutoSize = true;
+            this.enabledCheckBox.Checked = true;
+            this.enabledCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.enabledCheckBox.Location = new System.Drawing.Point(3, 3);
+            this.enabledCheckBox.Name = "enabledCheckBox";
+            this.enabledCheckBox.Size = new System.Drawing.Size(15, 14);
+            this.enabledCheckBox.TabIndex = 0;
+            this.enabledCheckBox.UseVisualStyleBackColor = true;
+            this.enabledCheckBox.CheckedChanged += new System.EventHandler(this.enabledCheckBox_CheckedChanged);
+            // 
             // InputComponent
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.enabledCheckBox);
             this.Controls.Add(this.inputComponentGroupBox);
             this.Name = "InputComponent";
             this.Size = new System.Drawing.Size(350, 230);
+            this.Load += new System.EventHandler(this.InputComponent_Load);
             this.inputComponentGroupBox.ResumeLayout(false);
-            this.inputComponentGroupBox.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
