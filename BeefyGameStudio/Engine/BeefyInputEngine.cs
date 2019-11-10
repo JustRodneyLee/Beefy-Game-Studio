@@ -17,10 +17,10 @@ namespace BeefyEngine
     {
         public IBeefyInput Input;
         public InputCondition Condition;
-        public Action Action;
+        public string Action;
         public float HoldTime;
 
-        public BeefyInputBinding(Keys key, Action action, InputCondition inputCondition, float holdTime = 0)
+        public BeefyInputBinding(Keys key, string action, InputCondition inputCondition, float holdTime = 0)
         {
             Input = new BKey(key);
             Condition = inputCondition;
@@ -28,7 +28,7 @@ namespace BeefyEngine
             HoldTime = holdTime;
         }
 
-        public BeefyInputBinding(MouseButton button, Action action, InputCondition inputCondition, float holdTime = 0)
+        public BeefyInputBinding(MouseButton button, string action, InputCondition inputCondition, float holdTime = 0)
         {
             Input = new BMouseBtn();
             Condition = inputCondition;
@@ -37,7 +37,7 @@ namespace BeefyEngine
         }        
 
         //TODO : Mouse Move
-        public BeefyInputBinding(MouseAxis mouseAxis, Action action)
+        public BeefyInputBinding(MouseAxis mouseAxis, string action)
         {
             Input = new BMouseMove(mouseAxis);
             Condition = InputCondition.Move;
@@ -159,10 +159,20 @@ namespace BeefyEngine
         public bool Enabled { get; private set; }
         public BeefyObject Entity { get; set; }
         public List<BeefyInputBinding> Bindings;
+        public BeefyScript ControllerScript { get; private set; }
 
         public BeefyInputController(BeefyObject parent)
         {
             Entity = parent;
+        }
+
+        /// <summary>
+        /// Sets the Controller Script
+        /// </summary>
+        /// <param name="bs"></param>
+        public void SetControllerScript(BeefyScript bs)
+        {
+            ControllerScript = bs;
         }
 
         /// <summary>
@@ -173,17 +183,17 @@ namespace BeefyEngine
             Bindings.Add(bib);
         }
 
-        public void AddInputBinding(Keys key, Action action, InputCondition condition, float time = 0)
+        public void AddInputBinding(Keys key, string action, InputCondition condition, float time = 0)
         {
             Bindings.Add(new BeefyInputBinding(key, action, condition, time));
         }
 
-        public void AddInputBinding(MouseButton btn, Action action, InputCondition condition, float time = 0)
+        public void AddInputBinding(MouseButton btn, string action, InputCondition condition, float time = 0)
         {
             Bindings.Add(new BeefyInputBinding(btn, action, condition, time));
         }
 
-        public void AddInputBinding(MouseAxis axis, Action action)
+        public void AddInputBinding(MouseAxis axis, string action)
         {
             Bindings.Add(new BeefyInputBinding(axis, action));
         }
@@ -421,19 +431,19 @@ namespace BeefyEngine
                                 case InputCondition.Down:
                                     if (IsDown(((BKey)BIB.Input).KeyCode))
                                     {
-                                        BIB.Action();
+                                        BIC.ControllerScript.Invoke(BIB.Action);
                                     }
                                     break;
                                 case InputCondition.Up:
                                     if (IsUp(((BKey)BIB.Input).KeyCode))
                                     {
-                                        BIB.Action();
+                                        BIC.ControllerScript.Invoke(BIB.Action);
                                     }
                                     break;
                                 case InputCondition.Hold:
                                     if (GetHeldTime(((BKey)BIB.Input).KeyCode)==BIB.HoldTime)
                                     {
-                                        BIB.Action();
+                                        BIC.ControllerScript.Invoke(BIB.Action);
                                     }
                                     break;
                             }
@@ -444,19 +454,19 @@ namespace BeefyEngine
                                 case InputCondition.Down:
                                     if (IsDown(((BMouseBtn)BIB.Input).MouseButton))
                                     {
-                                        BIB.Action();
+                                        BIC.ControllerScript.Invoke(BIB.Action);
                                     }
                                     break;
                                 case InputCondition.Up:
                                     if (IsUp(((BMouseBtn)BIB.Input).MouseButton))
                                     {
-                                        BIB.Action();
+                                        BIC.ControllerScript.Invoke(BIB.Action);
                                     }
                                     break;
                                 case InputCondition.Hold:
                                     if (GetHeldTime(((BMouseBtn)BIB.Input).MouseButton) == BIB.HoldTime)
                                     {
-                                        BIB.Action();
+                                        BIC.ControllerScript.Invoke(BIB.Action);
                                     }
                                     break;
                                 case InputCondition.Move:
@@ -464,11 +474,11 @@ namespace BeefyEngine
                                     {
                                         case MouseAxis.X:
                                             if (DeltaX != 0)
-                                                BIB.Action();
+                                                BIC.ControllerScript.Invoke(BIB.Action);
                                             break;
                                         case MouseAxis.Y:
                                             if (DeltaY != 0)
-                                                BIB.Action();
+                                                BIC.ControllerScript.Invoke(BIB.Action);
                                             break;
                                     }
                                     break;

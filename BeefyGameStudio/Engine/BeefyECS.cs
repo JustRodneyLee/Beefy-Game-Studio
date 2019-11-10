@@ -80,5 +80,34 @@ namespace BeefyEngine
             bt.Scale = bt.Scale;
             return bt;
         }
-    }       
+    }
+
+    public class BeefyCustomProperty : IBeefyComponent
+    {
+        public string ComponentID => throw new NotImplementedException();
+        public bool Enabled { get; private set; }
+        public BeefyObject Entity { get; set; }
+
+        public BeefyCustomProperty(BeefyObject parent)
+        {
+            Entity = parent;
+            Enable();
+        }
+
+        public object Clone()
+        {
+            BeefyCustomProperty bcp = new BeefyCustomProperty(Entity);
+            return bcp;
+        }
+
+        public void Disable()
+        {
+            Enabled = false;
+        }
+
+        public void Enable()
+        {
+            Enabled = true;
+        }
+    }
 }

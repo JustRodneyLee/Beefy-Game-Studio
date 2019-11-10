@@ -24,8 +24,9 @@ namespace BeefyEngine
         public bool Enabled { get; private set; }
         public BeefyObject Entity { get; set; }
         public BeefyShape Collider { get; set; }
-        public PhysicsType Type { get; set; }        
+        public PhysicsType Type { get; set; }
         public Vector2 Velocity { get; set; }
+        public float AngularVelocity {get;set;} //Only rotates perpendicular to the 2D-plane; +ve for clockwise and -ve for counterclockwise
         public bool AffectedByGravity { get; set; }
         public float GAcceleration { get; set; }
 
@@ -45,6 +46,7 @@ namespace BeefyEngine
             Collider = new BeefyShape();
             Type = PhysicsType.Rigidbody;            
             Velocity = new Vector2(0, 0);
+            AngularVelocity = 0f;
             AffectedByGravity = true;
             GAcceleration = -9.8f;
         }
@@ -52,7 +54,7 @@ namespace BeefyEngine
         public void AddForce(Vector2 force)
         {
             Velocity += force;
-        }
+        }        
 
         public object Clone()
         {
@@ -90,6 +92,9 @@ namespace BeefyEngine
                 //Calculate Horizontal Displacement
 
                 //Calculate Final Displacement
+                BO.GetComponent<BeefyTransform>().Coordinates += BPComponent.Velocity;
+                //Calculate Rotation                
+                //BO.GetComponent<BeefyTransform>().Rotation += BPComponent.AngularVelocity;
             }
             return null;
         }

@@ -3,25 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 
-namespace BeefyGameStudio.Engine
+namespace BeefyEngine
 {
     public class BeefyScript
     {
-        BeefyScript()
-        {
+        IBeefyComponent Component;
 
+        public BeefyScript(IBeefyComponent ibc)
+        {
+            Component = ibc;
         }
 
-        public void Update()
+        public void Invoke(string actionName)
         {
-
+            Type thisType = this.GetType();
+            MethodInfo info = thisType.GetMethod(actionName);
+            info.Invoke(this, null);
         }
 
-        public void Invoke()
+        public virtual void Run()
         {
-
+         
         }
-
     }
 }

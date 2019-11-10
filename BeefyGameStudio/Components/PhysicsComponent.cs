@@ -14,14 +14,12 @@ namespace BeefyGameStudio.Components
 {
     public partial class PhysicsComponent : UserControl, InspectorComponent
     {
-        public PhysicsComponent()
-        {
-            InitializeComponent();
-        }
+        BeefyPhysics physics;               
 
         public PhysicsComponent(BeefyPhysics bp)
         {
             Name = "PhysicsComponent";
+            physics = bp;
             InitializeComponent();
         }
 
@@ -33,13 +31,23 @@ namespace BeefyGameStudio.Components
         {
         }
 
-        private void TransformComponent_Load(object sender, EventArgs e)
-        {
-        }
-
         private void enabledCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            
+            if (enabledCheckBox.Checked)
+            {
+                physics.Enable(); 
+                physicsComponentGroupBox.Enabled = true;
+            }
+            else
+            {
+                physics.Disable();
+                physicsComponentGroupBox.Enabled = false;
+            }
+        }
+
+        private void PhysicsComponent_Load(object sender, EventArgs e)
+        {
+            Width = Parent.Width;
         }
     }
 }

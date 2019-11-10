@@ -94,6 +94,12 @@
     <Compile Include="Components\AudioComponent.Designer.cs">
       <DependentUpon>AudioComponent.cs</DependentUpon>
     </Compile>
+    <Compile Include="Components\InputComponent.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Components\InputComponent.Designer.cs">
+      <DependentUpon>InputComponent.cs</DependentUpon>
+    </Compile>
     <Compile Include="Components\InspectorComponent.cs" />
     <Compile Include="Components\LightingComponent.cs">
       <SubType>UserControl</SubType>
@@ -167,6 +173,9 @@
     <EmbeddedResource Include="BGS.resx">
       <DependentUpon>BGS.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Components\InputComponent.resx">
+      <DependentUpon>InputComponent.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Components\PhysicsComponent.resx">
       <DependentUpon>PhysicsComponent.cs</DependentUpon>
     </EmbeddedResource>
@@ -223,6 +232,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\HMGLogoWhiteOnDark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Engine\Presets\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\MonoGame.Forms.DX.2.3.8\build\MonoGame.Forms.DX.targets" Condition="Exists('..\packages\MonoGame.Forms.DX.2.3.8\build\MonoGame.Forms.DX.targets')" />

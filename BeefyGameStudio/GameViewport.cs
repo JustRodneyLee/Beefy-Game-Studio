@@ -146,6 +146,7 @@ namespace BeefyGameStudio
         List<BeefyObject> DrawnObjects;
         Dictionary<string, BeefyShape> SelectionBoundaries;
         List<BeefyObject> SelectedObjects;
+        public BeefyObject InspectedObject { get { if (SelectedObjects.Count==1 && SelectedObjects.First() != null) { return SelectedObjects.First(); } else { return null; } } }
 
         BeefyLayer currentLayer;
         bool showAllLayers;
@@ -229,16 +230,17 @@ namespace BeefyGameStudio
         }
 
         public void Inspect(BeefyObject bo)
-        {            
+        {
             if (bo != null)
             {
-                foreach (Control ctrl in InspectorPanel.Controls)
+                InspectorPanel.Controls.Clear();
+                /*foreach (Control ctrl in InspectorPanel.Controls)
                 {
                     if (ctrl.Name.Contains("Component"))
                     {
                         InspectorPanel.Controls.Remove(ctrl);
                     }
-                }
+                }*/
                 InspectorLabel.Text = "Inspector - " + bo.ObjectID;                
                 AddPropertyBtn.Enabled = true;
                 AddPropertyBtn.Visible = true;
@@ -258,14 +260,20 @@ namespace BeefyGameStudio
                         case "Audio":
                             //InspectorPanel.Controls.Add(new AudioComponent((BeefyAudio)bc));
                             break;
+                        case "InputController":
+                            InspectorPanel.Controls.Add(new InputComponent((BeefyInputController)bc));
+                            break;
                         case "Physics":
                             InspectorPanel.Controls.Add(new PhysicsComponent((BeefyPhysics)bc));
+                            break;
+                        case "Custom":
+                            //InspectorPanel.Controls.Add(new PhysicsComponent((BeefyPhysics)bc));
                             break;
                         default:
                             //InspectorPanel.Controls.Add(new InspectorComponent(bc));
                             break;
                     }
-                }
+                }                
             }
             else
             {
@@ -611,12 +619,13 @@ namespace BeefyGameStudio
                                 {
                                     if (bo.HasComponent<BeefyRenderer2D>())
                                     {
-                                        bo.GetComponent<BeefyRenderer2D>().Origin -= new Vector2(bo.GetComponent<BeefyTransform>().LastCoordinates.X - SelectionBoundaries[bo.ObjectID].Origin.X, SelectionBoundaries[bo.ObjectID].Origin.Y - bo.GetComponent<BeefyTransform>().LastCoordinates.Y);
+                                        if (bo.GetComponent<BeefyTransform>().Rotation==0)
+                                            bo.GetComponent<BeefyRenderer2D>().Origin -= new Vector2(bo.GetComponent<BeefyTransform>().LastCoordinates.X - SelectionBoundaries[bo.ObjectID].Origin.X, SelectionBoundaries[bo.ObjectID].Origin.Y - bo.GetComponent<BeefyTransform>().LastCoordinates.Y);
                                     }
                                     bo.GetComponent<BeefyTransform>().Coordinates = SelectionBoundaries[bo.ObjectID].Origin;
                                     bo.GetComponent<BeefyTransform>().LastCoordinates = bo.GetComponent<BeefyTransform>().Coordinates;
                                 }
-                            }
+                            }                            
                             break;
                         case EditorAction.AddNew:
                             if (ObjectsToAdd.Count != 0)

@@ -65,6 +65,7 @@
             this.Name = "PhysicsComponent";
             this.Padding = new System.Windows.Forms.Padding(1);
             this.Size = new System.Drawing.Size(350, 230);
+            this.Load += new System.EventHandler(this.PhysicsComponent_Load);
             this.physicsComponentGroupBox.ResumeLayout(false);
             this.physicsComponentGroupBox.PerformLayout();
             this.ResumeLayout(false);

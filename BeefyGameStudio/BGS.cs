@@ -558,32 +558,40 @@ namespace BeefyGameStudio
 
         private void AddRenderer2DPropertyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            
+            MainViewport.InspectedObject.AddComponent(new BeefyRenderer2D(MainViewport.InspectedObject));
+            MainViewport.Invalidate();
         }
 
         private void AddAudioPropertyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            MainViewport.InspectedObject.AddComponent(new BeefyAudio(MainViewport.InspectedObject));
+            MainViewport.Invalidate();
         }
 
         private void AddPhysicsPropertyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //MainViewport.ReturnSelected().
+            MainViewport.InspectedObject.AddComponent(new BeefyPhysics(MainViewport.InspectedObject));
+            MainViewport.Inspect(MainViewport.InspectedObject);
+            MainViewport.Invalidate();
         }
 
         private void AddInputPropertyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            MainViewport.InspectedObject.AddComponent(new BeefyInputController(MainViewport.InspectedObject));
+            MainViewport.Inspect(MainViewport.InspectedObject);
+            MainViewport.Invalidate();
         }
 
         private void AddCameraPropertyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            //MainViewport.InspectedObject.AddComponent(new BeefyCameraTracking(MainViewport.InspectedObject));
+            MainViewport.Invalidate();
         }
 
         private void CustomToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            
+            MainViewport.InspectedObject.AddComponent(new BeefyCustomProperty(MainViewport.InspectedObject));
+            MainViewport.Invalidate();
         }
         #endregion
 
