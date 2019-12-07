@@ -118,7 +118,7 @@ namespace BeefyGameStudio
                                     //TODO
                                     break;
                             }
-                        }                        
+                        }
                     }
                     catch (Exception e)
                     {

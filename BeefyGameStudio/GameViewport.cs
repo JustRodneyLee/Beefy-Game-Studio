@@ -80,7 +80,6 @@ namespace BeefyGameStudio
         }
 
         public Camera2D View;
-        Vector2 viewCenter; Vector2 centerOfZoom;
         public EditorAction editorAction;
         public EditorAction lastAction;
         public EditorManipulator editorManipulator;
@@ -160,7 +159,6 @@ namespace BeefyGameStudio
             View = new Camera2D();
             View.Position = new Vector2(0, 0);
             View.Zoom = 1;
-            centerOfZoom = View.Position;
             editorAction = EditorAction.None;
             lastAction = editorAction;
             editorManipulator = EditorManipulator.NoEdit;
@@ -472,6 +470,12 @@ namespace BeefyGameStudio
 
         #region Mouse Controls
 
+        public void GetEditorMousePos(MouseEventArgs e)
+        {
+            if (IsMouseInsideControl)
+                EditorMousePos = new Vector2((float)Math.Round((Editor.Cam.Position.X + e.X - VPWidth / 2) / View.Zoom, 2), (float)Math.Round((-Editor.Cam.Position.Y - e.Y + VPHeight / 2) / View.Zoom, 2));
+        }
+
         protected override void OnMouseEnter(EventArgs e)
         {
             Invalidate();
@@ -480,24 +484,27 @@ namespace BeefyGameStudio
 
         protected override void OnMouseWheel(MouseEventArgs e)
         {
-            //TODO : Improvement on Scrolling
+            ///Zooming
+            GetEditorMousePos(e);
             switch (editorAction)
             {
                 case EditorAction.None:
-                    //View.Position =;
                     if (e.Delta > 0)
                     {
                         if (View.Zoom >= 1)
                             View.Zoom += 1f;
                         else
                             View.Zoom += 0.1f;
-                        if (View.Zoom >= 10)
-                            View.Zoom = 10;
+                        if (View.Zoom >= 20)
+                            View.Zoom = 20;
                     }
                     else
                     if (View.Zoom > 1)
                         View.Zoom -= 1f;
-                    else View.Zoom -= 0.1f;                    
+                    else if (View.Zoom >= 0.1)
+                        View.Zoom -= 0.1f;
+                    else View.Zoom -= 0.01f;
+                    Editor.Cam.Position = View.Position * View.Zoom;
                     break;
                 case EditorAction.Pan:
                     if (e.Delta > 0)
@@ -513,6 +520,7 @@ namespace BeefyGameStudio
                     if (View.Zoom > 1)
                         View.Zoom -= 1f;
                     else View.Zoom -= 0.1f;
+                    Editor.Cam.Position = View.Position * View.Zoom;
                     break;
                 case EditorAction.Scale:
                     if (e.Delta > 0)
@@ -734,8 +742,7 @@ namespace BeefyGameStudio
         {
             dX = lX - e.X;
             dY = lY - e.Y;
-            if (IsMouseInsideControl)
-                EditorMousePos = new Vector2((float)Math.Round((View.Position.X + e.X - VPWidth / 2) / View.Zoom, 2), (float)Math.Round((-View.Position.Y - e.Y + VPHeight / 2) / View.Zoom, 2));
+            GetEditorMousePos(e);
             switch (editorAction)
             {
                 case EditorAction.None:
@@ -754,8 +761,8 @@ namespace BeefyGameStudio
                     }                        
                     break;
                 case EditorAction.Pan:
-                    View.Move(new Vector2(dX * EditorSettings.PanSpeed, dY * EditorSettings.PanSpeed));
-                    //TODO : Pan speed needs fixingf
+                    View.Move(new Vector2(dX / View.Zoom * EditorSettings.PanSpeed, dY / View.Zoom * EditorSettings.PanSpeed));
+                    //TODO : Pan speed needs fixing
                     RecalculateCulling();
                     break;
                 case EditorAction.BoxSelect:
@@ -1386,8 +1393,7 @@ namespace BeefyGameStudio
 
         private void RecalculateCulling()
         {
-            viewCenter = new Vector2((float)Math.Round(View.Position.X / View.Zoom, 2), (float)Math.Round(View.Position.Y / View.Zoom, 2));
-            CullingRect = new Rectangle((int)(viewCenter.X - (VPWidth / 2) / View.Zoom), (int)(- viewCenter.Y + (VPHeight / 2) / View.Zoom), (int)(VPWidth / View.Zoom), (int)(VPHeight / View.Zoom));
+            CullingRect = new Rectangle((int)(View.Position.X - (VPWidth / 2) / View.Zoom), (int)(- View.Position.Y + (VPHeight / 2) / View.Zoom), (int)(VPWidth / View.Zoom), (int)(VPHeight / View.Zoom));
         }
 
         private void InspectorUpdate()
@@ -1665,30 +1671,31 @@ namespace BeefyGameStudio
         {
             Editor.BackgroundColor = new Color(50, 50, 50);
             base.Draw();
-            Editor.BeginCamera2D(SpriteSortMode.BackToFront, null, SamplerState.PointClamp);
-            Editor.Cam.Position = View.Position;
-            Editor.Cam.Zoom = 1;
+            Editor.BeginCamera2D(SpriteSortMode.BackToFront, BlendState.NonPremultiplied, SamplerState.PointClamp);
+            Editor.Cam.Position = View.Position * View.Zoom;
             ///Underlying grid
             int scaledGridSize = (int)(EditorSettings.GridSize * View.Zoom);
-            for (int i = scaledGridSize; i < VPWidth + (int)View.Position.X; i += scaledGridSize)
+            for (int i = scaledGridSize; i < VPWidth + (int)(Editor.Cam.Position.X); i += scaledGridSize)
             {
-                Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle(i, (int)View.Position.Y - VPHeight / 2, 1, VPHeight), null, Color.Gray, 0, default(Vector2), SpriteEffects.None, 0.9998f);
+                Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle(i, (int)Editor.Cam.Position.Y - VPHeight / 2, 1, VPHeight), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
             }
-            for (int i = -scaledGridSize; i > -VPWidth + (int)View.Position.X; i -= scaledGridSize)
+            for (int i = -scaledGridSize; i > -VPWidth + (int)(Editor.Cam.Position.X); i -= scaledGridSize)
             {
-                Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle(i, (int)View.Position.Y - VPHeight / 2, 1, VPHeight), null, Color.Gray, 0, default(Vector2), SpriteEffects.None, 0.9998f);
+                Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle(i, (int)Editor.Cam.Position.Y - VPHeight / 2, 1, VPHeight), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
             }
-            for (int i = scaledGridSize; i < VPHeight + (int)View.Position.Y; i += scaledGridSize)
+            for (int i = scaledGridSize; i < VPHeight + (int)(Editor.Cam.Position.Y); i += scaledGridSize)
             {
-                Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle((int)View.Position.X - VPWidth / 2, i, VPWidth, 1), null, Color.Gray, 0, default(Vector2), SpriteEffects.None, 0.9998f);
+                Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle((int)Editor.Cam.Position.X - VPWidth / 2, i, VPWidth, 1), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
             }
-            for (int i = -scaledGridSize; i > -VPHeight + (int)View.Position.Y; i -= scaledGridSize)
+            for (int i = -scaledGridSize; i > -VPHeight + (int)(Editor.Cam.Position.Y); i -= scaledGridSize)
             {
-                Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle((int)View.Position.X - VPWidth / 2, i, VPWidth, 1), null, Color.Gray, 0, default(Vector2), SpriteEffects.None, 0.9998f);
-            }                
-            ///X-Y Axis & Origin
-            Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle((int)View.Position.X - VPWidth / 2, 0, VPWidth, 1), null, EditorSettings.XAxisColor, 0, default(Vector2), SpriteEffects.None, 0.9997f);
-            Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle(0, (int)View.Position.Y - VPHeight / 2, 1, VPHeight), null, EditorSettings.YAxisColor, 0, default(Vector2), SpriteEffects.None, 0.9997f);
+                Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle((int)Editor.Cam.Position.X - VPWidth / 2, i, VPWidth, 1), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
+            }
+            ///X-Y Axis & Origin            
+            if (CullingRect.Y >= 0 && (CullingRect.Y - CullingRect.Height) <= 0)
+                Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle((int)Editor.Cam.Position.X - VPWidth / 2, 0, VPWidth, 1), null, EditorSettings.XAxisColor * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9997f); //X-Axis
+            if (CullingRect.X <= 0 && (CullingRect.X + CullingRect.Width) >= 0)
+                Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle(0, (int)Editor.Cam.Position.Y - VPHeight / 2, 1, VPHeight), null, EditorSettings.YAxisColor * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9997f); //Y-Axis
             for (int i = -2; i < 3; i++)
                 for (int j = -2; j < 3; j++)
                     if ((i * i + j * j) != 8)
@@ -1797,9 +1804,9 @@ namespace BeefyGameStudio
             Editor.spriteBatch.Begin();
             Editor.spriteBatch.DrawString(Editor.Font, "Scale:" + Math.Round(View.Zoom, 1) + "x", new Vector2(0, 0), Color.White);
             Editor.spriteBatch.DrawString(Editor.Font, "Mouse Pos:" + EditorMousePos.ToString(), new Vector2(0, Editor.FontHeight), Color.White);
-            Editor.spriteBatch.DrawString(Editor.Font, "View Center:" + viewCenter.ToString(), new Vector2(0, Editor.FontHeight * 2), Color.White);
             Editor.spriteBatch.DrawString(Editor.Font, "View Pos:" + View.Position.ToString(), new Vector2(0, Editor.FontHeight * 3), Color.White);
-            Editor.spriteBatch.DrawString(Editor.Font, "View Width:" + VPWidth.ToString(), new Vector2(0, Editor.FontHeight * 4), Color.White);
+            //Editor.spriteBatch.DrawString(Editor.Font, "View Width:" + VPWidth.ToString(), new Vector2(0, Editor.FontHeight * 4), Color.White);
+            Editor.spriteBatch.DrawString(Editor.Font, "Editor Pos:" + Editor.Cam.Position.ToString(), new Vector2(0, Editor.FontHeight * 4), Color.White);
             Editor.spriteBatch.DrawString(Editor.Font, "View Height:" + VPHeight.ToString(), new Vector2(0, Editor.FontHeight * 5), Color.White);
             Editor.spriteBatch.DrawString(Editor.Font, "Culling Rect:" + CullingRect.ToString(), new Vector2(0, Editor.FontHeight * 6), Color.White);
             Editor.spriteBatch.DrawString(Editor.Font, "Last Action:" + lastAction.ToString(), new Vector2(0, Editor.FontHeight * 7), Color.White);
