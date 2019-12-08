@@ -15,14 +15,15 @@ namespace BeefyEngine
 
     public struct BeefyAnimation
     {
-        Texture2D SpriteSheet { get; set; }
+        Texture2D TextureData { get; set; }
         List<Rectangle> SourceFrames { get; set; }
         int FrameRate { get; set; }
         int FrameCount { get; set; }
         int Frame { get; set; }
+
         public BeefyAnimation(Texture2D ss, List<Rectangle> sf, int fr, int fc, int f = 0)
         {
-            SpriteSheet = ss;
+            TextureData = ss;
             SourceFrames = sf;
             FrameRate = fr;
             FrameCount = fc;
@@ -228,8 +229,9 @@ namespace BeefyEngine
                 foreach (BeefyObject BO in BL.BOC)
                 {
                     BeefyRenderer2D BR2D = BO.GetComponent<BeefyRenderer2D>();
-                    renderer.Begin(SpriteSortMode.FrontToBack, null, null, null, null, null, Camera.Transform);
+                    renderer.Begin(SpriteSortMode.FrontToBack, BlendState.NonPremultiplied, null, null, null, null, Camera.Transform);
                     renderer.Draw(BR2D.Texture, BO.GetComponent<BeefyTransform>().Coordinates, BR2D.SourceRectangle, BR2D.Tint * BL.LayerAlpha, BO.GetComponent<BeefyTransform>().Rotation, BR2D.Origin, BO.GetComponent<BeefyTransform>().Scale, SpriteEffects.None, BO.GetComponent<BeefyTransform>().Depth);
+                    //TODO : Lighting and Normal Maps
                     renderer.End();
                 }
             }

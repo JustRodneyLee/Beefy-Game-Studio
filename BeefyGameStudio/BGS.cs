@@ -46,7 +46,8 @@ namespace BeefyGameStudio
 
         private void CloseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Close();
+            if (lvlSaved)
+                Close();
         }
 
         private void NewToolStripMenuItem_Click(object sender, EventArgs e)
@@ -459,9 +460,7 @@ namespace BeefyGameStudio
 
         private void AddBoxToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            BeefyObject Box = new BeefyObject("Box");
-            Box.AddComponent(new BeefyRenderer2D(Box));
-            Box.AddComponent(new BeefyPhysics(Box));
+            BeefyObject Box = new BeefyPresets.Box();
             MainViewport.AddNewObject(Box);
         }
 
@@ -656,6 +655,47 @@ namespace BeefyGameStudio
         private void InspectorVSHierarchy_Panel2_Resize(object sender, EventArgs e)
         {
 //            MainViewport.Inspect(MainViewport.InspectedObject);
+        }
+
+        private void editingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MainViewport.CanRedo)
+                redoToolStripMenuItem.Enabled = true;
+            else
+                redoToolStripMenuItem.Enabled = false;
+            if (MainViewport.CanUndo)
+                undoToolStripMenuItem.Enabled = true;
+            else
+                undoToolStripMenuItem.Enabled = false;
+            if (MainViewport.ReturnSelected().Count!=0)
+            {
+                cutToolStripMenuItem.Enabled = true;
+                copyToolStripMenuItem.Enabled = true;
+                pasteToolStripMenuItem.Enabled = true;
+                deleteToolStripMenuItem.Enabled = true;
+            }
+            else
+            {
+                cutToolStripMenuItem.Enabled = false;
+                copyToolStripMenuItem.Enabled = false;
+                pasteToolStripMenuItem.Enabled = false;
+                deleteToolStripMenuItem.Enabled = false;
+            }
+        }
+
+        private void newProjToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void openProjToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void saveProjToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

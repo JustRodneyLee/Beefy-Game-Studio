@@ -139,6 +139,8 @@ namespace BeefyGameStudio
         SearchBar Search;
         Button AddPropertyBtn;
 
+        public bool CanUndo { get; } //Used by Main Form
+        public bool CanRedo { get; } //Used by Main Form
         List<Modification> Modifications; //Changes to be applied (TODO)
         int modifyIndex;
         List<BeefyObject> ObjectsToAdd;
@@ -960,6 +962,10 @@ namespace BeefyGameStudio
             }
         }
 
+        /// <summary>
+        /// Adds an Abstract object to the scene.
+        /// </summary>
+        /// <param name="coords"></param>
         public void AddAbstractObject(Vector2 coords)
         {
             BeefyObject nbo = new BeefyObject(true);
@@ -968,6 +974,10 @@ namespace BeefyGameStudio
             AddBeefyObject(nbo);
         }
 
+        /// <summary>
+        /// Adds a new object which position in scene is determined by a user click.
+        /// </summary>
+        /// <param name="bo"></param>
         public void AddNewObject(BeefyObject bo)
         {
             ObjectsToAdd = new List<BeefyObject>();
@@ -1709,7 +1719,7 @@ namespace BeefyGameStudio
                 }
                 else
                 {
-                    if (bo.GetComponent<BeefyRenderer2D>()!=null&& bo.GetComponent<BeefyRenderer2D>().Enabled)
+                    if (bo.GetComponent<BeefyRenderer2D>()!=null && bo.GetComponent<BeefyRenderer2D>().Enabled)
                         EditorDraw(bo);
                 }
                 if (SelectedObjects.Exists(x => x.ObjectID == bo.ObjectID))

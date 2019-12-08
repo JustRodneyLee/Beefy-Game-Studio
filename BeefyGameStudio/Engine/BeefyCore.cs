@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Audio;
+using System;
+using System.Collections.Generic;
 
 namespace BeefyEngine
 {
@@ -31,11 +26,10 @@ namespace BeefyEngine
         public int FramesPerSecond { get; internal set; }
         public float SecondsPerFrame { get; internal set; }
         public List<BeefyLevel> Levels { get; set; }
-        public int CurrentLevelIndex { get; set; }
 
         public BeefyEngineCore(Game game)
         {
-            TheGame = game;
+            TheGame = game;            
             BeefyDebugger.LogInternal("Running " + TheGame.ToString() + " on Beefy Engine v" + _Version.ToString());
         }
 
@@ -67,13 +61,21 @@ namespace BeefyEngine
         public void Update()
         {
             BIE.InternalUpdate();
-            BPE.Update(Levels[CurrentLevelIndex]);
-            BAE.Update(Levels[CurrentLevelIndex]);
+            foreach (BeefyLevel BL in Levels)
+            {
+                BPE.Update(BL);
+                BAE.Update(BL);
+                
+            }
+            BeefyDebugger.Update();
         }
 
         public void Draw()
         {
-            BRE.Update(Levels[CurrentLevelIndex]);
+            foreach (BeefyLevel BL in Levels)
+            {
+                BRE.Update(BL);
+            }            
         }
 
         public void Shutdown()
@@ -83,13 +85,12 @@ namespace BeefyEngine
             TheGame.Exit();
         }
 
-       public void Dispose()
+        public void Dispose()
         {
             GC.SuppressFinalize(this);            
             BIE.Dispose();
-            BPE.Dispose();
-            GraphicsDevice.Dispose();
-            BRE.Dispose();            
+            BPE.Dispose();            
+            BRE.Dispose();
             GC.ReRegisterForFinalize(this);
         }
     }

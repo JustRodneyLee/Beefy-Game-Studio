@@ -139,10 +139,12 @@
     <Compile Include="Engine\BeefyNetworkEngine.cs" />
     <Compile Include="Engine\BeefyObject.cs" />
     <Compile Include="Engine\BeefyPhysicsEngine.cs" />
+    <Compile Include="Engine\BeefyPresets.cs" />
     <Compile Include="Engine\BeefyRenderingEngine.cs" />
     <Compile Include="Engine\BeefyLevel.cs" />
     <Compile Include="Engine\BeefyScript.cs" />
     <Compile Include="Engine\BeefyShape.cs" />
+    <Compile Include="Engine\BeefyUI.cs" />
     <Compile Include="GameViewport.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -235,9 +237,7 @@
   <ItemGroup>
     <None Include="Resources\HMGLogoWhiteOnDark.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Engine\Presets\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\MonoGame.Forms.DX.2.3.8\build\MonoGame.Forms.DX.targets" Condition="Exists('..\packages\MonoGame.Forms.DX.2.3.8\build\MonoGame.Forms.DX.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
