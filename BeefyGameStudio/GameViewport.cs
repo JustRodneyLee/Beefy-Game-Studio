@@ -698,7 +698,7 @@ namespace BeefyGameStudio
                             editorAction = EditorAction.None;
                             foreach (BeefyObject bo in DrawnObjects)
                             {
-                                if (BeefyShape.IsColliding(new BeefyShape(selection_Box), SelectionBoundaries[bo.ObjectID]))
+                                if (BeefyShape.IsIntersecting(new BeefyShape(selection_Box), SelectionBoundaries[bo.ObjectID]))
                                 {
                                     SelectObject(bo);
                                 }
@@ -1631,7 +1631,7 @@ namespace BeefyGameStudio
         /// <returns>True if needs to be culled</returns>
         private bool CheckCulling(BeefyObject bo)
         {
-            if (BeefyShape.IsColliding(new BeefyShape(CullingRect), SelectionBoundaries[bo.ObjectID]))
+            if (BeefyShape.IsIntersecting(new BeefyShape(CullingRect), SelectionBoundaries[bo.ObjectID]))
                 return false;
             else
                 return true;

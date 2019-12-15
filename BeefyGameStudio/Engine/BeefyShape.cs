@@ -290,7 +290,7 @@ namespace BeefyEngine
         /// <param name="bs1">Shape 1</param>
         /// <param name="bs2">Shape 2</param>
         /// <returns></returns>
-        public static bool IsColliding(BeefyShape bs1, BeefyShape bs2) //TODO : Convex Shape Fix
+        public static bool IsIntersecting(BeefyShape bs1, BeefyShape bs2) //TODO : Convex Shape Fix
         {
             Vector2 Support(BeefyShape shape1, BeefyShape shape2, Vector2 v)
             {

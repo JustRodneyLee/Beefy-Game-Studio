@@ -236,7 +236,7 @@ namespace BeefyEngine
 
     public class BeefyInputEngine : IBeefySystem
     {
-        public BeefyEngineCore Core { get; }
+        public BeefyEngine Core { get; }
         KeyboardState CurrentKeyboardState;
         KeyboardState LastKeyboardState;        
         MouseState CurrentMouseState;
@@ -248,7 +248,7 @@ namespace BeefyEngine
         BMouseBtn MiddleMouseButton;
         BMouseBtn RightMouseButton;
 
-        public BeefyInputEngine(BeefyEngineCore core)
+        public BeefyInputEngine(BeefyEngine core)
         {
             Core = core;
             BeefyKeys = new List<BKey>();
@@ -342,14 +342,14 @@ namespace BeefyEngine
             return 0f;
         }
 
-        protected BKey UpdateKey(Keys targetKey)
+        protected BKey UpdateKey(Keys targetKey, GameTime time)
         {
             BKey aKey = new BKey(targetKey);
             aKey.KeyCode = targetKey;
             if (CurrentKeyboardState.IsKeyDown(targetKey))
             {
                 aKey.KeyDown = true;
-                aKey.KeyHeldTime += BeefyKeys.Find(key => key.KeyCode == targetKey).KeyHeldTime + Core.SecondsPerFrame;
+                aKey.KeyHeldTime += BeefyKeys.Find(key => key.KeyCode == targetKey).KeyHeldTime + (float)time.ElapsedGameTime.TotalSeconds;
             }
             else
             {
@@ -365,7 +365,7 @@ namespace BeefyEngine
         /// <summary>
         /// This method gets Keyboard and Mouse Inputs
         /// </summary>
-        public void InternalUpdate()
+        public void InternalUpdate(GameTime time)
         {
             CurrentKeyboardState = Keyboard.GetState();
             CurrentMouseState = Mouse.GetState();
@@ -374,11 +374,11 @@ namespace BeefyEngine
             {
                 if (!BeefyKeys.Exists(key => key.KeyCode == e))
                 {
-                    BeefyKeys.Add(UpdateKey(e));
+                    BeefyKeys.Add(UpdateKey(e, time));
                 }
                 else
                 {
-                    BeefyKeys[BeefyKeys.FindIndex(key => key.KeyCode == e)] = UpdateKey(e);
+                    BeefyKeys[BeefyKeys.FindIndex(key => key.KeyCode == e)] = UpdateKey(e, time);
                 }                
             }
             //Mouse

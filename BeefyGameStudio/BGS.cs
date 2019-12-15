@@ -44,24 +44,6 @@ namespace BeefyGameStudio
             lvlModified = true;
         }
 
-        private void CloseToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (lvlSaved)
-                Close();
-        }
-
-        private void NewToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            
-            
-        }
-
-        private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            
-            
-        }
-
         private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (!lvlSaved)
@@ -308,11 +290,6 @@ namespace BeefyGameStudio
         }
 
         private void SaveLvlAsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void SettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
         }
@@ -683,19 +660,39 @@ namespace BeefyGameStudio
             }
         }
 
+
+        #region Project Menu
         private void newProjToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            //TODO
         }
 
         private void openProjToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            OpenFileDialog.Multiselect = false;
+            OpenFileDialog.Title = "Beefy Game Studio - Open Project";
+            OpenFileDialog.Filter = "Beefy Game Project|*.bgp";
+            OpenFileDialog.ShowDialog();
         }
 
         private void saveProjToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            //TODO
         }
+
+        private void projSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (currentProject == null)
+                MessageBox.Show("You are not editing a project!","Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            else
+                new ProjectSettings(currentProject).ShowDialog();            
+        }
+
+        private void CloseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (lvlSaved)
+                Close();
+        }
+        #endregion
     }
 }

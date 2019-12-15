@@ -16,9 +16,9 @@ namespace BeefyEngine
         List<IBeefyAsset> Assets;        
         ContentManager content;
 
-        public BeefyEngineCore Core { get; }        
+        public BeefyEngine Core { get; }        
 
-        public BeefyAssetManager(BeefyEngineCore core)
+        public BeefyAssetManager(BeefyEngine core)
         {
             Core = core;
         }

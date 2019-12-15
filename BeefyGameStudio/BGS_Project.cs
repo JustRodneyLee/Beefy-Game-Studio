@@ -14,6 +14,17 @@ using BeefyEngine;
 
 namespace BeefyGameStudio
 {
+    public class BeefyProject
+    {        
+        /// Basic Info     
+        public string ProjectName { get; set; }
+        public List<string> ProjectDevelopers { get; set; }
+        public Version ProjectVersion { get; set; }
+
+        ///Game Settings
+        public bool PartialLoading { get; set; }
+    }
+
     public partial class BGS : Form
     {
         public enum FileType
@@ -30,6 +41,8 @@ namespace BeefyGameStudio
             AddToScene,
             WaitToAdd,
         }
+
+        public BeefyProject currentProject;
 
         public BeefyAssetLibrary assetLib;
         public string currentLevelPath;

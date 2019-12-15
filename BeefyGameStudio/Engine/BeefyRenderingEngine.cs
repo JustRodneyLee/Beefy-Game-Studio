@@ -210,12 +210,12 @@ namespace BeefyEngine
 
     public class BeefyRenderingEngine : IBeefySystem
     {
-        public BeefyEngineCore Core { get; }
+        public BeefyEngine Core { get; }
         public BeefyCamera2D Camera { get; set; }
         public Texture2D LightMap { get; }
         SpriteBatch renderer;
 
-        public BeefyRenderingEngine(BeefyEngineCore core)
+        public BeefyRenderingEngine(BeefyEngine core)
         {
             Core = core;
             Camera = new BeefyCamera2D(Core.GraphicsDevice.Viewport);

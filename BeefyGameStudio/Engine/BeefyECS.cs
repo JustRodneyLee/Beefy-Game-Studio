@@ -19,7 +19,7 @@ namespace BeefyEngine
     /// </summary>
     public interface IBeefySystem : IDisposable
     {
-        BeefyEngineCore Core { get; }
+        BeefyEngine Core { get; }
         string Update(BeefyLevel Level);
     }
 

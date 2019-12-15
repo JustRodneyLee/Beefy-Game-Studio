@@ -59,9 +59,9 @@ namespace BeefyEngine
 
     public class BeefyAudioEngine : IBeefySystem
     {
-        public BeefyEngineCore Core { get; }
+        public BeefyEngine Core { get; }
 
-        public BeefyAudioEngine(BeefyEngineCore core)
+        public BeefyAudioEngine(BeefyEngine core)
         {
             Core = core;
         }

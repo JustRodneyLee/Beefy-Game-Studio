@@ -82,12 +82,7 @@
     <Compile Include="BGS.Designer.cs">
       <DependentUpon>BGS.cs</DependentUpon>
     </Compile>
-    <Compile Include="BGS_Project.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="BGS_Render.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="BGS_Project.cs" />
     <Compile Include="CodeBuilder.cs" />
     <Compile Include="Components\AudioComponent.cs">
       <SubType>UserControl</SubType>
@@ -131,10 +126,9 @@
     <Compile Include="Engine\BeefyAssetManager.cs" />
     <Compile Include="Engine\BeefyAudioEngine.cs" />
     <Compile Include="Engine\BeefyCamera.cs" />
-    <Compile Include="Engine\BeefyCore.cs" />
+    <Compile Include="Engine\BeefyEngine.cs" />
     <Compile Include="Engine\BeefyDebugger.cs" />
     <Compile Include="Engine\BeefyECS.cs" />
-    <Compile Include="Engine\BeefyGame.cs" />
     <Compile Include="Engine\BeefyInputEngine.cs" />
     <Compile Include="Engine\BeefyNetworkEngine.cs" />
     <Compile Include="Engine\BeefyObject.cs" />
@@ -155,6 +149,12 @@
       <DependentUpon>Hotkeys.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="ProjectSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ProjectSettings.Designer.cs">
+      <DependentUpon>ProjectSettings.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SearchBar.cs">
       <SubType>Form</SubType>
@@ -188,6 +188,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Hotkeys.resx">
       <DependentUpon>Hotkeys.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProjectSettings.resx">
+      <DependentUpon>ProjectSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

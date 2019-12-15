@@ -108,6 +108,8 @@ namespace BeefyEngine
         public List<BeefyObject> RenderBO { get; }
         public List<BeefyObject> InputBO { get; }
 
+        public BeefyScript Logic { get; }
+
         public BeefyLevel(string lvlName)
         {
             LevelID = lvlName;
@@ -153,7 +155,8 @@ namespace BeefyEngine
         public void Dispose()
         {
             //TODO
-            BOC.Clear();            
+            BOC.Clear();
+            GC.Collect();
         }
     }
 }

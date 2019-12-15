@@ -65,16 +65,19 @@ namespace BeefyEngine
 
     public class BeefyPhysicsEngine : IBeefySystem
     {
-        public BeefyEngineCore Core { get; }
+        public BeefyEngine Core { get; }
 
-        public BeefyPhysicsEngine(BeefyEngineCore core)
+        public BeefyPhysicsEngine(BeefyEngine core)
         {
             Core = core;
         }
 
-        public bool CheckCollision(BeefyObject ba, BeefyObject bb)
+        public static bool CheckCollision(BeefyObject ba, BeefyObject bb)
         {
-            return false;
+            if (ba.HasComponent<BeefyPhysics>() && bb.HasComponent<BeefyPhysics>())
+                return BeefyShape.IsIntersecting(ba.GetComponent<BeefyPhysics>().Collider, bb.GetComponent<BeefyPhysics>().Collider);
+            else
+                return false;
         }
 
         public string Update(BeefyLevel Level)

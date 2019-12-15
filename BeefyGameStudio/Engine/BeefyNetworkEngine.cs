@@ -11,7 +11,7 @@ namespace BeefyEngine
 
     public class BeefyNetworkEngine
     {
-        public BeefyNetworkEngine(BeefyEngineCore Core)
+        public BeefyNetworkEngine(BeefyEngine Core)
         {
             
         }
