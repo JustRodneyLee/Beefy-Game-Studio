@@ -248,6 +248,17 @@ namespace BeefyEngine
         BMouseBtn MiddleMouseButton;
         BMouseBtn RightMouseButton;
 
+        /// <summary>
+        /// Gets or Sets the In-Game Mouse Position
+        /// </summary>
+        public Point MousePosition { get { return CurrentMouseState.Position; } set { Mouse.SetPosition(value.X, value.Y); } }
+
+        /// <summary>
+        /// Checks if any Key is pressed
+        /// </summary>
+        public bool IsAnyKeyDown { get; internal set; }
+        public bool CapsLocked { get; }
+
         public BeefyInputEngine(BeefyEngine core)
         {
             Core = core;
@@ -348,6 +359,7 @@ namespace BeefyEngine
             aKey.KeyCode = targetKey;
             if (CurrentKeyboardState.IsKeyDown(targetKey))
             {
+                IsAnyKeyDown = true;
                 aKey.KeyDown = true;
                 aKey.KeyHeldTime += BeefyKeys.Find(key => key.KeyCode == targetKey).KeyHeldTime + (float)time.ElapsedGameTime.TotalSeconds;
             }
@@ -369,6 +381,7 @@ namespace BeefyEngine
         {
             CurrentKeyboardState = Keyboard.GetState();
             CurrentMouseState = Mouse.GetState();
+            IsAnyKeyDown = false;
             //Keyboard
             foreach (Keys e in Enum.GetValues(typeof(Keys)))
             {

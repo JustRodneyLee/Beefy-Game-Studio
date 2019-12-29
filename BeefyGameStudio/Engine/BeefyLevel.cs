@@ -107,6 +107,7 @@ namespace BeefyEngine
         public List<BeefyObject> AudioBO { get; }
         public List<BeefyObject> RenderBO { get; }
         public List<BeefyObject> InputBO { get; }
+        public List<BeefyObject> UI { get; }
 
         public BeefyScript Logic { get; }
 
@@ -120,6 +121,7 @@ namespace BeefyEngine
             AudioBO = new List<BeefyObject>();
             RenderBO = new List<BeefyObject>();
             InputBO = new List<BeefyObject>();
+            UI = new List<BeefyObject>();
         }
 
         public void Clear()
@@ -129,7 +131,8 @@ namespace BeefyEngine
             PhysicsBO.Clear();
             AudioBO.Clear();
             RenderBO.Clear();
-            InputBO.Clear();            
+            InputBO.Clear();
+            UI.Clear();
         }
 
         public virtual void Load()
@@ -144,6 +147,8 @@ namespace BeefyEngine
                     AudioBO.Add(BO);                
                 if (BO.HasComponent<BeefyRenderer2D>())
                     RenderBO.Add(BO);
+                if (BO.HasComponent<BeefyUI>())
+                    UI.Add(BO);
             }
         }
 
@@ -155,7 +160,7 @@ namespace BeefyEngine
         public void Dispose()
         {
             //TODO
-            BOC.Clear();
+            Clear();
             GC.Collect();
         }
     }

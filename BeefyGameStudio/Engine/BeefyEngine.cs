@@ -11,10 +11,11 @@ namespace BeefyEngine
     {
         Version _Version = new Version(1,0);
 
-        BeefyInputEngine BInput;
-        BeefyPhysicsEngine BPhysics;        
-        BeefyRenderingEngine BRenderer;
-        BeefyAudioEngine BAudio;
+        public BeefyInputEngine BInput { get; internal set; }
+        public BeefyPhysicsEngine BPhysics { get; internal set; }
+        public BeefyRenderingEngine BRenderer { get; internal set; }
+        public BeefyAudioEngine BAudio { get; internal set; }
+        public BeefyUISystem BUI { get; internal set; }
 
         public string GameName { get; set; }
         public int FPS { get; internal set; }
@@ -38,7 +39,9 @@ namespace BeefyEngine
             BRenderer = new BeefyRenderingEngine(this);
             BeefyDebugger.LogInternal("Beefy Rendering Engine Initialization Complete.");
             BAudio = new BeefyAudioEngine(this);
-            BeefyDebugger.LogInternal("Beefy Audio Engine Initializaiton Complete.");
+            BeefyDebugger.LogInternal("Beefy Audio Engine Initialization Complete.");
+            BUI = new BeefyUISystem(this);
+            BeefyDebugger.LogInternal("Beefy UI System Initialization Complete.");
             Levels = new List<BeefyLevel>();
             BeefyDebugger.LogInternal("Beefy Engine Start-Up Complete.");
         }

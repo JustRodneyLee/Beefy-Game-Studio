@@ -7,6 +7,31 @@ using System.Reflection;
 
 namespace BeefyEngine
 {
+    public class BeefyCustomComponent : IBeefyComponent
+    {
+        //TODO
+        public string ComponentID { get { return "CustomComponent"; } }
+
+        public bool Enabled { get; internal set; }
+
+        public BeefyObject Entity { get; set; }
+
+        public object Clone()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Disable()
+        {
+            Enabled = false;
+        }
+
+        public void Enable()
+        {
+            Enabled = true;
+        }
+    }
+
     public class BeefyScript
     {
         IBeefyComponent Component;
@@ -20,12 +45,14 @@ namespace BeefyEngine
         {
             Type thisType = this.GetType();
             MethodInfo info = thisType.GetMethod(actionName);
-            info.Invoke(this, null);
-        }
-
-        public virtual void Run()
-        {
-         
+            try
+            {
+                info.Invoke(this, null);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
         }
     }
 }

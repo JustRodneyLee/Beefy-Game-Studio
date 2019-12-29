@@ -366,6 +366,11 @@ namespace BeefyEngine
             }
         }
 
+        public bool ContainsPoint(Point targetPoint)
+        {
+            return ContainsPoint(targetPoint.ToVector2());
+        }
+
         public bool ContainsPoint(Vector2 targetPoint)
         {
             //This function uses the PnPoly Algorithm

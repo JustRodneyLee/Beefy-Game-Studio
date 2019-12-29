@@ -25,6 +25,35 @@ namespace BeefyGameStudio
         public bool PartialLoading { get; set; }
     }
 
+    /// <summary>
+    /// Modification class for Undo and Redo functions
+    /// </summary>
+    public class Modification
+    {
+        public List<string> targetObjID = new List<string>();
+        public List<string> Tag = new List<string>(); //Parameter to change
+        public List<object> Delta = new List<object>(); //Value of change
+
+        public Modification()
+        {
+
+        }
+
+        public Modification(List<string> objectIDs, List<string> tags, List<object> deltas)
+        {
+            targetObjID = objectIDs;
+            Tag = tags;
+            Delta = deltas;
+        }
+
+        public void Register(string id, string tag, object delta)
+        {
+            targetObjID.Add(id);
+            Tag.Add(tag);
+            Delta.Add(delta);
+        }
+    }
+
     public partial class BGS : Form
     {
         public enum FileType
