@@ -1063,7 +1063,6 @@ namespace BeefyGameStudio
         {
             List<BeefyObject> objects = new List<BeefyObject>();
             BeefyObject ret;
-            int i = 0;
             if (CullingRect.X<=X&&CullingRect.Y>=Y&&(CullingRect.Y-CullingRect.Height<=Y)&& (CullingRect.X + CullingRect.Width >= X))
             {
                 foreach (BeefyObject bo in DrawnObjects)
@@ -1159,7 +1158,7 @@ namespace BeefyGameStudio
             else
             {
                 BeefyLayer bl = new BeefyLayer(Level, id);
-                Level.Layers.Add(bl);
+                Level.AddLayer(bl);
                 SwitchToLayer(bl.LayerID);
                 return true;
             }
@@ -1171,7 +1170,7 @@ namespace BeefyGameStudio
             {
                 SwitchToLayer(Level.Layers.First().LayerID);
                 //Bug fix : Remove objects in layer
-                Level.Layers.Remove(Level.Layers.Find(x => x.LayerID == id));                
+                Level.RemoveLayer(id);                
                 return true;
             }
             else
@@ -1789,14 +1788,14 @@ namespace BeefyGameStudio
             #region Draw Editor HUD
             Editor.spriteBatch.Begin();
             Editor.spriteBatch.DrawString(Editor.Font, "Scale:" + Math.Round(View.Zoom, 1) + "x", new Vector2(0, 0), Color.White);
-            Editor.spriteBatch.DrawString(Editor.Font, "Mouse Pos:" + EditorMousePos.ToString(), new Vector2(0, Editor.FontHeight), Color.White);
-            Editor.spriteBatch.DrawString(Editor.Font, "View Pos:" + View.Position.ToString(), new Vector2(0, Editor.FontHeight * 3), Color.White);
+            Editor.spriteBatch.DrawString(Editor.Font, "Mouse Pos:[" + Math.Round(EditorMousePos.X, 2).ToString() + "," + Math.Round(EditorMousePos.Y, 2).ToString() + "]", new Vector2(0, Editor.FontHeight), Color.White);
+            Editor.spriteBatch.DrawString(Editor.Font, "View Pos:[" + Math.Round(View.Position.X, 2).ToString() + "," + Math.Round(View.Position.Y, 2).ToString() + "]", new Vector2(0, Editor.FontHeight * 2), Color.White);
             //Editor.spriteBatch.DrawString(Editor.Font, "View Width:" + VPWidth.ToString(), new Vector2(0, Editor.FontHeight * 4), Color.White);
-            Editor.spriteBatch.DrawString(Editor.Font, "Editor Pos:" + Editor.Cam.Position.ToString(), new Vector2(0, Editor.FontHeight * 4), Color.White);
-            Editor.spriteBatch.DrawString(Editor.Font, "View Height:" + VPHeight.ToString(), new Vector2(0, Editor.FontHeight * 5), Color.White);
-            Editor.spriteBatch.DrawString(Editor.Font, "Culling Rect:" + CullingRect.ToString(), new Vector2(0, Editor.FontHeight * 6), Color.White);
-            Editor.spriteBatch.DrawString(Editor.Font, "Last Action:" + lastAction.ToString(), new Vector2(0, Editor.FontHeight * 7), Color.White);
-            Editor.spriteBatch.DrawString(Editor.Font, "Layer:" + Level.Layers.Count, new Vector2(0, Editor.FontHeight * 8), Color.White);
+            //Editor.spriteBatch.DrawString(Editor.Font, "Editor Pos:" + Editor.Cam.Position.ToString(), new Vector2(0, Editor.FontHeight * 4), Color.White);
+            //Editor.spriteBatch.DrawString(Editor.Font, "View Height:" + VPHeight.ToString(), new Vector2(0, Editor.FontHeight * 5), Color.White);
+            //Editor.spriteBatch.DrawString(Editor.Font, "Culling Rect:" + CullingRect.ToString(), new Vector2(0, Editor.FontHeight * 6), Color.White);
+            //Editor.spriteBatch.DrawString(Editor.Font, "Last Action:" + lastAction.ToString(), new Vector2(0, Editor.FontHeight * 7), Color.White);
+            //Editor.spriteBatch.DrawString(Editor.Font, "Layer:" + Level.Layers.Count, new Vector2(0, Editor.FontHeight * 8), Color.White);
             Editor.spriteBatch.End();
             #endregion            
         }

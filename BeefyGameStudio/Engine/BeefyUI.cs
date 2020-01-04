@@ -21,12 +21,11 @@ namespace BeefyEngine
     public class BeefyUISystem : IBeefySystem
     {
         public BeefyEngine Core { get; }
-        private BeefyInputEngine Input;
+        public BeefyObject FocusedObject { get; set; }
 
         public BeefyUISystem(BeefyEngine core)
         {
             Core = Core;
-            Input = Core.BInput;
         }
 
         public void Dispose()
@@ -38,34 +37,44 @@ namespace BeefyEngine
         {
             foreach (BeefyObject bo in Level.UI)
             {
+                BeefyUI ui = bo.GetComponent<BeefyUI>();
                 //TODO
-                if (bo.GetComponent<BeefyUI>().Collider.ContainsPoint(Input.MousePosition))
+                if (ui.Collider.ContainsPoint(Input.MousePosition))
                 {
-                    bo.GetComponent<BeefyUI>().MouseInControl = true;
+                    if (ui.MouseInControl)
+                        ui.Events.Invoke("MouseEnter");
+                    ui.MouseInControl = true;
                     if (Input.IsDown(MouseButton.Right))
                     {
-                        bo.GetComponent<BeefyUI>().Events.Invoke("MouseRightDown");
+                        ui.Events.Invoke("MouseRightDown");
                     }
                     if (Input.IsDown(MouseButton.Left))
                     {
-                        bo.GetComponent<BeefyUI>().Events.Invoke("MouseLeftDown");
+                        ui.Events.Invoke("MouseLeftDown");
+                        FocusedObject = bo;
                     }
                     if (Input.IsUp(MouseButton.Right))
                     {
-                        bo.GetComponent<BeefyUI>().Events.Invoke("MouseRightClicked");
+                        ui.Events.Invoke("MouseRightClicked");
                     }
                     if (Input.IsUp(MouseButton.Left))
                     {
-                        bo.GetComponent<BeefyUI>().Events.Invoke("MouseLeftClicked");
+                        ui.Events.Invoke("MouseLeftClicked");
                     }            
                     if (Input.IsAnyKeyDown)
+                    {                        
+                        ui.Events.Invoke("KeyPress", Input.PressedKeys);
+                    }
+                    if (Input.MouseScroll != 0)
                     {
-                        bo.GetComponent<BeefyUI>().Events.Invoke("KeyboardInput");
+                        ui.Events.Invoke("MouseScroll", Input.MouseScroll);
                     }
                 }
                 else
                 {
-                    bo.GetComponent<BeefyUI>().MouseInControl = false;
+                    if (ui.MouseInControl)
+                        ui.Events.Invoke("MouseLeave");
+                    ui.MouseInControl = false;
                 }                
             }
             return null;
@@ -113,6 +122,103 @@ namespace BeefyEngine
         }
     }
 
+    public class UIEvent : BeefyScript
+    {
+        internal BeefyUI UI;
+
+        public UIEvent(object obj) : base(obj)
+        {
+            UI = (BeefyUI)Parent;
+        }
+
+        public virtual void MouseEnter()
+        {
+
+        }
+
+        public virtual void MouseLeave()
+        {
+
+        }
+
+        public virtual void MouseRightDown()
+        {
+
+        }
+
+        public virtual void MouseLeftDown()
+        {
+
+        }
+
+        public virtual void MouseRightClicked()
+        {
+
+        }
+
+        public virtual void MouseLeftClicked()
+        {
+
+        }
+
+        public virtual void MouseScroll(int scrollValue)
+        {
+
+        }
+
+        public virtual void KeyPress(TextInputEventArgs e)
+        {
+
+        }
+
+        public virtual void KeyPress(BKey[] keys)
+        {
+
+        }        
+    }
+
+    public class TextBoxEvent : UIEvent
+    {
+        /// <summary>
+        /// Position of the "I" cursor in the textbox
+        /// </summary>
+        public int CursorPos { get; set; }
+        public bool Caps { get { if (Input.IsDown(Keys.LeftShift) || Input.IsDown(Keys.RightShift) || Input.CapsLocked) return true; else return false; } }
+
+        public TextBoxEvent(object obj) : base(obj)
+        {
+            CursorPos = 0;
+        }
+
+        public override void MouseLeftDown()
+        {
+            //TODO : Move cursor
+            base.MouseLeftDown();
+        }
+
+        public override void KeyPress(BKey[] keys)
+        {            
+            switch (keys[0].KeyCode)
+            {
+                case Keys.Back:
+                    UI.Text = UI.Text.Substring(0, CursorPos - 1) + UI.Text.Substring(CursorPos, UI.Text.Length - CursorPos);
+                    break;
+                case Keys.Delete:
+                    UI.Text = UI.Text.Substring(0, CursorPos) + UI.Text.Substring(CursorPos + 1, UI.Text.Length - CursorPos);
+                    break;
+                case Keys.Right:
+                    CursorPos += 1;
+                    break;
+                case Keys.Left:
+                    CursorPos -= 1;
+                    break;
+                default:
+                    UI.Text = UI.Text.Substring(0, CursorPos) + Input.LastCharacterInput + UI.Text.Substring(CursorPos, UI.Text.Length - CursorPos);
+                    break;
+            }                
+        }
+    }
+
     public class BeefyUIObject : BeefyObject
     {
         public BeefyShape Control { get; set; }            
@@ -122,7 +228,7 @@ namespace BeefyEngine
             AddComponent(new BeefyUI(this));
             AddComponent(new BeefyRenderer2D(this));
             Control = GetComponent<BeefyUI>().Collider;
-        }
+        }   
     }
 
     public class BeefyLabel : BeefyUIObject
@@ -135,40 +241,10 @@ namespace BeefyEngine
 
     public class BeefyButton : BeefyUIObject
     {
-
         public BeefyButton() : base()
         {
             GetComponent<BeefyUI>().Type = UIType.Button;
-        }
-
-        public class ButtonEvent : BeefyScript
-        {
-            public ButtonEvent(IBeefyComponent ibc) : base(ibc)
-            {
-                
-            }
-
-            public virtual void MouseRightDown()
-            {
-
-            }
-
-            public virtual void MouseLeftDown()
-            {
-
-            }
-
-            public virtual void MouseRightClicked()
-            {
-
-            }
-
-            public virtual void MouseLeftClicked()
-            {
-
-            }
-        }
-
+        }       
     }
 
     public class BeefyTextBox: BeefyUIObject
@@ -176,6 +252,7 @@ namespace BeefyEngine
         public BeefyTextBox() : base()
         {            
             GetComponent<BeefyUI>().Type = UIType.TextBox;
+            GetComponent<BeefyUI>().Events = new TextBoxEvent(GetComponent<BeefyUI>());
         }
     }
 }

@@ -44,20 +44,6 @@ namespace BeefyEngine
             Action = action;
             HoldTime = 0;
         }
-        /*
-        public T CodeToInput<T>(string InputCode)
-        {
-            string[] code = InputCode.Split('_');
-            switch (code[1]) //Second Branch of Code
-            {
-                case "K":
-                    return Enum.Parse(typeof(Keys), code[2]);
-                case "M":
-                    return Enum.Parse(typeof(MouseButton),code[2]);
-            }
-            return null;
-        }
-        */
     }
 
     public enum InputCondition
@@ -66,6 +52,7 @@ namespace BeefyEngine
         Up,
         Down,
         Hold,
+        Scroll,
     }
 
     public enum InputDevice
@@ -76,7 +63,6 @@ namespace BeefyEngine
 
     public interface IBeefyInput
     {
-        //string InputCode { get; }
         InputDevice InputDevice { get; }
     }
 
@@ -108,7 +94,7 @@ namespace BeefyEngine
             //InputCode = "BIE_K_" + (int)key;            
         }
         public InputDevice InputDevice { get; }
-        public Keys KeyCode { get; internal set; }        
+        public Keys KeyCode { get; internal set; }
         //public string InputCode { get; }
         public float KeyHeldTime { get; internal set; }
         public bool KeyDown { get; internal set; } //True when Key is pressed
@@ -163,7 +149,7 @@ namespace BeefyEngine
 
         public BeefyInputController(BeefyObject parent)
         {
-            Entity = parent;
+            Entity = parent;            
         }
 
         /// <summary>
@@ -234,38 +220,65 @@ namespace BeefyEngine
         }
     }
 
-    public class BeefyInputEngine : IBeefySystem
+    public static class Input
     {
-        public BeefyEngine Core { get; }
-        KeyboardState CurrentKeyboardState;
-        KeyboardState LastKeyboardState;        
-        MouseState CurrentMouseState;
-        MouseState LastMouseState;
-        List<BKey> BeefyKeys;
-        float DeltaX;
-        float DeltaY;
-        BMouseBtn LeftMouseButton;
-        BMouseBtn MiddleMouseButton;
-        BMouseBtn RightMouseButton;
+        static KeyboardState CurrentKeyboardState;
+        static KeyboardState LastKeyboardState;
+        static MouseState CurrentMouseState;
+        static MouseState LastMouseState;
+        static List<BKey> BeefyKeys;        
+        static BMouseBtn LeftMouseButton;
+        static BMouseBtn MiddleMouseButton;
+        static BMouseBtn RightMouseButton;
+
+        /// <summary>
+        /// Movement of Mouse
+        /// </summary>
+        public static float DeltaX;
+        public static float DeltaY;
 
         /// <summary>
         /// Gets or Sets the In-Game Mouse Position
         /// </summary>
-        public Point MousePosition { get { return CurrentMouseState.Position; } set { Mouse.SetPosition(value.X, value.Y); } }
+        public static Point MousePosition { get { return CurrentMouseState.Position; } set { Mouse.SetPosition(value.X, value.Y); } }
+
+        /// <summary>
+        /// Get the Mouse Scroll value of the last frame
+        /// </summary>
+        public static int MouseScroll { get; internal set; }
 
         /// <summary>
         /// Checks if any Key is pressed
         /// </summary>
-        public bool IsAnyKeyDown { get; internal set; }
-        public bool CapsLocked { get; }
+        public static bool IsAnyKeyDown { get; internal set; }
 
-        public BeefyInputEngine(BeefyEngine core)
+        public static Keys[] PressedKeys { get { return CurrentKeyboardState.GetPressedKeys(); } }
+
+        public static char LastCharacterInput { get; internal set; }
+
+        public static bool CapsLocked { get; }
+
+        public static void Initialize(BeefyEngine Core)
         {
-            Core = core;
-            BeefyKeys = new List<BKey>();
+
             LeftMouseButton = new BMouseBtn(MouseButton.Left);
             MiddleMouseButton = new BMouseBtn(MouseButton.Middle);
             RightMouseButton = new BMouseBtn(MouseButton.Right);
+            //Initialize Key Array
+            BeefyKeys = new List<BKey>();
+            foreach (Keys e in Enum.GetValues(typeof(Keys)))
+            {
+                if (!BeefyKeys.Exists(key => key.KeyCode == e))
+                {
+                    BeefyKeys.Add(UpdateKey(e, Core.GameTickTime));
+                }
+            }
+            Core.Window.TextInput += TextInputEvent;
+        }
+
+        public static void TextInputEvent(object sender, TextInputEventArgs e)
+        {
+            LastCharacterInput = e.Character;
         }
 
         /// <summary>
@@ -273,13 +286,13 @@ namespace BeefyEngine
         /// </summary>
         /// <param name="targetKey"></param>
         /// <returns></returns>
-        public bool IsDown(Keys targetKey)
+        public static bool IsDown(Keys targetKey)
         {
             if (BeefyKeys.Find(key => key.KeyCode == targetKey).KeyDown)
             {
                 return true;
             }
-            else { return false; }            
+            else { return false; }
         }
 
         /// <summary>
@@ -287,7 +300,7 @@ namespace BeefyEngine
         /// </summary>
         /// <param name="targetBtn"></param>
         /// <returns></returns>
-        public bool IsDown(MouseButton targetBtn)
+        public static bool IsDown(MouseButton targetBtn)
         {
             switch (targetBtn)
             {
@@ -306,7 +319,7 @@ namespace BeefyEngine
         /// </summary>
         /// <param name="targetKey"></param>
         /// <returns></returns>
-        public bool IsUp(Keys targetKey)
+        public static bool IsUp(Keys targetKey)
         {
             if (BeefyKeys.Find(key => key.KeyCode == targetKey).KeyUp)
             {
@@ -320,7 +333,7 @@ namespace BeefyEngine
         /// </summary>
         /// <param name="targetBtn"></param>
         /// <returns></returns>
-        public bool IsUp(MouseButton targetBtn)
+        public static bool IsUp(MouseButton targetBtn)
         {
             switch (targetBtn)
             {
@@ -334,12 +347,12 @@ namespace BeefyEngine
             return false;
         }
 
-        public float GetHeldTime(Keys targetKey)
+        public static float GetHeldTime(Keys targetKey)
         {
             return BeefyKeys.Find(key => key.KeyCode == targetKey).KeyHeldTime;
         }
 
-        public float GetHeldTime(MouseButton targetButton)
+        public static float GetHeldTime(MouseButton targetButton)
         {
             switch (targetButton)
             {
@@ -353,7 +366,7 @@ namespace BeefyEngine
             return 0f;
         }
 
-        protected BKey UpdateKey(Keys targetKey, GameTime time)
+        internal static BKey UpdateKey(Keys targetKey, float time)
         {
             BKey aKey = new BKey(targetKey);
             aKey.KeyCode = targetKey;
@@ -361,7 +374,7 @@ namespace BeefyEngine
             {
                 IsAnyKeyDown = true;
                 aKey.KeyDown = true;
-                aKey.KeyHeldTime += BeefyKeys.Find(key => key.KeyCode == targetKey).KeyHeldTime + (float)time.ElapsedGameTime.TotalSeconds;
+                aKey.KeyHeldTime += BeefyKeys.Find(key => key.KeyCode == targetKey).KeyHeldTime + time; // + (float)time.ElapsedGameTime.TotalSeconds;
             }
             else
             {
@@ -377,7 +390,7 @@ namespace BeefyEngine
         /// <summary>
         /// This method gets Keyboard and Mouse Inputs
         /// </summary>
-        public void InternalUpdate(GameTime time)
+        public static void InternalUpdate(float time) //(GameTime time)
         {
             CurrentKeyboardState = Keyboard.GetState();
             CurrentMouseState = Mouse.GetState();
@@ -392,14 +405,14 @@ namespace BeefyEngine
                 else
                 {
                     BeefyKeys[BeefyKeys.FindIndex(key => key.KeyCode == e)] = UpdateKey(e, time);
-                }                
+                }
             }
             //Mouse
             DeltaX = CurrentMouseState.X - LastMouseState.X;
             DeltaY = CurrentMouseState.Y - LastMouseState.Y;
             if (CurrentMouseState.LeftButton == ButtonState.Pressed)
                 LeftMouseButton.BtnDown = true;
-            if (CurrentMouseState.LeftButton == ButtonState.Released&&LastMouseState.LeftButton == ButtonState.Pressed)
+            if (CurrentMouseState.LeftButton == ButtonState.Released && LastMouseState.LeftButton == ButtonState.Pressed)
             {
                 LeftMouseButton.BtnUp = true;
             }
@@ -417,24 +430,43 @@ namespace BeefyEngine
                 MiddleMouseButton.BtnUp = false;
             }
 
-            if (CurrentMouseState.RightButton == ButtonState.Released&&LastMouseState.RightButton == ButtonState.Released)
+            if (CurrentMouseState.RightButton == ButtonState.Released && LastMouseState.RightButton == ButtonState.Released)
             {
                 RightMouseButton.BtnUp = true;
             }
             else
             {
                 RightMouseButton.BtnUp = false;
-            }       
+            }
+
+            MouseScroll = CurrentMouseState.ScrollWheelValue - LastMouseState.ScrollWheelValue; //Subtracting the cumalative ScrollWheelValues yields the mouse scroll change for the last frame
+
             LastKeyboardState = CurrentKeyboardState;
-            LastMouseState = CurrentMouseState;            
+            LastMouseState = CurrentMouseState;
+        }
+
+        public static void Dispose()
+        {
+            BeefyKeys.Clear();
+        }
+    }
+
+    public class BeefyInputEngine : IBeefySystem
+    {
+        public BeefyEngine Core { get; set; }
+
+        public BeefyInputEngine(BeefyEngine core)
+        {
+            Core = core;            
+            Input.Initialize(Core);
         }
 
         public string Update(BeefyLevel Level)
-        {            
-            foreach(BeefyObject BO in Level.InputBO)
+        {
+            foreach (BeefyObject BO in Level.InputBO)
             {
                 BeefyInputController BIC = BO.GetComponent<BeefyInputController>();
-                foreach(BeefyInputBinding BIB in BIC.Bindings)
+                foreach (BeefyInputBinding BIB in BIC.Bindings)
                 {
                     switch (BIB.Input.InputDevice)
                     {
@@ -442,19 +474,19 @@ namespace BeefyEngine
                             switch (BIB.Condition)
                             {
                                 case InputCondition.Down:
-                                    if (IsDown(((BKey)BIB.Input).KeyCode))
+                                    if (Input.IsDown(((BKey)BIB.Input).KeyCode))
                                     {
                                         BIC.ControllerScript.Invoke(BIB.Action);
                                     }
                                     break;
                                 case InputCondition.Up:
-                                    if (IsUp(((BKey)BIB.Input).KeyCode))
+                                    if (Input.IsUp(((BKey)BIB.Input).KeyCode))
                                     {
                                         BIC.ControllerScript.Invoke(BIB.Action);
                                     }
                                     break;
                                 case InputCondition.Hold:
-                                    if (GetHeldTime(((BKey)BIB.Input).KeyCode)==BIB.HoldTime)
+                                    if (Input.GetHeldTime(((BKey)BIB.Input).KeyCode) == BIB.HoldTime)
                                     {
                                         BIC.ControllerScript.Invoke(BIB.Action);
                                     }
@@ -465,19 +497,19 @@ namespace BeefyEngine
                             switch (BIB.Condition)
                             {
                                 case InputCondition.Down:
-                                    if (IsDown(((BMouseBtn)BIB.Input).MouseButton))
+                                    if (Input.IsDown(((BMouseBtn)BIB.Input).MouseButton))
                                     {
                                         BIC.ControllerScript.Invoke(BIB.Action);
                                     }
                                     break;
                                 case InputCondition.Up:
-                                    if (IsUp(((BMouseBtn)BIB.Input).MouseButton))
+                                    if (Input.IsUp(((BMouseBtn)BIB.Input).MouseButton))
                                     {
                                         BIC.ControllerScript.Invoke(BIB.Action);
                                     }
                                     break;
                                 case InputCondition.Hold:
-                                    if (GetHeldTime(((BMouseBtn)BIB.Input).MouseButton) == BIB.HoldTime)
+                                    if (Input.GetHeldTime(((BMouseBtn)BIB.Input).MouseButton) == BIB.HoldTime)
                                     {
                                         BIC.ControllerScript.Invoke(BIB.Action);
                                     }
@@ -486,18 +518,21 @@ namespace BeefyEngine
                                     switch (((BMouseMove)BIB.Input).InputAxis)
                                     {
                                         case MouseAxis.X:
-                                            if (DeltaX != 0)
+                                            if (Input.DeltaX != 0)
                                                 BIC.ControllerScript.Invoke(BIB.Action);
                                             break;
                                         case MouseAxis.Y:
-                                            if (DeltaY != 0)
+                                            if (Input.DeltaY != 0)
                                                 BIC.ControllerScript.Invoke(BIB.Action);
                                             break;
                                     }
                                     break;
+                                case InputCondition.Scroll:
+                                    BIC.ControllerScript.Invoke(BIB.Action, Input.MouseScroll);
+                                    break;
                             }
                             break;
-                    }                    
+                    }
                 }
             }
             return null;
@@ -505,7 +540,7 @@ namespace BeefyEngine
 
         public void Dispose()
         {
-            BeefyKeys.Clear();
+
         }
     }
 }

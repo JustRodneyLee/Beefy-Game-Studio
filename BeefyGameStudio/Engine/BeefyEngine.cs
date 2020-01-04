@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace BeefyEngine
@@ -19,9 +20,11 @@ namespace BeefyEngine
 
         public string GameName { get; set; }
         public int FPS { get; internal set; }
+        public float GameTickTime { get; internal set; }// { return (float)TargetElapsedTime.TotalSeconds; } }
         float secondsPerFrame;
         int framesPerSecond;
-        public List<BeefyLevel> Levels { get; set; }        
+        public List<BeefyLevel> Levels { get; set; } 
+        public BeefyLevel CurrentLevel { get; set; }
 
         public BeefyEngine()
         {        
@@ -31,7 +34,7 @@ namespace BeefyEngine
         protected override void Initialize()
         {
             base.Initialize();
-            BeefyDebugger.LogInternal("Beefy Engine Initializing...");            
+            BeefyDebugger.LogInternal("Beefy Engine Initializing...");   
             BInput = new BeefyInputEngine(this);
             BeefyDebugger.LogInternal("Beefy Input Engine Initialization Complete.");
             BPhysics = new BeefyPhysicsEngine(this);
@@ -49,20 +52,24 @@ namespace BeefyEngine
         protected override void LoadContent() //Load all or load portion of game data?
         {
             //TODO
-            base.LoadContent();
+            
+            base.LoadContent();            
         }
 
         protected override void Update(GameTime gameTime)
         {
-            BInput.InternalUpdate(gameTime);
+            GameTickTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            Input.InternalUpdate(GameTickTime); //(float)gameTime.ElapsedGameTime.TotalSeconds);
+            if (Levels.Count != 0)
+                BInput.Update(Levels.LastOrDefault());
+                BUI.Update(Levels.LastOrDefault());
             foreach (BeefyLevel BL in Levels)
             {
                 BPhysics.Update(BL);
                 BAudio.Update(BL);
             }
             base.Update(gameTime);
-            BeefyDebugger.Update();
-            
+            BeefyDebugger.Update();            
         }
 
         protected override void Draw(GameTime gameTime)

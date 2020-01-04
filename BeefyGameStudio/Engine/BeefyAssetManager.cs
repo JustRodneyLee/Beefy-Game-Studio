@@ -29,7 +29,7 @@ namespace BeefyEngine
         }
 
         public void Dispose()
-        {
+        {   
             content.Unload();
             content.Dispose();   
         }

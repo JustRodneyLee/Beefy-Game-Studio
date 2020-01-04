@@ -38,6 +38,7 @@
     <Reference Include="Lidgren.Network, Version=3.7.1.189, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>C:\Program Files (x86)\MonoGame\v3.0\Assemblies\Windows\Lidgren.Network.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Build, Version=15.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="MonoGame.Forms.DX, Version=2.3.8.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MonoGame.Forms.DX.2.3.8\lib\net451\MonoGame.Forms.DX.dll</HintPath>
     </Reference>
@@ -85,7 +86,6 @@
       <DependentUpon>BGS.cs</DependentUpon>
     </Compile>
     <Compile Include="BGS_Project.cs" />
-    <Compile Include="CodeBuilder.cs" />
     <Compile Include="Components\AudioComponent.cs">
       <SubType>UserControl</SubType>
     </Compile>

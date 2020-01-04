@@ -124,6 +124,21 @@ namespace BeefyEngine
             UI = new List<BeefyObject>();
         }
 
+        public void AddLayer(BeefyLayer layer)
+        {
+            Layers.Add(layer);
+        }
+
+        public void RemoveLayer(string id)
+        {
+            Layers.RemoveAll(x => x.LayerID == id);
+        }
+
+        public void RemoveLayer(BeefyLayer layer)
+        {
+            Layers.Remove(layer);
+        }
+
         public void Clear()
         {
             Layers.Clear();

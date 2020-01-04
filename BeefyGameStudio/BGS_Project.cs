@@ -10,19 +10,52 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Build;
+using Microsoft.Build.Construction;
 using BeefyEngine;
 
 namespace BeefyGameStudio
 {
-    public class BeefyProject
+    static class Extensions
+    {
+        public static IList<T> Clone<T>(this IList<T> listToClone) where T : ICloneable
+        {
+            return listToClone.Select(item => (T)item.Clone()).ToList();
+        }
+    }
+
+    public class BeefyProject : ICloneable, IDisposable
     {        
         /// Basic Info     
         public string ProjectName { get; set; }
         public List<string> ProjectDevelopers { get; set; }
         public Version ProjectVersion { get; set; }
-
+        public Image ProjectLogo { get; set; }
         ///Game Settings
         public bool PartialLoading { get; set; }
+
+        public BeefyProject()
+        {
+            ProjectDevelopers = new List<string>();
+            ProjectLogo = Properties.Resources.BGS;
+        }
+
+        public object Clone()
+        {
+            BeefyProject project = new BeefyProject();
+            project.ProjectName = ProjectName;
+            
+            project.ProjectVersion = ProjectVersion;
+            project.ProjectLogo = ProjectLogo;
+            project.PartialLoading = PartialLoading;
+            return project;
+        }
+
+        public void Dispose()
+        {
+            ProjectDevelopers.Clear();
+            ProjectLogo.Dispose();
+        }
     }
 
     /// <summary>
@@ -175,6 +208,13 @@ namespace BeefyGameStudio
                     MessageBox.Show("The Asset " + name + " is already Imported!", "Beefy Game Studio - Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             return true;
+        }
+
+        public void NewProject()
+        {
+            //SolutionFile solution;
+            //Use Microsoft.Build.Construction to create a new project file
+            //TODO
         }
 
         public bool SaveLevel(string path)

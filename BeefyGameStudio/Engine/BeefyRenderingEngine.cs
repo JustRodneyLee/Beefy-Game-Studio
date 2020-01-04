@@ -11,23 +11,25 @@ namespace BeefyEngine
     /// <summary>
     /// Sprites and Textures Rendering
     /// </summary>
-    /// 
-
-    public struct BeefyAnimation
+    public class BeefyAnimation
     {
-        Texture2D TextureData { get; set; }
-        List<Rectangle> SourceFrames { get; set; }
-        int FrameRate { get; set; }
-        int FrameCount { get; set; }
-        int Frame { get; set; }
+        public string AnimationName { get; set; }
+        public Texture2D TextureData { get; set; }
+        public List<Rectangle> SourceFrames { get; set; }
+        public bool Loop { get; set; }
+        public int FrameRate { get; set; }
+        public int FramesToPlay { get; set; }
+        public int Frame { get; set; }
 
-        public BeefyAnimation(Texture2D ss, List<Rectangle> sf, int fr, int fc, int f = 0)
+        public BeefyAnimation(string name, Texture2D ss, List<Rectangle> sf, int fr, int fc, bool lp = true, int f = 0)
         {
+            AnimationName = name;
             TextureData = ss;
             SourceFrames = sf;
             FrameRate = fr;
-            FrameCount = fc;
+            FramesToPlay = fc;
             Frame = f;
+            Loop = lp;
         }
     }
 
@@ -41,11 +43,12 @@ namespace BeefyEngine
         public float Rotation { get { return ConvertDegToRad(Entity.GetComponent<BeefyTransform>().Rotation); } }
         public Rectangle SourceRectangle { get; set; }
         public SpriteEffects SpriteEffects { get { return CheckFX(); } }
-        public Vector2 Scaling { get { return AbsScaling(); } }
+        public Vector2 Scaling { get { return AbsoluteScaling(); } }
         private Color intTint; //Internal tint
         public Color Tint { get { return intTint * Alpha; } set { intTint = value; } }
         public float Alpha { get; set; }
         public Vector2 Origin { get; set; }
+        public bool Animated { get { return Entity.HasComponent<BeefyAnimator2D>(); } }
 
         public BeefyRenderer2D(BeefyObject parent)
         {
@@ -99,7 +102,7 @@ namespace BeefyEngine
             }
         }
 
-        private Vector2 AbsScaling()
+        private Vector2 AbsoluteScaling()
         {
             Vector2 s = Entity.GetComponent<BeefyTransform>().Scale;
             if (s.X < 0 && s.Y < 0)
@@ -173,7 +176,9 @@ namespace BeefyEngine
         public string ComponentID { get { return "Animator2D"; } }
         public bool Enabled { get; private set; }        
         public List<BeefyAnimation> Animations { get; set; }
+        public BeefyAnimation CurrentAnimation { get; set; }
         public BeefyObject Entity { get; set; }
+        public BeefyRenderer2D Renderer { get { return Entity.GetComponent<BeefyRenderer2D>(); } }
         public float Timer { get; internal set; }
 
         public BeefyAnimator2D(BeefyObject parent)
@@ -191,19 +196,60 @@ namespace BeefyEngine
             Enabled = false;
         }
 
-        public void Animate(BeefyAnimation animation)
+        public void Animate(string animName, int startFrame = 0, int framesToPlay = 128)
         {
-            
+            CurrentAnimation = Animations.Find(x => x.AnimationName==animName);
+            CurrentAnimation.FramesToPlay = framesToPlay;
+            if (CurrentAnimation.FramesToPlay > 0)
+                if (CurrentAnimation.FramesToPlay > CurrentAnimation.SourceFrames.Count)
+                    CurrentAnimation.FramesToPlay = CurrentAnimation.SourceFrames.Count - startFrame + 1;
+            else if (CurrentAnimation.FramesToPlay < 0)
+                if (CurrentAnimation.FramesToPlay > CurrentAnimation.SourceFrames.Count)
+                    CurrentAnimation.FramesToPlay = - CurrentAnimation.SourceFrames.Count - startFrame - 1;
+            if (Renderer.Texture != CurrentAnimation.TextureData)
+                Renderer.SetTexture(CurrentAnimation.TextureData);
+            Renderer.SourceRectangle = CurrentAnimation.SourceFrames[startFrame];
         }
 
-        public void AddAnimation()
+        public void AddAnimation(BeefyAnimation animation)
         {
+            Animations.Add(animation);
+        }
 
+        public void Update(float gameTick)
+        {
+            if (Timer > (1 / CurrentAnimation.FrameRate))
+            {
+                if (CurrentAnimation.FramesToPlay > 0)
+                {
+                    CurrentAnimation.Frame++;
+                    if (CurrentAnimation.Frame > CurrentAnimation.FramesToPlay)
+                        if (CurrentAnimation.Loop)
+                            CurrentAnimation.Frame = 0;
+                        else
+                            CurrentAnimation = null;
+                }                    
+                else if (CurrentAnimation.FramesToPlay < 0)
+                {
+                    CurrentAnimation.Frame--;
+                    if (CurrentAnimation.Frame < CurrentAnimation.FramesToPlay)
+                        if (CurrentAnimation.Loop)
+                            CurrentAnimation.Frame = 0;
+                        else
+                            CurrentAnimation = null;
+                }
+                if (CurrentAnimation != null)
+                {
+                    Renderer.SourceRectangle = CurrentAnimation.SourceFrames[CurrentAnimation.Frame];
+                }
+            }
+            Timer += gameTick;
         }
 
         public object Clone()
         {
-            BeefyAnimator2D ba2d = new BeefyAnimator2D(Entity);
+            BeefyAnimator2D ba2d = new BeefyAnimator2D(Entity);            
+            //TODO
             return ba2d;
         }
     }
@@ -233,6 +279,8 @@ namespace BeefyEngine
                     renderer.Draw(BR2D.Texture, BO.GetComponent<BeefyTransform>().Coordinates, BR2D.SourceRectangle, BR2D.Tint * BL.LayerAlpha, BO.GetComponent<BeefyTransform>().Rotation, BR2D.Origin, BO.GetComponent<BeefyTransform>().Scale, SpriteEffects.None, BO.GetComponent<BeefyTransform>().Depth);
                     //TODO : Lighting and Normal Maps
                     renderer.End();
+                    if (BR2D.Animated)
+                        BO.GetComponent<BeefyAnimator2D>().Update(Core.GameTickTime);
                 }
             }
             return null;

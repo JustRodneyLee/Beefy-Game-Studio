@@ -626,6 +626,7 @@ namespace BeefyGameStudio
 
         private void BGS_FormClosed(object sender, FormClosedEventArgs e)
         {
+            Dispose();
             Application.Exit();
         }
 
