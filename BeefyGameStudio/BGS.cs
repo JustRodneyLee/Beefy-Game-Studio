@@ -360,12 +360,12 @@ namespace BeefyGameStudio
 
         private void AssetLibrary_DragEnter(object sender, DragEventArgs e)
         {
-            
+            //TODO
         }
 
         private void AssetLibrary_DragLeave(object sender, EventArgs e)
         {
-            
+            //TODO
         }
 
         private void MainViewport_DragEnter(object sender, DragEventArgs e)
@@ -632,7 +632,7 @@ namespace BeefyGameStudio
 
         private void InspectorVSHierarchy_Panel2_Resize(object sender, EventArgs e)
         {
-//            MainViewport.Inspect(MainViewport.InspectedObject);
+            //MainViewport.Inspect(MainViewport.InspectedObject);
         }
 
         private void editingToolStripMenuItem_Click(object sender, EventArgs e)

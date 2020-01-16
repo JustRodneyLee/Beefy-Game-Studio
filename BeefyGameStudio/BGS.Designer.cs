@@ -754,45 +754,45 @@
             // newProjToolStripMenuItem
             // 
             this.newProjToolStripMenuItem.Name = "newProjToolStripMenuItem";
-            this.newProjToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.newProjToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.newProjToolStripMenuItem.Text = "New";
             this.newProjToolStripMenuItem.Click += new System.EventHandler(this.newProjToolStripMenuItem_Click);
             // 
             // openProjToolStripMenuItem
             // 
             this.openProjToolStripMenuItem.Name = "openProjToolStripMenuItem";
-            this.openProjToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.openProjToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openProjToolStripMenuItem.Text = "Open";
             this.openProjToolStripMenuItem.Click += new System.EventHandler(this.openProjToolStripMenuItem_Click);
             // 
             // saveProjToolStripMenuItem
             // 
             this.saveProjToolStripMenuItem.Name = "saveProjToolStripMenuItem";
-            this.saveProjToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.saveProjToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveProjToolStripMenuItem.Text = "Save";
             this.saveProjToolStripMenuItem.Click += new System.EventHandler(this.saveProjToolStripMenuItem_Click);
             // 
             // ProjectSeparator
             // 
             this.ProjectSeparator.Name = "ProjectSeparator";
-            this.ProjectSeparator.Size = new System.Drawing.Size(113, 6);
+            this.ProjectSeparator.Size = new System.Drawing.Size(177, 6);
             // 
             // projSettingsToolStripMenuItem
             // 
             this.projSettingsToolStripMenuItem.Name = "projSettingsToolStripMenuItem";
-            this.projSettingsToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.projSettingsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.projSettingsToolStripMenuItem.Text = "Settings";
             this.projSettingsToolStripMenuItem.Click += new System.EventHandler(this.projSettingsToolStripMenuItem_Click);
             // 
             // ProjectSeperator2
             // 
             this.ProjectSeperator2.Name = "ProjectSeperator2";
-            this.ProjectSeperator2.Size = new System.Drawing.Size(113, 6);
+            this.ProjectSeperator2.Size = new System.Drawing.Size(177, 6);
             // 
             // closeToolStripMenuItem
             // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.closeToolStripMenuItem.Text = "Close";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.CloseToolStripMenuItem_Click);
             // 

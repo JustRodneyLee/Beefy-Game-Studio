@@ -63,6 +63,11 @@ namespace BeefyEngine
         public bool IsAbstract { get; internal set; } //Determines if this Object is tangible
         public readonly List<IBeefyComponent> Components;
 
+        private BeefyObject()
+        {
+            //Parameterless constructor for XML serialization
+        }
+
         public BeefyObject(bool isAbstract = false)
         {
             Components = new List<IBeefyComponent>();

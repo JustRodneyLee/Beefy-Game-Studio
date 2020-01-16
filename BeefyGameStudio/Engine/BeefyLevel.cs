@@ -16,6 +16,11 @@ namespace BeefyEngine
         public List<BeefyObject> BOC { get; set; }
         public BeefyLevel ParentLevel { get; set; }
 
+        private BeefyLayer()
+        {
+            //Parameterless constructor for XML serialization
+        }
+
         public BeefyLayer(BeefyLevel bl, string id)
         {
             ParentLevel = bl;
@@ -110,6 +115,11 @@ namespace BeefyEngine
         public List<BeefyObject> UI { get; }
 
         public BeefyScript Logic { get; }
+
+        private BeefyLevel()
+        {
+            //Parameterless constructor for XML serialization
+        }
 
         public BeefyLevel(string lvlName)
         {

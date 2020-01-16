@@ -50,6 +50,11 @@ namespace BeefyEngine
         public int Rotation { get; set; }
         public int LastRotation { get; set; }
 
+        private BeefyTransform()
+        {
+            //Parameterless constructor for XML serialization
+        }
+
         public BeefyTransform(BeefyObject parent)
         {
             Entity = parent;
@@ -87,6 +92,11 @@ namespace BeefyEngine
         public string ComponentID => throw new NotImplementedException();
         public bool Enabled { get; private set; }
         public BeefyObject Entity { get; set; }
+
+        private BeefyCustomProperty()
+        {
+            //Parameterless constructor for XML serialization
+        }
 
         public BeefyCustomProperty(BeefyObject parent)
         {

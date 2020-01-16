@@ -3,6 +3,8 @@ using System.IO;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml;
+using System.Xml.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
@@ -1183,7 +1185,7 @@ namespace BeefyGameStudio
         public bool LoadLevel(string path)
         {
             BeefyLevel lvl;
-            using (StreamReader file = new StreamReader(path + ".bgl"))
+            using (StreamReader file = new StreamReader(path))
             {
                 lvl = new BeefyLevel(file.ReadLine());
             }
@@ -1199,19 +1201,30 @@ namespace BeefyGameStudio
         }
 
         public bool SaveLevel(string path)
-        {            
-            using (StreamWriter file = new StreamWriter(path))
+        {
+            string lvlPath = path.Split('.').First();
+            Directory.CreateDirectory(lvlPath);
+            //Write level settings using XML serialiation
+            XmlSerializer serializer;
+            using (StreamWriter file = new StreamWriter(lvlPath + "\\settings"))
             {
-                file.WriteLine("***BEEFY GAME LEVEL***");
-                file.WriteLine(Level.LevelID);
-                //file.WriteLine(Level.);
-                //Write level settings
-                foreach (BeefyLayer bl in Level.Layers)
-                {
-                    file.WriteLine("-----" + bl.LayerID + "-----");
-                }
-                file.WriteLine("**********************");
+                //TODO
+                //XmlWriter writer = XmlWriter.Create()
             }                        
+            foreach (BeefyLayer bl in Level.Layers)
+            {
+                string layerPath = lvlPath + "\\" + bl.LayerID;
+                foreach (BeefyObject bo in bl.BOC)
+                {
+                    using (StreamWriter file = new StreamWriter(layerPath + "\\" + bo.ObjectID + ".bgo"))
+                    {
+                        foreach (IBeefyComponent ibc in bo.Components)
+                        {                            
+                            //TODO
+                        }                        
+                    }
+                }                
+            }            
             return true;
         }
         #endregion
