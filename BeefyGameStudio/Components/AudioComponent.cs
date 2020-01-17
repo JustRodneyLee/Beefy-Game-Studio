@@ -7,13 +7,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BeefyEngine;
 
 namespace BeefyGameStudio.Components
 {
     public partial class AudioComponent : UserControl
     {
-        public AudioComponent()
+        BeefyAudio audio;
+
+        public AudioComponent(BeefyAudio cmp)
         {
+            Name = "AudioComponent";
+            audio = cmp;
             InitializeComponent();
         }
     }

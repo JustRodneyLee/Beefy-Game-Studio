@@ -33,6 +33,7 @@
             this.increaseBtn = new System.Windows.Forms.Button();
             this.valueTextBox = new System.Windows.Forms.TextBox();
             this.valueBoxPanel = new System.Windows.Forms.Panel();
+            this.labelFocus = new System.Windows.Forms.Label();
             this.pressTickTimer = new System.Windows.Forms.Timer(this.components);
             this.valueBoxPanel.SuspendLayout();
             this.SuspendLayout();
@@ -77,7 +78,7 @@
             this.valueTextBox.Size = new System.Drawing.Size(78, 35);
             this.valueTextBox.TabIndex = 2;
             this.valueTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.valueTextBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.ValueTextBox_KeyUp);
+            this.valueTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ValueTextBox_KeyPress);
             this.valueTextBox.Leave += new System.EventHandler(this.ValueTextBox_Leave);
             this.valueTextBox.MouseEnter += new System.EventHandler(this.ValueTextBox_MouseEnter);
             this.valueTextBox.MouseLeave += new System.EventHandler(this.ValueTextBox_MouseLeave);
@@ -87,11 +88,20 @@
             this.valueBoxPanel.Controls.Add(this.valueTextBox);
             this.valueBoxPanel.Controls.Add(this.decreaseBtn);
             this.valueBoxPanel.Controls.Add(this.increaseBtn);
+            this.valueBoxPanel.Controls.Add(this.labelFocus);
             this.valueBoxPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.valueBoxPanel.Location = new System.Drawing.Point(0, 0);
             this.valueBoxPanel.Name = "valueBoxPanel";
             this.valueBoxPanel.Size = new System.Drawing.Size(148, 33);
             this.valueBoxPanel.TabIndex = 3;
+            // 
+            // labelFocus
+            // 
+            this.labelFocus.AutoSize = true;
+            this.labelFocus.Location = new System.Drawing.Point(56, 12);
+            this.labelFocus.Name = "labelFocus";
+            this.labelFocus.Size = new System.Drawing.Size(0, 12);
+            this.labelFocus.TabIndex = 3;
             // 
             // pressTickTimer
             // 
@@ -122,5 +132,6 @@
         private System.Windows.Forms.TextBox valueTextBox;
         private System.Windows.Forms.Panel valueBoxPanel;
         private System.Windows.Forms.Timer pressTickTimer;
+        private System.Windows.Forms.Label labelFocus;
     }
 }

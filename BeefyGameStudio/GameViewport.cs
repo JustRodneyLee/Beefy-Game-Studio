@@ -212,13 +212,6 @@ namespace BeefyGameStudio
             if (bo != null)
             {
                 InspectorPanel.Controls.Clear();
-                /*foreach (Control ctrl in InspectorPanel.Controls)
-                {
-                    if (ctrl.Name.Contains("Component"))
-                    {
-                        InspectorPanel.Controls.Remove(ctrl);
-                    }
-                }*/
                 InspectorLabel.Text = "Inspector - " + bo.ObjectID;                
                 AddPropertyBtn.Enabled = true;
                 AddPropertyBtn.Visible = true;
@@ -227,16 +220,16 @@ namespace BeefyGameStudio
                     switch (bc.ComponentID)
                     {
                         case "Transform":
-                            InspectorPanel.Controls.Add(new TransformComponent((BeefyTransform)bc));
+                            InspectorPanel.Controls.Add(new TransformComponent((BeefyTransform)bc, this));
                             break;
                         case "Renderer2D":
-                            //InspectorPanel.Controls.Add(new Renderer2DComponent((BeefyRenderer2D)bc));
+                            InspectorPanel.Controls.Add(new Renderer2DComponent((BeefyRenderer2D)bc));
                             break;
                         case "Lighting":
-                            //InspectorPanel.Controls.Add(new LightingComponent((BeefyLighting)bc));
+                            InspectorPanel.Controls.Add(new LightingComponent((BeefyLighting)bc));
                             break;
                         case "Audio":
-                            //InspectorPanel.Controls.Add(new AudioComponent((BeefyAudio)bc));
+                            InspectorPanel.Controls.Add(new AudioComponent((BeefyAudio)bc));
                             break;
                         case "InputController":
                             InspectorPanel.Controls.Add(new InputComponent((BeefyInputController)bc));
@@ -245,10 +238,10 @@ namespace BeefyGameStudio
                             InspectorPanel.Controls.Add(new PhysicsComponent((BeefyPhysics)bc));
                             break;
                         case "Custom":
-                            //InspectorPanel.Controls.Add(new PhysicsComponent((BeefyPhysics)bc));
+                            InspectorPanel.Controls.Add(new PhysicsComponent((BeefyPhysics)bc));
                             break;
                         default:
-                            //InspectorPanel.Controls.Add(new InspectorComponent(bc));
+                            //InspectorPanel.Controls.Add();
                             break;
                     }
                 }                
@@ -325,7 +318,6 @@ namespace BeefyGameStudio
                 case System.Windows.Forms.Keys.M:
                     if (SelectedObjects.Count != 0 && Level.Layers.Count>1)
                     {
-                        Console.WriteLine("yoy");
                         LayerContextMenu.Show(MousePosition);
                     }                        
                     //Else feedback?
@@ -521,7 +513,7 @@ namespace BeefyGameStudio
                             bt.Scale = bt.LastScale * new Vector2(sXY, 1);
                         else
                             bt.Scale = bt.LastScale * new Vector2(1, sXY);
-                        BoundaryTransform(bo);
+                        SyncBounds(bo);
                     }
                     break;
             }
@@ -769,7 +761,7 @@ namespace BeefyGameStudio
                     foreach (BeefyObject bo in SelectedObjects)
                     {
                         bo.GetComponent<BeefyTransform>().Coordinates = bo.GetComponent<BeefyTransform>().LastCoordinates + translation;
-                        BoundaryTransform(bo);
+                        SyncBounds(bo);
                     }
                     break;
                 case EditorAction.Rotate:
@@ -779,7 +771,7 @@ namespace BeefyGameStudio
                         BeefyObject bo = SelectedObjects.ElementAt(i);
                         BeefyTransform bt = bo.GetComponent<BeefyTransform>();
                         bt.Rotation = bt.LastRotation - (ToDegrees(rotation - startRotation));
-                        BoundaryTransform(bo);
+                        SyncBounds(bo);
                     }
                     break;
                 case EditorAction.Scale:
@@ -815,7 +807,7 @@ namespace BeefyGameStudio
                         else
                             scaling = new Vector2(1, sXY);
                         bt.Scale = bt.LastScale * scaling;
-                        BoundaryTransform(bo);
+                        SyncBounds(bo);
                     }
                     break;
                 case EditorAction.EditOrigin:
@@ -914,7 +906,7 @@ namespace BeefyGameStudio
         {
             bo.ObjectID = CheckObjectID(bo);
             SelectionBoundaries.Add(bo.ObjectID, new BeefyShape(GetBasicRect(bo)));
-            BoundaryTransform(bo);
+            SyncBounds(bo);
             Level.BOC.Add(bo);
             currentLayer.AddObject(bo);
             HierarchyView.Nodes.Add(bo.ObjectID, bo.ObjectID);            
@@ -1256,7 +1248,7 @@ namespace BeefyGameStudio
                     foreach (BeefyObject bo in SelectedObjects)
                     {
                         bo.GetComponent<BeefyTransform>().Coordinates = bo.GetComponent<BeefyTransform>().LastCoordinates;
-                        BoundaryTransform(bo);
+                        SyncBounds(bo);
                     }
                     translation = Vector2.Zero;                    
                     break;
@@ -1264,7 +1256,7 @@ namespace BeefyGameStudio
                     foreach (BeefyObject bo in SelectedObjects)
                     {
                         bo.GetComponent<BeefyTransform>().Rotation = bo.GetComponent<BeefyTransform>().LastRotation;
-                        BoundaryTransform(bo);
+                        SyncBounds(bo);
                     }
                     rotation = 0;
                     break;
@@ -1272,7 +1264,7 @@ namespace BeefyGameStudio
                     foreach (BeefyObject bo in SelectedObjects)
                     {
                         bo.GetComponent<BeefyTransform>().Scale = bo.GetComponent<BeefyTransform>().LastScale;
-                        BoundaryTransform(bo);
+                        SyncBounds(bo);
                     }
                     sXY = 1;
                     break;
@@ -1293,12 +1285,8 @@ namespace BeefyGameStudio
             }                
         }        
 
-        /// <summary>
-        /// Deals with the visual stuff (GUI, Mouse Cursor etc.)
-        /// </summary>
-        protected override void OnInvalidated(InvalidateEventArgs e)
+        public void GlobalUpdate()
         {
-            base.OnInvalidated(e);
             if (hasLoaded)
             {
                 RecalculateCulling();
@@ -1323,7 +1311,7 @@ namespace BeefyGameStudio
                 switch (editorAction)
                 {
                     case EditorAction.None:
-                        Mouse.SetCursor(MouseCursor.Arrow);                        
+                        Mouse.SetCursor(MouseCursor.Arrow);
                         switch (editorManipulator)
                         {
                             case EditorManipulator.NoEdit:
@@ -1387,6 +1375,15 @@ namespace BeefyGameStudio
                         break;
                 }
             }
+        }
+
+        /// <summary>
+        /// Deals with the visual stuff (GUI, Mouse Cursor etc.)
+        /// </summary>
+        protected override void OnInvalidated(InvalidateEventArgs e)
+        {
+            base.OnInvalidated(e);
+            GlobalUpdate();
         }
 
         private void RecalculateCulling()
@@ -1508,7 +1505,7 @@ namespace BeefyGameStudio
             return (int)(radians/Math.PI*180);
         }
 
-        private void BoundaryTransform(BeefyObject bo)
+        public void SyncBounds(BeefyObject bo)
         {
             SelectionBoundaries[bo.ObjectID] = new BeefyShape(GetBasicRect(bo));
             SelectionBoundaries[bo.ObjectID].SetOrigin(bo.GetComponent<BeefyTransform>().Coordinates);

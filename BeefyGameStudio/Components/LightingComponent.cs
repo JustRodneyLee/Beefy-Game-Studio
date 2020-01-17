@@ -7,13 +7,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BeefyEngine;
 
 namespace BeefyGameStudio.Components
 {
     public partial class LightingComponent : UserControl
     {
-        public LightingComponent()
+        BeefyLighting lighting;
+
+        public LightingComponent(BeefyLighting cmp)
         {
+            Name = "LightingComponent";
+            lighting = cmp;
             InitializeComponent();
         }
     }

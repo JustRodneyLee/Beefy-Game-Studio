@@ -227,6 +227,11 @@ namespace BeefyGameStudio
                     {
                         MessageBox.Show("Level cannot be saved!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
+                    else
+                    {
+                        lvlSaved = true;
+                        lvlModified = false;
+                    }
                     break;
                 case FileType.Project: //Save Project
                     //TODO
@@ -291,7 +296,11 @@ namespace BeefyGameStudio
 
         private void SaveLvlAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            SaveFileDialog.Title = "Beefy Game Studio - Save Level As";
+            SaveFileDialog.Filter = "Beefy Game Levels|*.bgl";
+            SaveFileDialog.DefaultExt = "bgl";
+            fileType = FileType.Level;
+            SaveFileDialog.ShowDialog();
         }
 
         private void ClearToolStripMenuItem_Click(object sender, EventArgs e)
@@ -304,7 +313,7 @@ namespace BeefyGameStudio
 
         private void BGS_KeyDown(object sender, KeyEventArgs e)
         {
-            if (ModifierKeys == Keys.Shift)
+            if (ModifierKeys == Keys.Control)
             {
                 if (e.KeyCode == Keys.S)
                 {
@@ -314,7 +323,11 @@ namespace BeefyGameStudio
                     }
                     else
                     {
-
+                        SaveFileDialog.Title = "Beefy Game Studio - Save Level As";
+                        SaveFileDialog.Filter = "Beefy Game Levels|*.bgl";
+                        SaveFileDialog.DefaultExt = "bgl";
+                        fileType = FileType.Level;
+                        SaveFileDialog.ShowDialog();
                     }
                 }else if (e.KeyCode == Keys.C)
                 {

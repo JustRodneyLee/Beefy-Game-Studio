@@ -15,65 +15,98 @@ namespace BeefyGameStudio.Components
     public partial class TransformComponent : UserControl, InspectorComponent
     {
         BeefyTransform transform;
-        float cX, cY, sX, sY;
-        int rot;
-        bool iabs;
+        GameViewport viewport;
 
-        public TransformComponent(BeefyTransform bt)
+        public TransformComponent(BeefyTransform bt, GameViewport vp)
         {            
             Name = "TransformComponent";
             transform = bt;
-            cX = transform.Coordinates.X;
-            cY = transform.Coordinates.Y;
-            sX = transform.Scale.X;
-            sY = transform.Scale.Y;
-            rot = transform.Rotation;
-            iabs = bt.Entity.IsAbstract;
+            viewport = vp;
             InitializeComponent();
         }
 
         public void UpdateParameters()
         {
-            cX = transform.Coordinates.X;
-            cY = transform.Coordinates.Y;
-            sX = transform.Scale.X;
-            sY = transform.Scale.Y;
-            rot = transform.Rotation;
-            valueBoxCoordsX.SetValue(ref cX);
-            valueBoxCoordsY.SetValue(ref cY);
-            valueBoxScaleX.SetValue(ref sX);
-            valueBoxScaleY.SetValue(ref sY);
-            valueBoxRotation.SetValue(ref rot);
-            valueBoxIsAbstract.SetValue(ref iabs);
+            valueBoxCoordsX.SetValue(transform.Coordinates.X);
+            valueBoxCoordsY.SetValue(transform.Coordinates.Y);
+            valueBoxScaleX.SetValue(transform.Scale.X);
+            valueBoxScaleY.SetValue(transform.Scale.Y);
+            valueBoxRotation.SetValue(transform.Rotation);
+            valueBoxIsAbstract.SetValue(transform.Entity.IsAbstract);
         }
 
         public void TransferParameters()
-        {            
-            if (valueBoxCoordsX.ActiveValueChange || valueBoxCoordsY.ActiveValueChange)
-            {
-                transform.Coordinates = new Vector2(cX, cY);
-            }
-            if (valueBoxScaleX.ActiveValueChange || valueBoxScaleY.ActiveValueChange)
-            {
-                transform.Scale = new Vector2(sX, sY);
-            }
-            if (valueBoxRotation.ActiveValueChange)
-            {
-                transform.Rotation = rot;
-            }                
-            transform.Entity.IsAbstract = iabs;
+        {
+            transform.Coordinates = new Vector2(valueBoxCoordsX.Value, valueBoxCoordsY.Value);
+            transform.Scale = new Vector2(valueBoxScaleX.Value, valueBoxScaleY.Value);
+            transform.Rotation = valueBoxRotation.Value;
+            transform.Entity.IsAbstract = valueBoxIsAbstract.Value;
         }
 
         private void TransformComponent_Load(object sender, EventArgs e)
         {
             Width = Parent.Width - 2 * Parent.Margin.Horizontal;
-            valueBoxCoordsX.SetValue(ref cX);
-            valueBoxCoordsY.SetValue(ref cY);
-            valueBoxScaleX.SetValue(ref sX);
-            valueBoxScaleY.SetValue(ref sY);
-            valueBoxRotation.SetValue(ref rot);
-            valueBoxIsAbstract.SetValue(ref iabs);
             valueBoxRotation.SetSuffix("°");
-        }        
+        }
+
+        private void valueBoxCoordsX_ValueChange(object sender, EventArgs e)
+        {
+            transform.Coordinates = new Vector2(valueBoxCoordsX.Value, transform.Coordinates.Y);
+            transform.LastCoordinates = transform.Coordinates;
+            viewport.SyncBounds(transform.Entity);
+            viewport.Invalidate();
+        }
+
+        private void valueBoxCoordsY_ValueChange(object sender, EventArgs e)
+        {
+            transform.Coordinates = new Vector2(transform.Coordinates.X, valueBoxCoordsY.Value);
+            transform.LastCoordinates = transform.Coordinates;
+            viewport.SyncBounds(transform.Entity);
+            viewport.Invalidate();
+        }
+
+        private void valueBoxRotation_ValueChange(object sender, EventArgs e)
+        {
+            transform.Rotation = (int)valueBoxRotation.Value;
+            transform.LastRotation = transform.Rotation;
+            viewport.SyncBounds(transform.Entity);
+            viewport.Invalidate();
+        }
+
+        private void valueBoxIsAbstract_ValueChange(object sender, EventArgs e)
+        {
+            transform.Entity.IsAbstract = valueBoxIsAbstract.Value;
+        }
+
+        private void valueBoxScaleX_ValueChange(object sender, EventArgs e)
+        {
+            transform.Scale = new Vector2(valueBoxScaleX.Value, transform.Scale.Y);
+            transform.LastScale = transform.Scale;
+            viewport.SyncBounds(transform.Entity);
+            viewport.GlobalUpdate();
+        }
+
+        private void valueBoxScaleY_ValueChange(object sender, EventArgs e)
+        {
+            transform.Scale = new Vector2(transform.Scale.X, valueBoxScaleY.Value);
+            transform.LastScale = transform.Scale;
+            viewport.SyncBounds(transform.Entity);
+            viewport.Invalidate();
+        }
+
+        private void valueBoxOriginX_ValueChange(object sender, EventArgs e)
+        {
+
+            // = transform.Scale;
+            viewport.SyncBounds(transform.Entity);
+            viewport.Invalidate();
+        }
+
+        private void valueBoxOriginY_ValueChange(object sender, EventArgs e)
+        {
+            viewport.SyncBounds(transform.Entity);
+            viewport.Invalidate();
+        }
     }
 }
+    
