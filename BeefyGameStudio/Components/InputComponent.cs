@@ -27,15 +27,13 @@ namespace BeefyGameStudio.Components
         {
             if (enabledCheckBox.Checked)
             {
-                controller.Enable();
-                inputComponentGroupBox.Enabled = true;
+                controller.Enable();                
             }
             else
             {
                 controller.Disable();
-                inputComponentGroupBox.Enabled = false;
             }
-            enabledCheckBox.Enabled = true;
+            inputComponentGroupBox.Enabled = enabledCheckBox.Checked;
         }
 
         private void InputComponent_Load(object sender, EventArgs e)

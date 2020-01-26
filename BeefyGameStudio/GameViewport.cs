@@ -1,24 +1,24 @@
 ﻿using System;
-using System.IO;
-using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Text;
+using System.Windows.Forms;
 using System.Threading.Tasks;
+using BeefyEngine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Forms.Controls;
+using MonoGame.Forms;
 using MonoGame.Forms.Components;
+using MonoGame.Forms.Controls;
 using BeefyGameStudio.Components;
-using BeefyEngine;
 
 namespace BeefyGameStudio
 {
-    public class GameViewport : InvalidationControl
+    public class GameViewport : MonoGameControl
     {
         public enum EditorAction
         {
@@ -55,15 +55,14 @@ namespace BeefyGameStudio
             X, Y, XY
         }
 
-        
-
-        public Camera2D View;
+        public Camera2D View;        
         public EditorAction editorAction;
         public EditorAction lastAction;
         public EditorManipulator editorManipulator;
         public EditorView editorView;        
         float lX, lY; //Last Absolute Mouse Position
         Vector2 EditorMousePos; //+X +Y Position
+        string MousePosStr; //Mouse Position string
         float dX; //Mouse delta X
         float dY; //Mouse delta Y
         public Vector2 MousePos { get { return new Vector2(EditorMousePos.X, EditorMousePos.Y); } }
@@ -92,6 +91,9 @@ namespace BeefyGameStudio
         //Rotating
         float rotation;
         float startRotation;
+        //Zooming
+        float targetZoom;
+        float deltaZoom; //10th of the difference between View.Zoom and targetZoom
 
         Vector2 modifierOrigin; //Origin variable for all modifying
 
@@ -117,10 +119,6 @@ namespace BeefyGameStudio
         SearchBar Search;
         Button AddPropertyBtn;
 
-        public bool CanUndo { get; } //Used by Main Form
-        public bool CanRedo { get; } //Used by Main Form
-        List<Modification> Modifications; //Changes to be applied (TODO)
-        int modifyIndex;
         List<BeefyObject> ObjectsToAdd;
         List<BeefyObject> DrawnObjects;
         Dictionary<string, BeefyShape> SelectionBoundaries;
@@ -130,15 +128,14 @@ namespace BeefyGameStudio
         BeefyLayer currentLayer;
         bool showAllLayers;
         public BeefyLevel Level;
-        bool hasLoaded;
 
         protected override void Initialize()
         {
             base.Initialize();
-            hasLoaded = false;
             View = new Camera2D();
             View.Position = new Vector2(0, 0);
-            View.Zoom = 1;
+            View.Zoom = 50f;
+            targetZoom = 50f;
             editorAction = EditorAction.None;
             lastAction = editorAction;
             editorManipulator = EditorManipulator.NoEdit;
@@ -147,11 +144,10 @@ namespace BeefyGameStudio
             ObjectsToAdd = new List<BeefyObject>();
             SelectedObjects = new List<BeefyObject>();
             SelectionBoundaries = new Dictionary<string, BeefyShape>();
-            DrawnObjects = new List<BeefyObject>();
-            Modifications = new List<Modification>();
-            modifyIndex = 0;            
+            DrawnObjects = new List<BeefyObject>();           
             AbstractIcon = SysBmpToTex2D(Properties.Resources.AbstractIcon);            
             axis = EditorAxis.XY;
+            MousePosStr = "Mouse Pos:[" + Math.Round(EditorMousePos.X, 2).ToString() + "," + Math.Round(EditorMousePos.Y, 2).ToString() + "]";
             RecalculateCulling();
         }
 
@@ -170,11 +166,8 @@ namespace BeefyGameStudio
         {
             Level = level;
             SwitchToLayer(level.Layers.First().LayerID);
-            ToggleAllLayers(true);            
-            hasLoaded = true;
+            ToggleAllLayers(true);
             GraphingTools = new GraphingTools(Editor.graphics, Editor.spriteBatch, EditorSettings.SelectionBorderWidth, EditorSettings.SelectionBorderColor);
-            Invalidate();
-            Draw();
         }
 
         public void ClearLevel()
@@ -238,7 +231,7 @@ namespace BeefyGameStudio
                             InspectorPanel.Controls.Add(new PhysicsComponent((BeefyPhysics)bc));
                             break;
                         case "Custom":
-                            InspectorPanel.Controls.Add(new PhysicsComponent((BeefyPhysics)bc));
+                            //InspectorPanel.Controls.Add(new BeefyCustomProperty((BeefyPhysics)bc));
                             break;
                         default:
                             //InspectorPanel.Controls.Add();
@@ -278,7 +271,7 @@ namespace BeefyGameStudio
                         }
                     }
                     else
-                        SelectedObjects = new List<BeefyObject>();
+                        DeselectAll();
                     break;
                 case System.Windows.Forms.Keys.B:
                     editing = true;
@@ -383,7 +376,7 @@ namespace BeefyGameStudio
                 case System.Windows.Forms.Keys.X:
                     if (editorAction == EditorAction.Move||editorAction == EditorAction.Scale)
                     {
-                        RevertAction();
+                        CancelAction();
                         if (axis == EditorAxis.X)
                             axis = EditorAxis.XY;
                         else
@@ -393,7 +386,7 @@ namespace BeefyGameStudio
                 case System.Windows.Forms.Keys.Y:
                     if (editorAction==EditorAction.Move||editorAction==EditorAction.Scale)
                     {
-                        RevertAction();
+                        CancelAction();
                         if (axis == EditorAxis.Y)
                             axis = EditorAxis.XY;
                         else
@@ -420,11 +413,10 @@ namespace BeefyGameStudio
                     Search.Show();
                     break;
                 case System.Windows.Forms.Keys.Escape:
-                    RevertAction(true);
+                    CancelAction(true);
                     editorAction = EditorAction.None;
                 break;
             }
-            Invalidate();
             base.OnKeyDown(e);
         }
 
@@ -434,7 +426,6 @@ namespace BeefyGameStudio
                 SnapToGrid = false;
             if (ModifierKeys != System.Windows.Forms.Keys.Shift)
                 selection_multiSelect = false;
-            Invalidate();
             base.OnKeyUp(e);
         }
 
@@ -450,49 +441,45 @@ namespace BeefyGameStudio
 
         protected override void OnMouseEnter(EventArgs e)
         {
-            Invalidate();
             base.OnMouseEnter(e);
         }
 
         protected override void OnMouseWheel(MouseEventArgs e)
         {
+
+            void CheckZoom()
+            {
+                if (e.Delta > 0)
+                {
+                    if (targetZoom >= 10f && targetZoom < 100f)
+                        targetZoom += 5f;
+                    else if (targetZoom >= 1f && targetZoom < 10f)
+                        targetZoom += 1f;
+                    else if (targetZoom < 1f)
+                        targetZoom += 0.1f;
+                }
+                else
+                {
+                    if (targetZoom > 10f && targetZoom <= 100f)
+                        targetZoom -= 5f;
+                    else if (targetZoom > 1f && targetZoom <= 10f)
+                        targetZoom -= 1f;
+                    else if (targetZoom > 0.1f && targetZoom <= 1f)
+                        targetZoom -= 0.1f;
+                }
+                targetZoom = (float)Math.Round(targetZoom, 1);
+                deltaZoom = (targetZoom - View.Zoom) / 5f; 
+            }
+
             ///Zooming
             GetEditorMousePos(e);
             switch (editorAction)
             {
                 case EditorAction.None:
-                    if (e.Delta > 0)
-                    {
-                        if (View.Zoom >= 1)
-                            View.Zoom += 1f;
-                        else
-                            View.Zoom += 0.1f;
-                        if (View.Zoom >= 20)
-                            View.Zoom = 20;
-                    }
-                    else
-                    if (View.Zoom > 1)
-                        View.Zoom -= 1f;
-                    else if (View.Zoom >= 0.1)
-                        View.Zoom -= 0.1f;
-                    else View.Zoom -= 0.01f;
-                    Editor.Cam.Position = View.Position * View.Zoom;
+                    CheckZoom();
                     break;
                 case EditorAction.Pan:
-                    if (e.Delta > 0)
-                    {
-                        if (View.Zoom >= 1)
-                            View.Zoom += 1f;
-                        else
-                            View.Zoom += 0.1f;
-                        if (View.Zoom >= 10)
-                            View.Zoom = 10;
-                    }
-                    else
-                    if (View.Zoom > 1)
-                        View.Zoom -= 1f;
-                    else View.Zoom -= 0.1f;
-                    Editor.Cam.Position = View.Position * View.Zoom;
+                    CheckZoom();
                     break;
                 case EditorAction.Scale:
                     if (e.Delta > 0)
@@ -517,15 +504,14 @@ namespace BeefyGameStudio
                     }
                     break;
             }
-            Invalidate();
             base.OnMouseWheel(e);
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
+            Focus();
             lX = e.X;
-            lY = e.Y;
-            Modification modif = new Modification();
+            lY = e.Y;          
             switch (e.Button)
             {
                 case MouseButtons.Middle:
@@ -562,7 +548,6 @@ namespace BeefyGameStudio
                         case EditorAction.Move:                            
                             foreach (BeefyObject bo in SelectedObjects)
                             {
-                                modif.Register(bo.ObjectID, "TRANSFORM_MOVE", translation);
                                 bo.GetComponent<BeefyTransform>().LastCoordinates = bo.GetComponent<BeefyTransform>().Coordinates;                                
                             }
                             lastAction = editorAction;
@@ -573,7 +558,6 @@ namespace BeefyGameStudio
                         case EditorAction.Rotate:
                             foreach (BeefyObject bo in SelectedObjects)
                             {
-                                modif.Register(bo.ObjectID, "TRANSFORM_ROTATE", rotation);
                                 bo.GetComponent<BeefyTransform>().LastRotation = bo.GetComponent<BeefyTransform>().Rotation;
                             }
                             lastAction = editorAction;
@@ -584,7 +568,6 @@ namespace BeefyGameStudio
                         case EditorAction.Scale:
                             foreach (BeefyObject bo in SelectedObjects)
                             {
-                                modif.Register(bo.ObjectID, "TRANSFORM_SCALE", scaling);
                                 bo.GetComponent<BeefyTransform>().LastScale = bo.GetComponent<BeefyTransform>().Scale;
                             }
                             lastAction = editorAction;
@@ -599,6 +582,7 @@ namespace BeefyGameStudio
                                 {
                                     if (bo.HasComponent<BeefyRenderer2D>())
                                     {
+                                        //Need fix
                                         if (bo.GetComponent<BeefyTransform>().Rotation==0)
                                             bo.GetComponent<BeefyRenderer2D>().Origin -= new Vector2(bo.GetComponent<BeefyTransform>().LastCoordinates.X - SelectionBoundaries[bo.ObjectID].Origin.X, SelectionBoundaries[bo.ObjectID].Origin.Y - bo.GetComponent<BeefyTransform>().LastCoordinates.Y);
                                     }
@@ -610,7 +594,7 @@ namespace BeefyGameStudio
                         case EditorAction.AddNew:
                             if (ObjectsToAdd.Count != 0)
                             {
-                                SelectedObjects = new List<BeefyObject>();
+                                DeselectAll();
                                 AddBeefyObjects(ObjectsToAdd);
                                 foreach (BeefyObject bo in ObjectsToAdd)
                                 {
@@ -622,11 +606,9 @@ namespace BeefyGameStudio
                     break;
                 case MouseButtons.Right:
                     if (!(editorAction == EditorAction.None || editorAction == EditorAction.Pan))
-                        RevertAction(true);
+                        CancelAction(true);
                     break;
             }
-            Modifications.Add(modif);            
-            Invalidate();
             base.OnMouseDown(e);
         }
 
@@ -644,7 +626,7 @@ namespace BeefyGameStudio
                                 if (so != null)
                                 {
                                     if (!selection_multiSelect)
-                                        SelectedObjects = new List<BeefyObject>();
+                                        DeselectAll();
                                     if (SelectedObjects.Exists(x => x.ObjectID == so.ObjectID))
                                     {
                                         DeselectObject(so);
@@ -657,7 +639,7 @@ namespace BeefyGameStudio
                                 else
                                 {
                                     if (!editConfirm)
-                                        SelectedObjects = new List<BeefyObject>();
+                                        DeselectAll();
                                     else
                                         editConfirm = false;
                                 }
@@ -706,7 +688,6 @@ namespace BeefyGameStudio
             }
             editorAction = EditorAction.None;
             lastAction = editorAction;
-            Invalidate();
             base.OnMouseUp(e);
         }
 
@@ -727,14 +708,16 @@ namespace BeefyGameStudio
                         //TODOs
                     }
                     if (potentialSelect&&!selection_multiSelect)
-                    {
-                        potentialSelect = false;                
-                        editorAction = EditorAction.BoxSelect;         
+                    {                        
+                        if (dX!=0||dY!=0)
+                        {
+                            potentialSelect = false;
+                            editorAction = EditorAction.BoxSelect;
+                        }                        
                     }                        
                     break;
                 case EditorAction.Pan:
                     View.Move(new Vector2(dX / View.Zoom * EditorSettings.PanSpeed, dY / View.Zoom * EditorSettings.PanSpeed));
-                    //TODO : Pan speed needs fixing
                     RecalculateCulling();
                     break;
                 case EditorAction.BoxSelect:
@@ -757,7 +740,7 @@ namespace BeefyGameStudio
                             translation += (new Vector2(0, dY)) / View.Zoom;
                             break;
                     }
-                    translation = new Vector2((float)Math.Round(translation.X, 2), (float)Math.Round(translation.Y, 2));
+                    translation = new Vector2((float)Math.Round(translation.X, 2), (float)Math.Round(translation.Y, 2));                    
                     foreach (BeefyObject bo in SelectedObjects)
                     {
                         bo.GetComponent<BeefyTransform>().Coordinates = bo.GetComponent<BeefyTransform>().LastCoordinates + translation;
@@ -837,8 +820,7 @@ namespace BeefyGameStudio
                     break;
             }
             lX = e.X; lY = e.Y;
-            Invalidate();
-            base.OnMouseMove(e);
+            base.OnMouseMove(e);            
         }
 
         #endregion
@@ -862,8 +844,9 @@ namespace BeefyGameStudio
             switch (iba.AssetType)
             {
                 case BeefyAssetType.Visual:
-                    bo.AddComponent(new BeefyRenderer2D(bo));
+                    bo.AddComponent(new BeefyRenderer2D(bo));                    
                     bo.GetComponent<BeefyRenderer2D>().SetTexture(((BeefySprite)iba).SpriteData);
+                    bo.GetComponent<BeefyRenderer2D>().SetScaling(((BeefySprite)iba).ImportScale);
                     break;
                 case BeefyAssetType.Auditory:
                     bo.AddComponent(new BeefyAudio(bo));
@@ -905,11 +888,13 @@ namespace BeefyGameStudio
         public void AddBeefyObject(BeefyObject bo)
         {
             bo.ObjectID = CheckObjectID(bo);
-            SelectionBoundaries.Add(bo.ObjectID, new BeefyShape(GetBasicRect(bo)));
+            SelectionBoundaries.Add(bo.ObjectID, GetBoundary(bo));
             SyncBounds(bo);
             Level.BOC.Add(bo);
             currentLayer.AddObject(bo);
-            HierarchyView.Nodes.Add(bo.ObjectID, bo.ObjectID);            
+            HierarchyView.Nodes.Add(bo.ObjectID, bo.ObjectID);
+            DeselectAll();
+            SelectObject(bo);
             //Modifications.Add(new Mo)
         }
 
@@ -1008,6 +993,11 @@ namespace BeefyGameStudio
             }                
         }
 
+        public void DeselectAll()
+        {
+            SelectedObjects = new List<BeefyObject>();
+        }
+
         public void SelectObject(BeefyObject bo)
         {
             SelectedObjects.Add(bo);
@@ -1019,7 +1009,6 @@ namespace BeefyGameStudio
             {
                 Inspect(null);
             }
-            Invalidate();           
         }
 
         public void SelectObject(string id)
@@ -1030,7 +1019,6 @@ namespace BeefyGameStudio
         public void DeselectObject(BeefyObject bo)
         {
             SelectedObjects.Remove(bo);
-            Invalidate();
         }
 
         public void DeselectObject(string id)
@@ -1115,13 +1103,11 @@ namespace BeefyGameStudio
                 currentLayer = Level.Layers.Find(x => x.LayerID == id);
                 showAllLayers = false;
             }
-            Invalidate();
         }
 
         public void ToggleAllLayers(bool toggle)
         {
             showAllLayers = toggle;
-            Invalidate();
         }
 
         public int GetLargestLayerCount()
@@ -1240,7 +1226,7 @@ namespace BeefyGameStudio
             //TODO
         }
 
-        public void RevertAction(bool cancelEdit = false)
+        public void CancelAction(bool cancelEdit = false)
         {
             switch (editorAction)
             {
@@ -1283,108 +1269,7 @@ namespace BeefyGameStudio
                 editorAction = EditorAction.None;
                 axis = EditorAxis.XY;
             }                
-        }        
-
-        public void GlobalUpdate()
-        {
-            if (hasLoaded)
-            {
-                RecalculateCulling();
-                DrawnObjects = new List<BeefyObject>();
-                if (showAllLayers)
-                {
-                    foreach (BeefyObject bo in Level.BOC)
-                    {
-                        if (!CheckCulling(bo))
-                            DrawnObjects.Add(bo);
-                    }
-                }
-                else
-                {
-                    foreach (BeefyObject bo in currentLayer.BOC)
-                    {
-                        if (!CheckCulling(bo))
-                            DrawnObjects.Add(bo);
-                    }
-                }
-                InspectorUpdate();
-                switch (editorAction)
-                {
-                    case EditorAction.None:
-                        Mouse.SetCursor(MouseCursor.Arrow);
-                        switch (editorManipulator)
-                        {
-                            case EditorManipulator.NoEdit:
-                                Status.Text = "Ready";
-                                break;
-                            case EditorManipulator.Rotation:
-                                Status.Text = "Ready - Rotation standby";
-                                break;
-                            case EditorManipulator.Scaling:
-                                Status.Text = "Ready - Scaling standby";
-                                break;
-                            case EditorManipulator.Translation:
-                                Status.Text = "Ready - Translation standby";
-                                break;
-                        }
-                        break;
-                    case EditorAction.BoxSelect:
-                        Mouse.SetCursor(MouseCursor.Crosshair);
-                        if (selection_firstPointSet)
-                        {
-                            Status.Text = "Box Select - " + selection_Box.Location + " to " + EditorMousePos;
-                        }
-                        else
-                        {
-                            Status.Text = "Box Select - " + EditorMousePos;
-                        }
-                        break;
-                    case EditorAction.Move:
-                        Mouse.SetCursor(MouseCursor.SizeAll);
-                        if (axis == EditorAxis.X)
-                            Status.Text = "Translating - " + "X:" + translation.X;
-                        else if (axis == EditorAxis.Y)
-                            Status.Text = "Translating - " + "Y:" + translation.Y;
-                        else if (axis == EditorAxis.XY)
-                            Status.Text = "Translating - " + translation;
-                        break;
-                    case EditorAction.Scale:
-                        Mouse.SetCursor(MouseCursor.SizeNESW);
-                        if (axis == EditorAxis.X)
-                            Status.Text = "Scaling - " + "X:" + sXY;
-                        else if (axis == EditorAxis.Y)
-                            Status.Text = "Scaling - " + "Y:" + sXY;
-                        else if (axis == EditorAxis.XY)
-                            Status.Text = "Scaling - " + sXY;
-                        break;
-                    case EditorAction.Rotate:
-                        Mouse.SetCursor(MouseCursor.SizeNS);
-                        Status.Text = "Rotating - " + ToDegrees(rotation - startRotation) + "°";
-                        break;
-                    case EditorAction.EditOrigin:
-                        Mouse.SetCursor(MouseCursor.Hand);
-                        Status.Text = "Moving Origin - " + EditorMousePos;
-                        break;
-                    case EditorAction.AddNew:
-                        Mouse.SetCursor(MouseCursor.Crosshair);
-                        Status.Text = "Add New " + statVar + " At " + EditorMousePos;
-                        break;
-                    case EditorAction.Draw:
-                        Mouse.SetCursor(MouseCursor.Crosshair);
-                        Status.Text = "Drawing Commentary";
-                        break;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Deals with the visual stuff (GUI, Mouse Cursor etc.)
-        /// </summary>
-        protected override void OnInvalidated(InvalidateEventArgs e)
-        {
-            base.OnInvalidated(e);
-            GlobalUpdate();
-        }
+        }               
 
         private void RecalculateCulling()
         {
@@ -1507,12 +1392,12 @@ namespace BeefyGameStudio
 
         public void SyncBounds(BeefyObject bo)
         {
-            SelectionBoundaries[bo.ObjectID] = new BeefyShape(GetBasicRect(bo));
+            SelectionBoundaries[bo.ObjectID] = GetBoundary(bo);
             SelectionBoundaries[bo.ObjectID].SetOrigin(bo.GetComponent<BeefyTransform>().Coordinates);
             if (!bo.IsAbstract)
             {
                 SelectionBoundaries[bo.ObjectID].Scale(bo.GetComponent<BeefyTransform>().Scale);
-                SelectionBoundaries[bo.ObjectID].Rotate(-bo.GetComponent<BeefyTransform>().Rotation * Math.PI / 180f);                
+                SelectionBoundaries[bo.ObjectID].Rotate(-bo.GetComponent<BeefyTransform>().Rotation * Math.PI / 180f);
             }
         }
 
@@ -1559,17 +1444,6 @@ namespace BeefyGameStudio
                         break;
                 }
             }
-        }
-
-        private void AddModification(string[] objectIDs, string[] tags, object[] deltas)
-        {
-            Modification modification = new Modification();
-            for(int i = modifyIndex; i < Modifications.Count; i++)
-            {
-                Modifications.RemoveAt(i); //Clearing all actions after current undoing
-            }
-            Modifications.Add(modification);
-            modifyIndex += 1;
         }
 
         /// <summary>
@@ -1624,23 +1498,34 @@ namespace BeefyGameStudio
 
         
         /// <summary>
-        /// Gets the rectangular boundary of a Game Object
+        /// Gets the boundary of a Game Object
         /// </summary>
         /// <param name="bo"></param>
         /// <returns></returns>
-        private Rectangle GetBasicRect(BeefyObject bo)
+        private BeefyShape GetBoundary(BeefyObject bo)
         {
+            BeefyShape boundary = new BeefyShape();
             BeefyTransform bt = bo.GetComponent<BeefyTransform>();
             BeefyRenderer2D br = bo.GetComponent<BeefyRenderer2D>();
             if (!bo.IsAbstract)
             {
+                Vector2 firstVert = bt.Coordinates - new Vector2(br.Origin.X, -br.Origin.Y);
                 if (br != null)
-                    return new Rectangle((bt.Coordinates - new Vector2(br.Origin.X, -br.Origin.Y)).ToPoint(), new Point(br.Texture.Width, br.Texture.Height));
-                else
-                    return new Rectangle((bt.Coordinates - new Vector2(br.Origin.X, -br.Origin.Y)).ToPoint() - new Point(EditorSettings.SelectionBorderWidth), (bt.Coordinates - br.Origin).ToPoint() + new Point(EditorSettings.SelectionBorderWidth));
-            }                
+                {
+                    boundary.AddVertex(firstVert);
+                    boundary.AddVertex(firstVert + new Vector2(br.Texture.Width * br.Scaling.X, 0));
+                    boundary.AddVertex(firstVert + new Vector2(br.Texture.Width * br.Scaling.X, -br.Texture.Height * br.Scaling.Y));
+                    boundary.AddVertex(firstVert + new Vector2(0, -br.Texture.Height * br.Scaling.Y));
+                }            
+            }
             else
-                return new Rectangle(bt.Coordinates.ToPoint() + new Point(-34, 34), new Point(67, 67));
+            {
+                boundary.AddVertex(bt.Coordinates - new Vector2(33f / EditorSettings.PixelScale, 32f / EditorSettings.PixelScale));
+                boundary.AddVertex(bt.Coordinates + new Vector2(32f / EditorSettings.PixelScale, -32f / EditorSettings.PixelScale));
+                boundary.AddVertex(bt.Coordinates + new Vector2(32f / EditorSettings.PixelScale, 33f / EditorSettings.PixelScale));
+                boundary.AddVertex(bt.Coordinates + new Vector2(-33f / EditorSettings.PixelScale, 33f / EditorSettings.PixelScale));
+            }                
+            return boundary;
         }
 
         private BeefyLayer GetObjectLayer(BeefyObject bo)
@@ -1658,6 +1543,116 @@ namespace BeefyGameStudio
             return currentLayer;
         }
 
+        protected override void Update(GameTime gameTime)
+        {
+            base.Update(gameTime);
+            MousePosStr = "Mouse Pos:[" + Math.Round(EditorMousePos.X, 2).ToString() + "," + Math.Round(EditorMousePos.Y, 2).ToString() + "]";
+            if (View.Zoom != targetZoom)
+            {
+                View.Zoom += deltaZoom;
+            }
+            else
+            {
+                deltaZoom = 0;
+            }
+            if (View.Zoom < targetZoom && deltaZoom < 0)
+            {
+                View.Zoom = targetZoom;
+                deltaZoom = 0;
+            }
+            else if (View.Zoom > targetZoom && deltaZoom > 0)
+            {
+                View.Zoom = targetZoom;
+                deltaZoom = 0;
+            }
+            Editor.Cam.Position = View.Position * View.Zoom;
+            RecalculateCulling();
+            DrawnObjects = new List<BeefyObject>();
+            if (showAllLayers)
+            {
+                foreach (BeefyObject bo in Level.BOC)
+                {
+                    if (!CheckCulling(bo))
+                        DrawnObjects.Add(bo);
+                }
+            }
+            else
+            {
+                foreach (BeefyObject bo in currentLayer.BOC)
+                {
+                    if (!CheckCulling(bo))
+                        DrawnObjects.Add(bo);
+                }
+            }
+            InspectorUpdate();
+            switch (editorAction)
+            {
+                case EditorAction.None:
+                    Mouse.SetCursor(MouseCursor.Arrow);
+                    switch (editorManipulator)
+                    {
+                        case EditorManipulator.NoEdit:
+                            Status.Text = "Ready";
+                            break;
+                        case EditorManipulator.Rotation:
+                            Status.Text = "Ready - Rotation standby";
+                            break;
+                        case EditorManipulator.Scaling:
+                            Status.Text = "Ready - Scaling standby";
+                            break;
+                        case EditorManipulator.Translation:
+                            Status.Text = "Ready - Translation standby";
+                            break;
+                    }
+                    break;
+                case EditorAction.BoxSelect:
+                    Mouse.SetCursor(MouseCursor.Crosshair);
+                    if (selection_firstPointSet)
+                    {
+                        Status.Text = "Box Select - " + selection_Box.Location + " to " + EditorMousePos;
+                    }
+                    else
+                    {
+                        Status.Text = "Box Select - " + EditorMousePos;
+                    }
+                    break;
+                case EditorAction.Move:
+                    Mouse.SetCursor(MouseCursor.SizeAll);
+                    if (axis == EditorAxis.X)
+                        Status.Text = "Translating - " + "X:" + translation.X;
+                    else if (axis == EditorAxis.Y)
+                        Status.Text = "Translating - " + "Y:" + translation.Y;
+                    else if (axis == EditorAxis.XY)
+                        Status.Text = "Translating - " + translation;
+                    break;
+                case EditorAction.Scale:
+                    Mouse.SetCursor(MouseCursor.SizeNESW);
+                    if (axis == EditorAxis.X)
+                        Status.Text = "Scaling - " + "X:" + sXY;
+                    else if (axis == EditorAxis.Y)
+                        Status.Text = "Scaling - " + "Y:" + sXY;
+                    else if (axis == EditorAxis.XY)
+                        Status.Text = "Scaling - " + sXY;
+                    break;
+                case EditorAction.Rotate:
+                    Mouse.SetCursor(MouseCursor.SizeNS);
+                    Status.Text = "Rotating - " + ToDegrees(rotation - startRotation) + "°";
+                    break;
+                case EditorAction.EditOrigin:
+                    Mouse.SetCursor(MouseCursor.Hand);
+                    Status.Text = "Moving Origin - " + EditorMousePos;
+                    break;
+                case EditorAction.AddNew:
+                    Mouse.SetCursor(MouseCursor.Crosshair);
+                    Status.Text = "Add New " + statVar + " At " + EditorMousePos;
+                    break;
+                case EditorAction.Draw:
+                    Mouse.SetCursor(MouseCursor.Crosshair);
+                    Status.Text = "Drawing Commentary";
+                    break;
+            }
+        }
+
         /// <summary>
         /// Note:
         /// +X -Y Coords used for drawing!
@@ -1669,11 +1664,17 @@ namespace BeefyGameStudio
             Editor.BeginCamera2D(SpriteSortMode.BackToFront, BlendState.NonPremultiplied, SamplerState.PointClamp);
             Editor.Cam.Position = View.Position * View.Zoom;
             ///Underlying grid
+            if (View.Zoom >= 0.1f && View.Zoom < 1f)
+                EditorSettings.GridSize = 1000;
+            else if (View.Zoom >= 1f && View.Zoom < 10f)
+                EditorSettings.GridSize = 10;
+            else
+                EditorSettings.GridSize = 1;
             int scaledGridSize = (int)(EditorSettings.GridSize * View.Zoom);
             for (int i = scaledGridSize; i < VPWidth + (int)(Editor.Cam.Position.X); i += scaledGridSize)
             {
                 Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle(i, (int)Editor.Cam.Position.Y - VPHeight / 2, 1, VPHeight), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
-            }
+            }            
             for (int i = -scaledGridSize; i > -VPWidth + (int)(Editor.Cam.Position.X); i -= scaledGridSize)
             {
                 Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle(i, (int)Editor.Cam.Position.Y - VPHeight / 2, 1, VPHeight), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
@@ -1685,7 +1686,7 @@ namespace BeefyGameStudio
             for (int i = -scaledGridSize; i > -VPHeight + (int)(Editor.Cam.Position.Y); i -= scaledGridSize)
             {
                 Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle((int)Editor.Cam.Position.X - VPWidth / 2, i, VPWidth, 1), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
-            }
+            }            
             ///X-Y Axis & Origin            
             if (CullingRect.Y >= 0 && (CullingRect.Y - CullingRect.Height) <= 0)
                 Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle((int)Editor.Cam.Position.X - VPWidth / 2, 0, VPWidth, 1), null, EditorSettings.XAxisColor * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9997f); //X-Axis
@@ -1700,7 +1701,7 @@ namespace BeefyGameStudio
             {
                 if (bo.IsAbstract)
                 {
-                    EditorDraw(AbstractIcon, bo.GetComponent<BeefyTransform>().Coordinates, new Vector2(33, 33), new Vector2(1), 0f, Color.White * GetObjectLayer(bo).LayerAlpha, bo.GetComponent<BeefyTransform>().Depth);
+                    EditorDraw(AbstractIcon, bo.GetComponent<BeefyTransform>().Coordinates, new Vector2(33, 33), new Vector2(1) / EditorSettings.PixelScale, 0f, Color.White * GetObjectLayer(bo).LayerAlpha, bo.GetComponent<BeefyTransform>().Depth);
                 }
                 else
                 {
@@ -1747,8 +1748,8 @@ namespace BeefyGameStudio
                     #endregion
                 }
             }            
-            Editor.EndCamera2D();
-            
+            Editor.EndCamera2D();            
+
             #region Draw Editor Action
             Editor.spriteBatch.Begin();
             switch (editorAction)
@@ -1797,15 +1798,8 @@ namespace BeefyGameStudio
 
             #region Draw Editor HUD
             Editor.spriteBatch.Begin();
-            Editor.spriteBatch.DrawString(Editor.Font, "Scale:" + Math.Round(View.Zoom, 1) + "x", new Vector2(0, 0), Color.White);
-            Editor.spriteBatch.DrawString(Editor.Font, "Mouse Pos:[" + Math.Round(EditorMousePos.X, 2).ToString() + "," + Math.Round(EditorMousePos.Y, 2).ToString() + "]", new Vector2(0, Editor.FontHeight), Color.White);
-            Editor.spriteBatch.DrawString(Editor.Font, "View Pos:[" + Math.Round(View.Position.X, 2).ToString() + "," + Math.Round(View.Position.Y, 2).ToString() + "]", new Vector2(0, Editor.FontHeight * 2), Color.White);
-            //Editor.spriteBatch.DrawString(Editor.Font, "View Width:" + VPWidth.ToString(), new Vector2(0, Editor.FontHeight * 4), Color.White);
-            //Editor.spriteBatch.DrawString(Editor.Font, "Editor Pos:" + Editor.Cam.Position.ToString(), new Vector2(0, Editor.FontHeight * 4), Color.White);
-            //Editor.spriteBatch.DrawString(Editor.Font, "View Height:" + VPHeight.ToString(), new Vector2(0, Editor.FontHeight * 5), Color.White);
-            //Editor.spriteBatch.DrawString(Editor.Font, "Culling Rect:" + CullingRect.ToString(), new Vector2(0, Editor.FontHeight * 6), Color.White);
-            //Editor.spriteBatch.DrawString(Editor.Font, "Last Action:" + lastAction.ToString(), new Vector2(0, Editor.FontHeight * 7), Color.White);
-            //Editor.spriteBatch.DrawString(Editor.Font, "Layer:" + Level.Layers.Count, new Vector2(0, Editor.FontHeight * 8), Color.White);
+            Editor.spriteBatch.DrawString(Editor.Font, "Scale:" + targetZoom + "x", new Vector2(0, 0), Color.White);
+            Editor.spriteBatch.DrawString(Editor.Font, MousePosStr, new Vector2((int)((VPWidth - Editor.Font.MeasureString(MousePosStr).X)/2), 0), Color.White);
             Editor.spriteBatch.End();
             #endregion            
         }

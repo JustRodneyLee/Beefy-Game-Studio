@@ -31,7 +31,7 @@ namespace BeefyGameStudio.Components
             valueBoxCoordsY.SetValue(transform.Coordinates.Y);
             valueBoxScaleX.SetValue(transform.Scale.X);
             valueBoxScaleY.SetValue(transform.Scale.Y);
-            valueBoxRotation.SetValue(transform.Rotation);
+            valueBoxRotation.SetValue(transform.Rotation);            
             valueBoxIsAbstract.SetValue(transform.Entity.IsAbstract);
         }
 
@@ -47,6 +47,8 @@ namespace BeefyGameStudio.Components
         {
             Width = Parent.Width - 2 * Parent.Margin.Horizontal;
             valueBoxRotation.SetSuffix("°");
+            if (transform.Entity.Components.Count == 1)
+                valueBoxIsAbstract.Enabled = false;
         }
 
         private void valueBoxCoordsX_ValueChange(object sender, EventArgs e)
@@ -54,7 +56,6 @@ namespace BeefyGameStudio.Components
             transform.Coordinates = new Vector2(valueBoxCoordsX.Value, transform.Coordinates.Y);
             transform.LastCoordinates = transform.Coordinates;
             viewport.SyncBounds(transform.Entity);
-            viewport.Invalidate();
         }
 
         private void valueBoxCoordsY_ValueChange(object sender, EventArgs e)
@@ -62,7 +63,6 @@ namespace BeefyGameStudio.Components
             transform.Coordinates = new Vector2(transform.Coordinates.X, valueBoxCoordsY.Value);
             transform.LastCoordinates = transform.Coordinates;
             viewport.SyncBounds(transform.Entity);
-            viewport.Invalidate();
         }
 
         private void valueBoxRotation_ValueChange(object sender, EventArgs e)
@@ -70,12 +70,12 @@ namespace BeefyGameStudio.Components
             transform.Rotation = (int)valueBoxRotation.Value;
             transform.LastRotation = transform.Rotation;
             viewport.SyncBounds(transform.Entity);
-            viewport.Invalidate();
         }
 
         private void valueBoxIsAbstract_ValueChange(object sender, EventArgs e)
         {
             transform.Entity.IsAbstract = valueBoxIsAbstract.Value;
+            viewport.SyncBounds(transform.Entity);
         }
 
         private void valueBoxScaleX_ValueChange(object sender, EventArgs e)
@@ -83,7 +83,6 @@ namespace BeefyGameStudio.Components
             transform.Scale = new Vector2(valueBoxScaleX.Value, transform.Scale.Y);
             transform.LastScale = transform.Scale;
             viewport.SyncBounds(transform.Entity);
-            viewport.GlobalUpdate();
         }
 
         private void valueBoxScaleY_ValueChange(object sender, EventArgs e)
@@ -91,21 +90,11 @@ namespace BeefyGameStudio.Components
             transform.Scale = new Vector2(transform.Scale.X, valueBoxScaleY.Value);
             transform.LastScale = transform.Scale;
             viewport.SyncBounds(transform.Entity);
-            viewport.Invalidate();
         }
 
-        private void valueBoxOriginX_ValueChange(object sender, EventArgs e)
+        private void TransformComponent_Resize(object sender, EventArgs e)
         {
-
-            // = transform.Scale;
-            viewport.SyncBounds(transform.Entity);
-            viewport.Invalidate();
-        }
-
-        private void valueBoxOriginY_ValueChange(object sender, EventArgs e)
-        {
-            viewport.SyncBounds(transform.Entity);
-            viewport.Invalidate();
+            Width = Parent.Width - 2 * Parent.Margin.Horizontal;
         }
     }
 }

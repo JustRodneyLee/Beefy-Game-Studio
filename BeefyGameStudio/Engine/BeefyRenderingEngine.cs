@@ -43,8 +43,10 @@ namespace BeefyEngine
         public float Rotation { get { return ConvertDegToRad(Entity.GetComponent<BeefyTransform>().Rotation); } }
         public Rectangle SourceRectangle { get; set; }
         public SpriteEffects SpriteEffects { get { return CheckFX(); } }
-        public Vector2 Scaling { get { return AbsoluteScaling(); } }
-        private Color intTint; //Internal tint
+        private Vector2 intScaling { get { return Entity.GetComponent<BeefyTransform>().Scale / pxScaling; } }
+        public Vector2 Scaling { get { return AbsoluteScaling() / pxScaling; } }
+        private float pxScaling = 1f; //Internal scaling. Defined during asset import.
+        private Color intTint; //Internal tint        
         public Color Tint { get { return intTint * Alpha; } set { intTint = value; } }
         public float Alpha { get; set; }
         public Vector2 Origin { get; set; }
@@ -68,16 +70,16 @@ namespace BeefyEngine
         private Vector2 CheckCoords()
         {   
             Vector2 ret = Entity.GetComponent<BeefyTransform>().Coordinates;
-            if (Entity.GetComponent<BeefyTransform>().Scale.X < 0 && Entity.GetComponent<BeefyTransform>().Scale.Y < 0)
+            if (intScaling.X < 0 && intScaling.Y < 0)
                 return ret;
-            else if (Entity.GetComponent<BeefyTransform>().Scale.X < 0)
+            else if (intScaling.X < 0)
                 return new Vector2(
-                    ret.X + Entity.GetComponent<BeefyTransform>().Scale.X * (Texture.Width - 2 * Origin.X) * (float)Math.Cos(Rotation),
-                    ret.Y - (float)Math.Sin(Rotation) * (Texture.Width - 2 * Origin.X) * Entity.GetComponent<BeefyTransform>().Scale.X);
-            else if (Entity.GetComponent<BeefyTransform>().Scale.Y < 0)
+                    ret.X + intScaling.X * (Texture.Width - 2 * Origin.X) * (float)Math.Cos(Rotation),
+                    ret.Y - (float)Math.Sin(Rotation) * (Texture.Width - 2 * Origin.X) * intScaling.X);
+            else if (intScaling.Y < 0)
                 return new Vector2(
-                    ret.X - (float)Math.Sin(Rotation) * Entity.GetComponent<BeefyTransform>().Scale.Y * (Texture.Height - 2 * Origin.Y),
-                    ret.Y + 2 * Origin.Y * Entity.GetComponent<BeefyTransform>().Scale.Y * (float)Math.Cos(Rotation) - Entity.GetComponent<BeefyTransform>().Scale.Y * Texture.Height * (float)Math.Cos(Rotation));
+                    ret.X - (float)Math.Sin(Rotation) * intScaling.Y * (Texture.Height - 2 * Origin.Y),
+                    ret.Y + 2 * Origin.Y * intScaling.Y * (float)Math.Cos(Rotation) - intScaling.Y * Texture.Height * (float)Math.Cos(Rotation));
             else
                 return ret;
         }
@@ -125,6 +127,11 @@ namespace BeefyEngine
         {
             Texture = tex;
             SourceRectangle = tex.Bounds;
+        }
+
+        public void SetScaling(float scale)
+        {
+            pxScaling = scale;
         }
 
         public object Clone()
@@ -276,7 +283,7 @@ namespace BeefyEngine
                 {
                     BeefyRenderer2D BR2D = BO.GetComponent<BeefyRenderer2D>();
                     renderer.Begin(SpriteSortMode.FrontToBack, BlendState.NonPremultiplied, null, null, null, null, Camera.Transform);
-                    renderer.Draw(BR2D.Texture, BO.GetComponent<BeefyTransform>().Coordinates, BR2D.SourceRectangle, BR2D.Tint * BL.LayerAlpha, BO.GetComponent<BeefyTransform>().Rotation, BR2D.Origin, BO.GetComponent<BeefyTransform>().Scale, SpriteEffects.None, BO.GetComponent<BeefyTransform>().Depth);
+                    renderer.Draw(BR2D.Texture, BO.GetComponent<BeefyTransform>().Coordinates, BR2D.SourceRectangle, BR2D.Tint * BL.LayerAlpha, BO.GetComponent<BeefyTransform>().Rotation, BR2D.Origin, BR2D.Scaling, BR2D.SpriteEffects, BO.GetComponent<BeefyTransform>().Depth);
                     //TODO : Lighting and Normal Maps
                     renderer.End();
                     if (BR2D.Animated)

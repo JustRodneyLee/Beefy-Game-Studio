@@ -25,25 +25,9 @@ namespace BeefyGameStudio
         string suffix;
         bool inc;
         bool dec;
+        bool underEdit; //A parameter indicating if the text in the textbox is under manual change
 
         public event EventHandler ValueChange;
-
-        /*public bool ActiveValueChange
-        {
-            get
-            {
-                switch (DataType)
-                {
-                    case ValueType.Boolean:
-                        return BoolVal == _BoolVal;
-                    case ValueType.Number:
-                        return NumberVal == _NumberVal;
-                    case ValueType.String:
-                        return StringVal == _StringVal;
-                }
-                return false;
-            }
-        }*/
 
         string StringVal;
         string _StringVal;
@@ -59,59 +43,7 @@ namespace BeefyGameStudio
         bool _BoolVal;
         [Description("Boolean Value Stored"), Category("Data")]
         public bool BooleanValue { get { return BoolVal; } set { BoolVal = value; } }        
-
-        /*[Description("Value Stored"), Category("Data")]
-        public object Value
-        {
-            get
-            {
-                switch (DataType)
-                {
-                    case ValueType.Boolean:
-                        return BoolVal;
-                    case ValueType.Number:
-                        return NumberVal;
-                    case ValueType.String:
-                        return StringVal;
-                }
-                return null;
-            }
-
-            set
-            {
-                switch (DataType)
-                {
-                    case ValueType.String:
-                        Value = value;
-                        break;
-                    case ValueType.Boolean:
-                        if (value.ToString().ToLower() == "true" || value.ToString().ToLower() == "t" || value.ToString().ToLower() == "y" || value.ToString().ToLower() == "yes")
-                        {
-                            Value = true;
-                        }
-                        else if (value.ToString().ToLower() == "false" || value.ToString().ToLower() == "f" || value.ToString().ToLower() == "n" || value.ToString().ToLower() == "no")
-                        {
-                            Value = false;
-                        }
-                        else
-                        {
-                            MessageBox.Show("Invalid Input!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                        break;
-                    case ValueType.Number:
-                        //Hexadecimal numbers are not accepted
-                        if (!float.TryParse(value.ToString(), out _))
-                        {
-                            MessageBox.Show("Invalid Input!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                        else
-                        {
-                            Value = (float)value;
-                        }
-                        break;
-                }
-            }
-        }*/
+        
         [Description("Type of Value Stored"), Category("Data")]
         public ValueType DataType { get; set; }
 
@@ -200,7 +132,7 @@ namespace BeefyGameStudio
             UpdateText();
         }
 
-        private void ValueDecrease()
+        private void ValueDecrease(float val = 1f)
         {
             switch (DataType)
             {
@@ -208,7 +140,7 @@ namespace BeefyGameStudio
                     //TODO
                     break;
                 case ValueType.Number:
-                    NumberVal -= 1f;
+                    NumberVal -= val;
                     break;
                 case ValueType.Boolean:
                     BoolVal = !BoolVal;
@@ -218,7 +150,7 @@ namespace BeefyGameStudio
             UpdateText();
         }
 
-        private void ValueIncrease()
+        private void ValueIncrease(float val = 1f)
         {            
             switch (DataType)
             {
@@ -226,7 +158,7 @@ namespace BeefyGameStudio
                     //TODO
                     break;
                 case ValueType.Number:
-                    NumberVal += 1f;
+                    NumberVal += val;
                     break;
                 case ValueType.Boolean:
                     BoolVal = !BoolVal;
@@ -247,65 +179,66 @@ namespace BeefyGameStudio
                     break;
                 case ValueType.Boolean:
                     _BoolVal = BoolVal;
-                    if (valueTextBox.Text.ToLower() == "true" || valueTextBox.Text.ToLower() == "t" || valueTextBox.Text.ToLower() == "y" || valueTextBox.Text.ToLower() == "yes")
+                    if (underEdit)
                     {
-                        BoolVal = true;
-                        ValueChange?.Invoke(this, null);
-                    }
-                    else if (valueTextBox.Text.ToLower() == "false" || valueTextBox.Text.ToLower() == "f" || valueTextBox.Text.ToLower() == "n" || valueTextBox.Text.ToLower() == "no")
-                    {
-                        BoolVal = false;
-                        ValueChange?.Invoke(this, null);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Invalid Input!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        UpdateText();
-                    }
+                        if (valueTextBox.Text.ToLower() == "true" || valueTextBox.Text.ToLower() == "t" || valueTextBox.Text.ToLower() == "y" || valueTextBox.Text.ToLower() == "yes" || valueTextBox.Text == "1")
+                        {
+                            BoolVal = true;
+                            ValueChange?.Invoke(this, null);
+                        }
+                        else if (valueTextBox.Text.ToLower() == "false" || valueTextBox.Text.ToLower() == "f" || valueTextBox.Text.ToLower() == "n" || valueTextBox.Text.ToLower() == "no" || valueTextBox.Text == "0")
+                        {
+                            BoolVal = false;
+                            ValueChange?.Invoke(this, null);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Invalid Input!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            UpdateText();
+                        }
+                        underEdit = false;
+                    }                        
                     break;
                 case ValueType.Number:
                     _NumberVal = NumberVal;
                     //Hexadecimal numbers are not accepted (by now)
-                    float temp;
-                    string s = valueTextBox.Text;
-                    if (prefix!=null)
-                        s.Remove(0, prefix.Length);
-                    if (suffix!=null)
-                        s.Remove(s.Length - suffix.Length, suffix.Length);
-                    MessageBox.Show(s);
-                    if (!float.TryParse(s, out temp))
+                    if (underEdit)
                     {
-                        MessageBox.Show("Invalid Input!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        UpdateText();
-                    }
-                    else
-                    {
-                        NumberVal = temp;
-                        ValueChange?.Invoke(this, null);
-                    }
+                        float temp;
+                        if (!float.TryParse(valueTextBox.Text, out temp))
+                        {
+                            MessageBox.Show("Invalid Input!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            UpdateText();
+                        }
+                        else
+                        {
+                            NumberVal = temp;
+                            ValueChange?.Invoke(this, null);
+                        }
+                        underEdit = false;
+                    }                    
                     break;
             }            
         }
 
         private void UpdateText()
         {
-            switch (DataType)
-            {
-                case ValueType.String:
-                    valueTextBox.Text = prefix + StringVal + suffix;
-                    break;
-                case ValueType.Number:
-                    valueTextBox.Text = prefix + Math.Round(NumberVal, decimalDigits).ToString() + suffix;
-                    break;
-                case ValueType.Boolean:
-                    if (BoolVal)
-                    {
-                        valueTextBox.Text = "Yes";
-                    }
-                    else
-                        valueTextBox.Text = "No";
-                    break;
-            }
+            if (!underEdit)
+                switch (DataType)
+                {
+                    case ValueType.String:
+                        valueTextBox.Text = prefix + StringVal + suffix;
+                        break;
+                    case ValueType.Number:
+                        valueTextBox.Text = prefix + Math.Round(NumberVal, decimalDigits).ToString() + suffix;
+                        break;
+                    case ValueType.Boolean:
+                        if (BoolVal)
+                            valueTextBox.Text = "Yes";
+                        else
+                            valueTextBox.Text = "No";
+                        break;
+                }
         }
 
         public void SetDigits(int digits)
@@ -325,7 +258,7 @@ namespace BeefyGameStudio
 
         private void CheckLeaveControl()
         {
-            if (!ClientRectangle.Contains(PointToClient(Cursor.Position)))
+            if (!ClientRectangle.Contains(PointToClient(Cursor.Position))&&!underEdit)
             {
                 valueTextBox.SendToBack();
                 increaseBtn.Visible = false;
@@ -350,7 +283,7 @@ namespace BeefyGameStudio
         private void ValueTextBox_MouseLeave(object sender, EventArgs e)
         {
             _Refresh();
-            CheckLeaveControl();
+            CheckLeaveControl();            
         }
 
         private void DecreaseBtn_MouseDown(object sender, MouseEventArgs e)
@@ -398,11 +331,11 @@ namespace BeefyGameStudio
         private void PressTickTimer_Tick(object sender, EventArgs e)
         {
             hold += pressTickTimer.Interval;
-            if (inc && hold >= 500)
+            if (inc && hold >= 300)
             {
                 ValueIncrease();
             }
-            else if (dec && hold >= 500)
+            else if (dec && hold >= 300)
             {
                 ValueDecrease();
             }
@@ -426,24 +359,52 @@ namespace BeefyGameStudio
 
         private void ValueTextBox_Leave(object sender, EventArgs e)
         {
-            UpdateData();
+            UpdateData();            
             //TODO Check change
         }
 
         private void ValueTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)Keys.Enter)
-            {
+            {                
                 UpdateData();
+                underEdit = false;
                 labelFocus.Focus();
                 e.Handled = true;
             }
             else if (e.KeyChar == (char)Keys.Escape)
             {
-                UpdateText();
+                underEdit = false;
+                UpdateText();                
                 labelFocus.Focus();
                 e.Handled = true;
             }
+        }
+
+        private void ValueBox_EnabledChanged(object sender, EventArgs e)
+        {
+            if (Enabled)
+            {
+                valueTextBox.BackColor = default;
+            }
+            else
+            {                
+                valueTextBox.BackColor = Color.LightGray;
+            }
+        }
+
+        private void valueTextBox_Click(object sender, EventArgs e)
+        {
+            underEdit = true;
+            switch (DataType)
+            {
+                case ValueType.Number:
+                    valueTextBox.Text = NumberVal.ToString();
+                    break;
+                case ValueType.String:
+                    valueTextBox.Text = StringVal;
+                    break;
+            }                
         }
     }
 }

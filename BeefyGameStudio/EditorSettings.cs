@@ -20,6 +20,7 @@ namespace BeefyGameStudio
         public static int SelectionBorderWidth { get; set; }
         public static Color SelectionBorderColor { get; set; }
         public static float PanSpeed { get; set; }
+        public static float PixelScale { get; set; }
         public static Color YAxisColor { get; set; }
         public static Color XAxisColor { get; set; }
         public static Color OriginColor { get; set; }
@@ -27,8 +28,9 @@ namespace BeefyGameStudio
 
         public static void Init()
         {
-            GridSize = 100; //px
+            GridSize = 10; //px
             PanSpeed = 1;
+            PixelScale = 100;
             ShowScaleInViewPort = true;
             ShowFPSInViewPort = true;
             SelectionBorderWidth = 2;

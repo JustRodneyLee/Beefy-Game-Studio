@@ -58,35 +58,6 @@ namespace BeefyGameStudio
         }
     }
 
-    /// <summary>
-    /// Modification class for Undo and Redo functions
-    /// </summary>
-    public class Modification
-    {
-        public List<string> targetObjID = new List<string>();
-        public List<string> Tag = new List<string>(); //Parameter to change
-        public List<object> Delta = new List<object>(); //Value of change
-
-        public Modification()
-        {
-
-        }
-
-        public Modification(List<string> objectIDs, List<string> tags, List<object> deltas)
-        {
-            targetObjID = objectIDs;
-            Tag = tags;
-            Delta = deltas;
-        }
-
-        public void Register(string id, string tag, object delta)
-        {
-            targetObjID.Add(id);
-            Tag.Add(tag);
-            Delta.Add(delta);
-        }
-    }
-
     public partial class BGS : Form
     {
         public enum FileType
@@ -179,7 +150,7 @@ namespace BeefyGameStudio
                             switch (type)
                             {
                                 case BeefyAssetType.Visual:
-                                    BeefySprite bs = new BeefySprite() { AssetName = aName, AssetPath = path, SpriteData = Texture2D.FromStream(MainViewport.Editor.graphics, stream) };
+                                    BeefySprite bs = new BeefySprite() { AssetName = aName, AssetPath = path, SpriteData = Texture2D.FromStream(MainViewport.Editor.graphics, stream), ImportScale = EditorSettings.PixelScale };
                                     assetLib.AddAsset(bs);
                                     AssetLibrary.LargeImageList.Images.Add(bs.AssetName, FitImage(Image.FromStream(stream)));
                                     AssetLibrary.Items.Add(bs.AssetName, bs.AssetName, bs.AssetName);

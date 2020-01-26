@@ -106,6 +106,11 @@ namespace BeefyEngine
         }
 
         #region AddVertex Implementations
+        public void AddVertex(Vector2 vec)
+        {
+            vertexSet.Add(new BeefyVertex(vec));
+        }
+
         public void AddVertex(BeefyVertex targetVert)
         {
             vertexSet.Add(targetVert);
@@ -290,7 +295,7 @@ namespace BeefyEngine
         /// <param name="bs1">Shape 1</param>
         /// <param name="bs2">Shape 2</param>
         /// <returns></returns>
-        public static bool IsIntersecting(BeefyShape bs1, BeefyShape bs2) //TODO : Convex Shape Fix
+        public static bool IsIntersecting(BeefyShape bs1, BeefyShape bs2) //TODO : Concave Shape Fix
         {
             Vector2 Support(BeefyShape shape1, BeefyShape shape2, Vector2 v)
             {
@@ -427,6 +432,42 @@ namespace BeefyEngine
         public void Dispose()
         {
             throw new NotImplementedException();
+        }
+    }
+
+    public class BeefyRectangle : BeefyShape
+    {
+        bool RectangleConstructed;
+        public float X { get { if (RectangleConstructed) return vertexSet.First().X; else return 0; } set { if (RectangleConstructed) vertexSet.First().X = value; } }
+        public float Y { get { if (RectangleConstructed) return vertexSet.First().Y; else return 0; } set { if (RectangleConstructed) vertexSet.First().Y = value; } }
+
+        public float Height 
+        { 
+            get { if (RectangleConstructed) return vertexSet[2].Y - vertexSet.First().Y; else return 0; } 
+            set { if (RectangleConstructed) vertexSet[2].Y = vertexSet.First().Y + value; } 
+        }
+
+        public float Width 
+        { 
+            get { if (RectangleConstructed) return vertexSet[2].X - vertexSet.First().X; else return 0; } 
+            set { if (RectangleConstructed) vertexSet[2].X = vertexSet.First().X + value; } 
+        }
+
+        public BeefyRectangle() : base()
+        {            
+        }
+
+        /// <summary>
+        /// Defines a Beefy Rectangle using two diagonally opposite vertices
+        /// </summary>
+        public BeefyRectangle(Vector2 v1, Vector2 v2) : base()
+        {   
+            vertexSet.Add(new BeefyVertex(v1));
+            vertexSet.Add(new BeefyVertex(new Vector2(v1.X, v2.Y)));
+            vertexSet.Add(new BeefyVertex(v2));
+            vertexSet.Add(new BeefyVertex(new Vector2(v2.X, v1.Y)));
+            origin = (v1 + v2) / 2;
+            RectangleConstructed = true;
         }
     }
 

@@ -10,11 +10,19 @@ namespace BeefyEngine
     public class BeefyScriptComponent : IBeefyComponent
     {
         //TODO
-        public string ComponentID { get { return "CustomComponent"; } }
+        public string ComponentID { get { return "ScriptComponent"; } }
 
         public bool Enabled { get; internal set; }
 
         public BeefyObject Entity { get; set; }
+
+        public BeefyScript Script { get; set; }
+
+        public BeefyScriptComponent(BeefyObject parent)
+        {
+            Entity = parent;
+            Enabled = true;
+        }
 
         public object Clone()
         {

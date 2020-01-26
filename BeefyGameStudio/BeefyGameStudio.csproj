@@ -98,7 +98,9 @@
     <Compile Include="Components\InputComponent.Designer.cs">
       <DependentUpon>InputComponent.cs</DependentUpon>
     </Compile>
-    <Compile Include="Components\InspectorComponent.cs" />
+    <Compile Include="Components\InspectorComponent.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Components\LightingComponent.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -124,6 +126,9 @@
       <DependentUpon>TransformComponent.cs</DependentUpon>
     </Compile>
     <Compile Include="EditorSettings.cs" />
+    <Compile Include="GameViewport.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Engine\BeefyAsset.cs" />
     <Compile Include="Engine\BeefyAssetManager.cs" />
     <Compile Include="Engine\BeefyAudioEngine.cs" />
@@ -141,9 +146,7 @@
     <Compile Include="Engine\BeefyScript.cs" />
     <Compile Include="Engine\BeefyShape.cs" />
     <Compile Include="Engine\BeefyUI.cs" />
-    <Compile Include="GameViewport.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="Viewport_Old.cs" />
     <Compile Include="Hotkeys.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -184,6 +187,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Components\PhysicsComponent.resx">
       <DependentUpon>PhysicsComponent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Components\Renderer2DComponent.resx">
+      <DependentUpon>Renderer2DComponent.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Components\TransformComponent.resx">
       <DependentUpon>TransformComponent.cs</DependentUpon>

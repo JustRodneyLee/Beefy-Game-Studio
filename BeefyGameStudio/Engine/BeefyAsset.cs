@@ -80,6 +80,7 @@ namespace BeefyEngine
         public string AssetPath { get; set; }
         public BeefyAssetType AssetType { get { return BeefyAssetType.Visual; } }
         public Texture2D SpriteData { get; set; }
+        public float ImportScale { get; set; }
     }
 
     public class BeefySound : IBeefyAsset

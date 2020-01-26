@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using BeefyGameStudio.Components;
 
 namespace BeefyGameStudio
 {
@@ -13,7 +14,7 @@ namespace BeefyGameStudio
         ImportAction importAction;
         
         bool lvlSaved;
-        bool lvlModified;
+        bool lvlModified;        
 
         public BGS()
         {
@@ -26,7 +27,7 @@ namespace BeefyGameStudio
             MainViewport.SetControls(ViewportAddMenuStrip, ViewportEditMenuStrip, LayerMenuStrip, InspectorLabel, InspectorPanel, addProperty, (ToolStripStatusLabel)StatusStrip.Items[0], AllLayersHierarchy);
             InitGameViewport();            
             InitAssetLib();
-            this.Text = "Beefy Game Studio v" + EditorSettings.Version + " - " + MainViewport.Level.LevelID;
+            Text = "Beefy Game Studio v" + EditorSettings.Version + " - " + MainViewport.Level.LevelID;
         }
 
         private void InitAssetLib()
@@ -38,8 +39,8 @@ namespace BeefyGameStudio
 
         private void InitGameViewport()
         {
-            MainViewport.Editor.Initialize();
             MainViewport.LoadLevel(new BeefyLevel("New Level"));
+            MainViewport.Editor.Initialize();            
             lvlSaved = false;
             lvlModified = true;
         }
@@ -166,6 +167,7 @@ namespace BeefyGameStudio
 
         private void AudioToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            fileType = FileType.Asset;
             OpenFileDialog.Multiselect = true;
             OpenFileDialog.Title = "Beefy Game Studio - Add Audio to Library";
             OpenFileDialog.Filter = "Ogg Vorbis|*.ogg";
@@ -548,39 +550,37 @@ namespace BeefyGameStudio
         private void AddRenderer2DPropertyToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MainViewport.InspectedObject.AddComponent(new BeefyRenderer2D(MainViewport.InspectedObject));
-            MainViewport.Invalidate();
+            MainViewport.Inspect(MainViewport.InspectedObject);
         }
 
         private void AddAudioPropertyToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MainViewport.InspectedObject.AddComponent(new BeefyAudio(MainViewport.InspectedObject));
-            MainViewport.Invalidate();
+            MainViewport.Inspect(MainViewport.InspectedObject);
         }
 
         private void AddPhysicsPropertyToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MainViewport.InspectedObject.AddComponent(new BeefyPhysics(MainViewport.InspectedObject));
             MainViewport.Inspect(MainViewport.InspectedObject);
-            MainViewport.Invalidate();
         }
 
         private void AddInputPropertyToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MainViewport.InspectedObject.AddComponent(new BeefyInputController(MainViewport.InspectedObject));
             MainViewport.Inspect(MainViewport.InspectedObject);
-            MainViewport.Invalidate();
         }
 
         private void AddCameraPropertyToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //MainViewport.InspectedObject.AddComponent(new BeefyCameraTracking(MainViewport.InspectedObject));
-            MainViewport.Invalidate();
+            MainViewport.Inspect(MainViewport.InspectedObject);
         }
 
         private void CustomToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MainViewport.InspectedObject.AddComponent(new BeefyCustomProperty(MainViewport.InspectedObject));
-            MainViewport.Invalidate();
+            MainViewport.Inspect(MainViewport.InspectedObject);
         }
         #endregion
 
@@ -611,6 +611,15 @@ namespace BeefyGameStudio
                     assetLib.Reset();
                 }
             }
+        }
+
+        private void addObjectToLibToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            fileType = FileType.Asset;
+            OpenFileDialog.Multiselect = true;
+            OpenFileDialog.Title = "Beefy Game Studio - Add Object to Library";
+            OpenFileDialog.Filter = "Beefy Game Object|*.bgo";
+            OpenFileDialog.ShowDialog();
         }
         #endregion
 
@@ -650,11 +659,11 @@ namespace BeefyGameStudio
 
         private void editingToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (MainViewport.CanRedo)
+            if (true)
                 redoToolStripMenuItem.Enabled = true;
             else
                 redoToolStripMenuItem.Enabled = false;
-            if (MainViewport.CanUndo)
+            if (true)
                 undoToolStripMenuItem.Enabled = true;
             else
                 undoToolStripMenuItem.Enabled = false;
@@ -673,7 +682,6 @@ namespace BeefyGameStudio
                 deleteToolStripMenuItem.Enabled = false;
             }
         }
-
 
         #region Project Menu
         private void newProjToolStripMenuItem_Click(object sender, EventArgs e)
@@ -708,5 +716,18 @@ namespace BeefyGameStudio
                 Close();
         }
         #endregion
+
+        private void InspectorPanel_Resize(object sender, EventArgs e)
+        {
+            foreach (InspectorComponent c in InspectorPanel.Controls)
+            {
+                
+            }
+        }
+
+        private void AssetLibrary_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
+            MainViewport.DeselectAll();            
+        }
     }
 }

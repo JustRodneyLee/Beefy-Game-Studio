@@ -78,6 +78,7 @@
             this.valueTextBox.Size = new System.Drawing.Size(78, 35);
             this.valueTextBox.TabIndex = 2;
             this.valueTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.valueTextBox.Click += new System.EventHandler(this.valueTextBox_Click);
             this.valueTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ValueTextBox_KeyPress);
             this.valueTextBox.Leave += new System.EventHandler(this.ValueTextBox_Leave);
             this.valueTextBox.MouseEnter += new System.EventHandler(this.ValueTextBox_MouseEnter);
@@ -114,10 +115,12 @@
             this.AutoSize = true;
             this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.Controls.Add(this.valueBoxPanel);
+            this.DoubleBuffered = true;
             this.MinimumSize = new System.Drawing.Size(30, 10);
             this.Name = "ValueBox";
             this.Size = new System.Drawing.Size(148, 33);
             this.Load += new System.EventHandler(this.ValueBox_Load);
+            this.EnabledChanged += new System.EventHandler(this.ValueBox_EnabledChanged);
             this.Resize += new System.EventHandler(this.ValueBox_Resize);
             this.valueBoxPanel.ResumeLayout(false);
             this.valueBoxPanel.PerformLayout();
