@@ -43,9 +43,9 @@ namespace BeefyEngine
         public float Rotation { get { return ConvertDegToRad(Entity.GetComponent<BeefyTransform>().Rotation); } }
         public Rectangle SourceRectangle { get; set; }
         public SpriteEffects SpriteEffects { get { return CheckFX(); } }
-        private Vector2 intScaling { get { return Entity.GetComponent<BeefyTransform>().Scale / pxScaling; } }
-        public Vector2 Scaling { get { return AbsoluteScaling() / pxScaling; } }
-        private float pxScaling = 1f; //Internal scaling. Defined during asset import.
+        private Vector2 intScaling { get { return Entity.GetComponent<BeefyTransform>().Scale / PixelScaling; } }
+        public Vector2 Scaling { get { return AbsoluteScaling() / PixelScaling; } }
+        public float PixelScaling { get; set; } //Pixel to coords scaling. Defined during asset import.
         private Color intTint; //Internal tint        
         public Color Tint { get { return intTint * Alpha; } set { intTint = value; } }
         public float Alpha { get; set; }
@@ -131,7 +131,7 @@ namespace BeefyEngine
 
         public void SetScaling(float scale)
         {
-            pxScaling = scale;
+            PixelScaling = scale;
         }
 
         public object Clone()

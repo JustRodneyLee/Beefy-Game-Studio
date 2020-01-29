@@ -91,9 +91,8 @@ namespace BeefyGameStudio
         //Rotating
         float rotation;
         float startRotation;
-        //Zooming
-        float targetZoom;
-        float deltaZoom; //10th of the difference between View.Zoom and targetZoom
+        //Zoom
+        float zoomLvl;
 
         Vector2 modifierOrigin; //Origin variable for all modifying
 
@@ -134,8 +133,8 @@ namespace BeefyGameStudio
             base.Initialize();
             View = new Camera2D();
             View.Position = new Vector2(0, 0);
-            View.Zoom = 50f;
-            targetZoom = 50f;
+            View.Zoom = 32f;
+            zoomLvl = 2f;
             editorAction = EditorAction.None;
             lastAction = editorAction;
             editorManipulator = EditorManipulator.NoEdit;
@@ -451,24 +450,28 @@ namespace BeefyGameStudio
             {
                 if (e.Delta > 0)
                 {
-                    if (targetZoom >= 10f && targetZoom < 100f)
-                        targetZoom += 5f;
-                    else if (targetZoom >= 1f && targetZoom < 10f)
-                        targetZoom += 1f;
-                    else if (targetZoom < 1f)
-                        targetZoom += 0.1f;
+                    View.Zoom *= 2f;
+                    if (View.Zoom >= 256f)
+                        View.Zoom = 256f;
                 }
                 else
                 {
-                    if (targetZoom > 10f && targetZoom <= 100f)
-                        targetZoom -= 5f;
-                    else if (targetZoom > 1f && targetZoom <= 10f)
-                        targetZoom -= 1f;
-                    else if (targetZoom > 0.1f && targetZoom <= 1f)
-                        targetZoom -= 0.1f;
+                    View.Zoom *= 0.5f;
+                    if (View.Zoom <= 0.25f)
+                        View.Zoom = 0.25f;
                 }
-                targetZoom = (float)Math.Round(targetZoom, 1);
-                deltaZoom = (targetZoom - View.Zoom) / 5f; 
+                if (View.Zoom >= 0.25f && View.Zoom <= 2f)
+                {
+                    zoomLvl = 2f / View.Zoom;
+                }
+                else if (View.Zoom >= 4f && View.Zoom <= 32f)
+                {
+                    zoomLvl = 32f / View.Zoom;
+                }
+                else if (View.Zoom >= 64f && View.Zoom <= 256f)
+                {
+                    zoomLvl = 256f / View.Zoom;
+                }
             }
 
             ///Zooming
@@ -1513,9 +1516,9 @@ namespace BeefyGameStudio
                 if (br != null)
                 {
                     boundary.AddVertex(firstVert);
-                    boundary.AddVertex(firstVert + new Vector2(br.Texture.Width * br.Scaling.X, 0));
-                    boundary.AddVertex(firstVert + new Vector2(br.Texture.Width * br.Scaling.X, -br.Texture.Height * br.Scaling.Y));
-                    boundary.AddVertex(firstVert + new Vector2(0, -br.Texture.Height * br.Scaling.Y));
+                    boundary.AddVertex(firstVert + new Vector2(br.Texture.Width / br.PixelScaling, 0));
+                    boundary.AddVertex(firstVert + new Vector2(br.Texture.Width / br.PixelScaling, -br.Texture.Height / br.PixelScaling));
+                    boundary.AddVertex(firstVert + new Vector2(0, -br.Texture.Height / br.PixelScaling));
                 }            
             }
             else
@@ -1547,24 +1550,6 @@ namespace BeefyGameStudio
         {
             base.Update(gameTime);
             MousePosStr = "Mouse Pos:[" + Math.Round(EditorMousePos.X, 2).ToString() + "," + Math.Round(EditorMousePos.Y, 2).ToString() + "]";
-            if (View.Zoom != targetZoom)
-            {
-                View.Zoom += deltaZoom;
-            }
-            else
-            {
-                deltaZoom = 0;
-            }
-            if (View.Zoom < targetZoom && deltaZoom < 0)
-            {
-                View.Zoom = targetZoom;
-                deltaZoom = 0;
-            }
-            else if (View.Zoom > targetZoom && deltaZoom > 0)
-            {
-                View.Zoom = targetZoom;
-                deltaZoom = 0;
-            }
             Editor.Cam.Position = View.Position * View.Zoom;
             RecalculateCulling();
             DrawnObjects = new List<BeefyObject>();
@@ -1664,28 +1649,52 @@ namespace BeefyGameStudio
             Editor.BeginCamera2D(SpriteSortMode.BackToFront, BlendState.NonPremultiplied, SamplerState.PointClamp);
             Editor.Cam.Position = View.Position * View.Zoom;
             ///Underlying grid
-            if (View.Zoom >= 0.1f && View.Zoom < 1f)
-                EditorSettings.GridSize = 1000;
-            else if (View.Zoom >= 1f && View.Zoom < 10f)
+            if (View.Zoom <= 2)
+            {
+                EditorSettings.GridSize = 100;
+            }
+            else if (View.Zoom <= 32)
+            {
                 EditorSettings.GridSize = 10;
-            else
+            }
+            else if (View.Zoom <= 256)
+            {
                 EditorSettings.GridSize = 1;
-            int scaledGridSize = (int)(EditorSettings.GridSize * View.Zoom);
-            for (int i = scaledGridSize; i < VPWidth + (int)(Editor.Cam.Position.X); i += scaledGridSize)
+            }
+            else
             {
-                Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle(i, (int)Editor.Cam.Position.Y - VPHeight / 2, 1, VPHeight), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
+                EditorSettings.GridSize = 1;
+            }
+            int minorGridSize = (int)(EditorSettings.GridSize * View.Zoom);
+            int majorGridSize = 9 * minorGridSize;
+            Color minorGridColor = Color.Gray * (0.85f - zoomLvl * 0.05f);
+            for (int i = minorGridSize; i < VPWidth + (int)(Editor.Cam.Position.X); i += minorGridSize)
+            {
+                if (i % majorGridSize == 0)
+                    Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle(i, (int)Editor.Cam.Position.Y - VPHeight / 2, 1, VPHeight), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
+                else
+                    Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle(i, (int)Editor.Cam.Position.Y - VPHeight / 2, 1, VPHeight), null, minorGridColor, 0, default(Vector2), SpriteEffects.None, 0.9998f);
             }            
-            for (int i = -scaledGridSize; i > -VPWidth + (int)(Editor.Cam.Position.X); i -= scaledGridSize)
+            for (int i = -minorGridSize; i > -VPWidth + (int)(Editor.Cam.Position.X); i -= minorGridSize)
             {
-                Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle(i, (int)Editor.Cam.Position.Y - VPHeight / 2, 1, VPHeight), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
+                if (i % majorGridSize == 0)
+                    Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle(i, (int)Editor.Cam.Position.Y - VPHeight / 2, 1, VPHeight), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
+                else
+                    Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle(i, (int)Editor.Cam.Position.Y - VPHeight / 2, 1, VPHeight), null, minorGridColor, 0, default(Vector2), SpriteEffects.None, 0.9998f);
             }
-            for (int i = scaledGridSize; i < VPHeight + (int)(Editor.Cam.Position.Y); i += scaledGridSize)
+            for (int i = minorGridSize; i < VPHeight + (int)(Editor.Cam.Position.Y); i += minorGridSize)
             {
-                Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle((int)Editor.Cam.Position.X - VPWidth / 2, i, VPWidth, 1), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
+                if (i % majorGridSize == 0)
+                    Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle((int)Editor.Cam.Position.X - VPWidth / 2, i, VPWidth, 1), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
+                else
+                    Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle((int)Editor.Cam.Position.X - VPWidth / 2, i, VPWidth, 1), null, minorGridColor, 0, default(Vector2), SpriteEffects.None, 0.9998f);
             }
-            for (int i = -scaledGridSize; i > -VPHeight + (int)(Editor.Cam.Position.Y); i -= scaledGridSize)
+            for (int i = -minorGridSize; i > -VPHeight + (int)(Editor.Cam.Position.Y); i -= minorGridSize)
             {
-                Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle((int)Editor.Cam.Position.X - VPWidth / 2, i, VPWidth, 1), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
+                if (i % majorGridSize == 0)
+                    Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle((int)Editor.Cam.Position.X - VPWidth / 2, i, VPWidth, 1), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
+                else
+                    Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle((int)Editor.Cam.Position.X - VPWidth / 2, i, VPWidth, 1), null, minorGridColor, 0, default(Vector2), SpriteEffects.None, 0.9998f);
             }            
             ///X-Y Axis & Origin            
             if (CullingRect.Y >= 0 && (CullingRect.Y - CullingRect.Height) <= 0)
@@ -1798,7 +1807,8 @@ namespace BeefyGameStudio
 
             #region Draw Editor HUD
             Editor.spriteBatch.Begin();
-            Editor.spriteBatch.DrawString(Editor.Font, "Scale:" + targetZoom + "x", new Vector2(0, 0), Color.White);
+            Editor.spriteBatch.DrawString(Editor.Font, "Scale:" + View.Zoom + "x", new Vector2(0, 0), Color.White);
+            Editor.spriteBatch.DrawString(Editor.Font, zoomLvl.ToString(), new Vector2(0, Editor.FontHeight), Color.White);
             Editor.spriteBatch.DrawString(Editor.Font, MousePosStr, new Vector2((int)((VPWidth - Editor.Font.MeasureString(MousePosStr).X)/2), 0), Color.White);
             Editor.spriteBatch.End();
             #endregion            
