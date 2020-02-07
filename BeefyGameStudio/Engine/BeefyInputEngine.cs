@@ -71,8 +71,7 @@ namespace BeefyEngine
         public BMouseMove(MouseAxis axis)
         {
             InputDevice = InputDevice.Mouse;
-            InputAxis = axis;            
-            
+            InputAxis = axis;                        
         }
 
         public InputDevice InputDevice { get; }        

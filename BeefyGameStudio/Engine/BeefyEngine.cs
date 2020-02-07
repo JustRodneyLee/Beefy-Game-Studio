@@ -17,6 +17,7 @@ namespace BeefyEngine
         public BeefyRenderingEngine BRenderer { get; internal set; }
         public BeefyAudioEngine BAudio { get; internal set; }
         public BeefyUISystem BUI { get; internal set; }
+        public BeefyAssetManager BAsset { get; internal set; }
 
         public string GameName { get; set; }
         public int FPS { get; internal set; }
@@ -28,7 +29,7 @@ namespace BeefyEngine
 
         public BeefyEngine()
         {        
-            BeefyDebugger.LogInternal("Running " + GameName + " on Beefy Engine v" + _Version.ToString());
+            BeefyDebugger.LogInternal("Running " + GameName + " on Beefy Engine v" + _Version.ToString());            
         }
 
         protected override void Initialize()
@@ -45,6 +46,8 @@ namespace BeefyEngine
             BeefyDebugger.LogInternal("Beefy Audio Engine Initialization Complete.");
             BUI = new BeefyUISystem(this);
             BeefyDebugger.LogInternal("Beefy UI System Initialization Complete.");
+            BAsset = new BeefyAssetManager(this);
+            BeefyDebugger.LogInternal("Beefy Asset Manager Initialization Complete.");
             Levels = new List<BeefyLevel>();
             BeefyDebugger.LogInternal("Beefy Engine Start-Up Complete.");
         }
@@ -52,7 +55,7 @@ namespace BeefyEngine
         protected override void LoadContent() //Load all or load portion of game data?
         {
             //TODO
-            
+                        
             base.LoadContent();            
         }
 

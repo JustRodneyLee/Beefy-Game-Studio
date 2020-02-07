@@ -1185,12 +1185,13 @@ namespace BeefyGameStudio
         {
             string lvlPath = path.Split('.').First();
             Directory.CreateDirectory(lvlPath);
+            LevelData data = new LevelData(Level);
             //Write level settings using XML serialiation
             XmlSerializer serializer;
-            using (StreamWriter file = new StreamWriter(lvlPath + "\\settings"))
+            using (StreamWriter file = new StreamWriter(lvlPath + "\\" + Level.LevelID + ".bgl"))
             {
-                //TODO
-                //XmlWriter writer = XmlWriter.Create()
+                serializer = new XmlSerializer(typeof(LevelData));
+                serializer.Serialize(file, data);
             }                        
             foreach (BeefyLayer bl in Level.Layers)
             {
@@ -1570,6 +1571,7 @@ namespace BeefyGameStudio
                 }
             }
             InspectorUpdate();
+            if (Focused)
             switch (editorAction)
             {
                 case EditorAction.None:
@@ -1668,6 +1670,7 @@ namespace BeefyGameStudio
             int minorGridSize = (int)(EditorSettings.GridSize * View.Zoom);
             int majorGridSize = 9 * minorGridSize;
             Color minorGridColor = Color.Gray * (0.85f - zoomLvl * 0.05f);
+            //TODO : Bug fix. Lines disappear when zooming in 256x at 800,800
             for (int i = minorGridSize; i < VPWidth + (int)(Editor.Cam.Position.X); i += minorGridSize)
             {
                 if (i % majorGridSize == 0)

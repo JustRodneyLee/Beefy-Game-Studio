@@ -156,6 +156,15 @@ namespace BeefyGameStudio
             layerNameLabel.Visible = true;
         }
 
+        private void addScriptToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            fileType = FileType.Asset;
+            OpenFileDialog.Multiselect = true;
+            OpenFileDialog.Title = "Beefy Game Studio - Add Script to Library";
+            OpenFileDialog.Filter = "Beefy Game Script|*.bgs";
+            OpenFileDialog.ShowDialog();
+        }
+
         private void TextureToolStripMenuItem_Click(object sender, EventArgs e)
         {
             fileType = FileType.Asset;
@@ -654,7 +663,10 @@ namespace BeefyGameStudio
 
         private void InspectorVSHierarchy_Panel2_Resize(object sender, EventArgs e)
         {
-            //MainViewport.Inspect(MainViewport.InspectedObject);
+            foreach (Control c in InspectorPanel.Controls)
+            {
+                c.Width = InspectorPanel.Width - 2 * InspectorPanel.Margin.Horizontal;
+            }
         }
 
         private void editingToolStripMenuItem_Click(object sender, EventArgs e)
@@ -686,7 +698,12 @@ namespace BeefyGameStudio
         #region Project Menu
         private void newProjToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //TODO
+            NewProject np = new NewProject();
+            if (np.ShowDialog()==DialogResult.OK)
+            {
+                NewProject(np.Path);
+                np.Dispose();
+            }
         }
 
         private void openProjToolStripMenuItem_Click(object sender, EventArgs e)
@@ -719,15 +736,38 @@ namespace BeefyGameStudio
 
         private void InspectorPanel_Resize(object sender, EventArgs e)
         {
-            foreach (InspectorComponent c in InspectorPanel.Controls)
+            foreach (Control c in InspectorPanel.Controls)
             {
-                
+                c.Width = InspectorPanel.Width - 2 * InspectorPanel.Margin.Horizontal;
             }
         }
 
         private void AssetLibrary_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
             MainViewport.DeselectAll();            
+        }
+
+        private void buildProjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void buildAssetLibraryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void folderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        /// <summary>
+        /// Creates a new Beefy Script
+        /// </summary>
+        private void scriptToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -121,6 +121,9 @@
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editingtoolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.preferencesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.buildToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.buildAssetLibraryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.buildProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.hotkeysToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -145,6 +148,21 @@
             this.bringToFrontToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sendToBackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.LayerMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.addScriptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.scriptToLibToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.LibraryMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.libNewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.folderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.scriptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.libAddToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.libTextureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.libAudioToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.libToolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
+            this.libObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.libScriptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.createNewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newScriptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainViewport = new BeefyGameStudio.GameViewport();
             this.StatusStrip.SuspendLayout();
             this.MainLayout.SuspendLayout();
@@ -174,6 +192,7 @@
             this.MainMenu.SuspendLayout();
             this.AddPropertyMenuStrip.SuspendLayout();
             this.ViewportEditMenuStrip.SuspendLayout();
+            this.LibraryMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // addToolStripMenuItem
@@ -251,7 +270,8 @@
             this.textureToolStripMenuItem,
             this.audioToolStripMenuItem,
             this.RawAssetSeparator,
-            this.objectToLibToolStripMenuItem});
+            this.objectToLibToolStripMenuItem,
+            this.scriptToLibToolStripMenuItem});
             this.addAssetToolStripMenuItem.Name = "addAssetToolStripMenuItem";
             this.addAssetToolStripMenuItem.Size = new System.Drawing.Size(126, 20);
             this.addAssetToolStripMenuItem.Text = "Add Asset To Library";
@@ -374,6 +394,7 @@
             // AssetLibrary
             // 
             this.AssetLibrary.AllowDrop = true;
+            this.AssetLibrary.ContextMenuStrip = this.LibraryMenuStrip;
             this.AssetLibrary.Dock = System.Windows.Forms.DockStyle.Fill;
             this.AssetLibrary.HideSelection = false;
             this.AssetLibrary.Location = new System.Drawing.Point(0, 16);
@@ -719,6 +740,7 @@
             this.levelToolStripMenuItem,
             this.libraryToolStripMenuItem,
             this.editingToolStripMenuItem,
+            this.buildToolStripMenuItem,
             this.helpToolStripMenuItem});
             this.MainMenu.Location = new System.Drawing.Point(0, 0);
             this.MainMenu.Name = "MainMenu";
@@ -858,7 +880,8 @@
             this.exportToolStripMenuItem,
             this.resetToolStripMenuItem,
             this.librarytoolStripSeparator,
-            this.addAssetToLibraryToolStripMenuItem});
+            this.addAssetToLibraryToolStripMenuItem,
+            this.createNewToolStripMenuItem});
             this.libraryToolStripMenuItem.Name = "libraryToolStripMenuItem";
             this.libraryToolStripMenuItem.Size = new System.Drawing.Size(55, 20);
             this.libraryToolStripMenuItem.Text = "Library";
@@ -895,7 +918,8 @@
             this.addTextureToolStripMenuItem,
             this.addAudioToolStripMenuItem,
             this.addAssettoolStripSeparator,
-            this.addObjectToLibToolStripMenuItem});
+            this.addObjectToLibToolStripMenuItem,
+            this.addScriptToolStripMenuItem});
             this.addAssetToLibraryToolStripMenuItem.Name = "addAssetToLibraryToolStripMenuItem";
             this.addAssetToLibraryToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
             this.addAssetToLibraryToolStripMenuItem.Text = "Add Asset To Library";
@@ -1007,6 +1031,29 @@
             this.preferencesToolStripMenuItem.Size = new System.Drawing.Size(135, 22);
             this.preferencesToolStripMenuItem.Text = "Preferences";
             this.preferencesToolStripMenuItem.Click += new System.EventHandler(this.PreferencesToolStripMenuItem_Click);
+            // 
+            // buildToolStripMenuItem
+            // 
+            this.buildToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.buildAssetLibraryToolStripMenuItem,
+            this.buildProjectToolStripMenuItem});
+            this.buildToolStripMenuItem.Name = "buildToolStripMenuItem";
+            this.buildToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
+            this.buildToolStripMenuItem.Text = "Build";
+            // 
+            // buildAssetLibraryToolStripMenuItem
+            // 
+            this.buildAssetLibraryToolStripMenuItem.Name = "buildAssetLibraryToolStripMenuItem";
+            this.buildAssetLibraryToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.buildAssetLibraryToolStripMenuItem.Text = "Build Asset Library";
+            this.buildAssetLibraryToolStripMenuItem.Click += new System.EventHandler(this.buildAssetLibraryToolStripMenuItem_Click);
+            // 
+            // buildProjectToolStripMenuItem
+            // 
+            this.buildProjectToolStripMenuItem.Name = "buildProjectToolStripMenuItem";
+            this.buildProjectToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.buildProjectToolStripMenuItem.Text = "Build Project";
+            this.buildProjectToolStripMenuItem.Click += new System.EventHandler(this.buildProjectToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -1182,6 +1229,119 @@
             this.LayerMenuStrip.Size = new System.Drawing.Size(61, 4);
             this.LayerMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.LayerMenuStrip_Opening);
             // 
+            // addScriptToolStripMenuItem
+            // 
+            this.addScriptToolStripMenuItem.Name = "addScriptToolStripMenuItem";
+            this.addScriptToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.addScriptToolStripMenuItem.Text = "Script";
+            this.addScriptToolStripMenuItem.Click += new System.EventHandler(this.addScriptToolStripMenuItem_Click);
+            // 
+            // scriptToLibToolStripMenuItem
+            // 
+            this.scriptToLibToolStripMenuItem.Name = "scriptToLibToolStripMenuItem";
+            this.scriptToLibToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.scriptToLibToolStripMenuItem.Text = "Script";
+            this.scriptToLibToolStripMenuItem.Click += new System.EventHandler(this.addScriptToolStripMenuItem_Click);
+            // 
+            // LibraryMenuStrip
+            // 
+            this.LibraryMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.libNewToolStripMenuItem,
+            this.libAddToolStripMenuItem});
+            this.LibraryMenuStrip.Name = "LibraryMenuStrip";
+            this.LibraryMenuStrip.Size = new System.Drawing.Size(99, 48);
+            // 
+            // libNewToolStripMenuItem
+            // 
+            this.libNewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.folderToolStripMenuItem,
+            this.scriptToolStripMenuItem});
+            this.libNewToolStripMenuItem.Name = "libNewToolStripMenuItem";
+            this.libNewToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
+            this.libNewToolStripMenuItem.Text = "New";
+            // 
+            // folderToolStripMenuItem
+            // 
+            this.folderToolStripMenuItem.Name = "folderToolStripMenuItem";
+            this.folderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.folderToolStripMenuItem.Text = "Folder";
+            this.folderToolStripMenuItem.Click += new System.EventHandler(this.folderToolStripMenuItem_Click);
+            // 
+            // scriptToolStripMenuItem
+            // 
+            this.scriptToolStripMenuItem.Name = "scriptToolStripMenuItem";
+            this.scriptToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.scriptToolStripMenuItem.Text = "Script";
+            this.scriptToolStripMenuItem.Click += new System.EventHandler(this.scriptToolStripMenuItem_Click);
+            // 
+            // libAddToolStripMenuItem
+            // 
+            this.libAddToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.libTextureToolStripMenuItem,
+            this.libAudioToolStripMenuItem,
+            this.libToolStripSeparator,
+            this.libObjectToolStripMenuItem,
+            this.libScriptToolStripMenuItem});
+            this.libAddToolStripMenuItem.Name = "libAddToolStripMenuItem";
+            this.libAddToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
+            this.libAddToolStripMenuItem.Text = "Add";
+            // 
+            // libTextureToolStripMenuItem
+            // 
+            this.libTextureToolStripMenuItem.Name = "libTextureToolStripMenuItem";
+            this.libTextureToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.libTextureToolStripMenuItem.Text = "Texture";
+            this.libTextureToolStripMenuItem.Click += new System.EventHandler(this.TextureToolStripMenuItem_Click);
+            // 
+            // libAudioToolStripMenuItem
+            // 
+            this.libAudioToolStripMenuItem.Name = "libAudioToolStripMenuItem";
+            this.libAudioToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.libAudioToolStripMenuItem.Text = "Audio";
+            this.libAudioToolStripMenuItem.Click += new System.EventHandler(this.AudioToolStripMenuItem_Click);
+            // 
+            // libToolStripSeparator
+            // 
+            this.libToolStripSeparator.Name = "libToolStripSeparator";
+            this.libToolStripSeparator.Size = new System.Drawing.Size(177, 6);
+            // 
+            // libObjectToolStripMenuItem
+            // 
+            this.libObjectToolStripMenuItem.Name = "libObjectToolStripMenuItem";
+            this.libObjectToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.libObjectToolStripMenuItem.Text = "Object";
+            this.libObjectToolStripMenuItem.Click += new System.EventHandler(this.ObjectToLibToolStripMenuItem_Click);
+            // 
+            // libScriptToolStripMenuItem
+            // 
+            this.libScriptToolStripMenuItem.Name = "libScriptToolStripMenuItem";
+            this.libScriptToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.libScriptToolStripMenuItem.Text = "Script";
+            this.libScriptToolStripMenuItem.Click += new System.EventHandler(this.addScriptToolStripMenuItem_Click);
+            // 
+            // createNewToolStripMenuItem
+            // 
+            this.createNewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.newFolderToolStripMenuItem,
+            this.newScriptToolStripMenuItem});
+            this.createNewToolStripMenuItem.Name = "createNewToolStripMenuItem";
+            this.createNewToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.createNewToolStripMenuItem.Text = "Create New";
+            // 
+            // newFolderToolStripMenuItem
+            // 
+            this.newFolderToolStripMenuItem.Name = "newFolderToolStripMenuItem";
+            this.newFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.newFolderToolStripMenuItem.Text = "Folder";
+            this.newFolderToolStripMenuItem.Click += new System.EventHandler(this.folderToolStripMenuItem_Click);
+            // 
+            // newScriptToolStripMenuItem
+            // 
+            this.newScriptToolStripMenuItem.Name = "newScriptToolStripMenuItem";
+            this.newScriptToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.newScriptToolStripMenuItem.Text = "Script";
+            this.newScriptToolStripMenuItem.Click += new System.EventHandler(this.scriptToolStripMenuItem_Click);
+            // 
             // MainViewport
             // 
             this.MainViewport.AllowDrop = true;
@@ -1250,6 +1410,7 @@
             this.AddPropertyMenuStrip.ResumeLayout(false);
             this.AddPropertyMenuStrip.PerformLayout();
             this.ViewportEditMenuStrip.ResumeLayout(false);
+            this.LibraryMenuStrip.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1372,6 +1533,24 @@
         private System.Windows.Forms.ToolStripMenuItem addObjectToLibToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem projSettingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator ProjectSeparator;
+        private System.Windows.Forms.ToolStripMenuItem buildToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem buildAssetLibraryToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem buildProjectToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem scriptToLibToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem addScriptToolStripMenuItem;
+        private System.Windows.Forms.ContextMenuStrip LibraryMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem libNewToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem folderToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem scriptToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem libAddToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem libTextureToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem libAudioToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator libToolStripSeparator;
+        private System.Windows.Forms.ToolStripMenuItem libObjectToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem libScriptToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem createNewToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem newFolderToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem newScriptToolStripMenuItem;
     }
 }
 

@@ -87,7 +87,7 @@ namespace BeefyEngine
         }
     }
 
-    public struct BeefyLevelSettings
+    public class BeefyLevelSettings
     {
         //TODO
     }

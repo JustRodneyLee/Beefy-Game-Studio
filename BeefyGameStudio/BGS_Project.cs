@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Build;
 using Microsoft.Build.Construction;
 using BeefyEngine;
@@ -181,11 +182,26 @@ namespace BeefyGameStudio
             return true;
         }
 
-        public void NewProject()
+        public void NewProject(string path)
         {
             //SolutionFile solution;
             //Use Microsoft.Build.Construction to create a new project file
             //TODO
+            try
+            {
+                Directory.CreateDirectory(path);
+                Directory.CreateDirectory(path + "\\Build");
+                Directory.CreateDirectory(path + "\\Raw");
+                Directory.CreateDirectory(path + "\\Engine");
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.ToString(), "Beefy Game Studio - Unhandled Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+
+            }
         }
 
         public bool SaveLevel(string path)

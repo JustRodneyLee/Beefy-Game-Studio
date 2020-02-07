@@ -79,6 +79,12 @@
     <Compile Include="AssetLibrary.Designer.cs">
       <DependentUpon>AssetLibrary.cs</DependentUpon>
     </Compile>
+    <Compile Include="BeefyHub.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BeefyHub.Designer.cs">
+      <DependentUpon>BeefyHub.cs</DependentUpon>
+    </Compile>
     <Compile Include="BGS.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -126,11 +132,11 @@
       <DependentUpon>TransformComponent.cs</DependentUpon>
     </Compile>
     <Compile Include="EditorSettings.cs" />
+    <Compile Include="Engine\BeefyAsset.cs" />
     <Compile Include="GameViewport.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Engine\BeefyAsset.cs" />
-    <Compile Include="Engine\BeefyAssetManager.cs" />
+    <Compile Include="EditorAsset.cs" />
     <Compile Include="Engine\BeefyAudioEngine.cs" />
     <Compile Include="Engine\BeefyCamera.cs" />
     <Compile Include="Engine\BeefyEngine.cs" />
@@ -146,6 +152,21 @@
     <Compile Include="Engine\BeefyScript.cs" />
     <Compile Include="Engine\BeefyShape.cs" />
     <Compile Include="Engine\BeefyUI.cs" />
+    <Compile Include="NewProject.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NewProject.Designer.cs">
+      <DependentUpon>NewProject.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ScriptEditor.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ScriptEditorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ScriptEditorForm.Designer.cs">
+      <DependentUpon>ScriptEditorForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Viewport_Old.cs" />
     <Compile Include="Hotkeys.cs">
       <SubType>Form</SubType>
@@ -179,6 +200,9 @@
     <EmbeddedResource Include="AssetLibrary.resx">
       <DependentUpon>AssetLibrary.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="BeefyHub.resx">
+      <DependentUpon>BeefyHub.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="BGS.resx">
       <DependentUpon>BGS.cs</DependentUpon>
     </EmbeddedResource>
@@ -197,6 +221,9 @@
     <EmbeddedResource Include="Hotkeys.resx">
       <DependentUpon>Hotkeys.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="NewProject.resx">
+      <DependentUpon>NewProject.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ProjectSettings.resx">
       <DependentUpon>ProjectSettings.cs</DependentUpon>
     </EmbeddedResource>
@@ -210,6 +237,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="ScriptEditorForm.resx">
+      <DependentUpon>ScriptEditorForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SearchBar.resx">
       <DependentUpon>SearchBar.cs</DependentUpon>
     </EmbeddedResource>

@@ -3,91 +3,74 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
-using BeefyEngine;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace BeefyEngine
 {
-    public enum BeefyAssetType
-    {
-        Visual,
-        Auditory,
-        Object,
-    }
+    public class BeefyAssetManager
+    {        
+        ContentManager mainContent;
+        Dictionary<BeefyLevel, ContentManager> contents; //Extra Content Managers for levels
 
-    public interface IBeefyAsset
-    {
-        string AssetName { get; set; }
-        string AssetPath { get; set; }
-        BeefyAssetType AssetType { get; }
-    }
+        public BeefyEngine Core { get; }
 
-    public class BeefyAssetLibrary
-    {
-        public string LibraryName { get; set; }
-        public Dictionary<string, IBeefyAsset> Assets { get; set; }
-
-        public BeefyAssetLibrary(string name)
+        public BeefyAssetManager(BeefyEngine core)
         {
-            LibraryName = name;
-            Assets = new Dictionary<string, IBeefyAsset>();
+            Core = core;
         }
 
-        public void AddAsset(IBeefyAsset asset)
+        public bool LoadAsset<T>(string assetPath, BeefyLevel beefyLevel)
         {
-            Assets.Add(asset.AssetName, asset);
-        }
-
-        public void Reset()
-        {
-            Assets.Clear();
-        }
-
-        public IBeefyAsset GetAssetByID(string id)
-        {
-            return Assets[id];
-        }
-
-        public List<IBeefyAsset> GetAssetsByIDs(List<string> ids)
-        {
-            List<IBeefyAsset> ibaList = new List<IBeefyAsset>();
-            foreach (string id in ids)
-            {
-                ibaList.Add(Assets[id]);
-            }
-            return ibaList;
-        }
-
-        public void RemoveAsset(string id)
-        {
-            Assets.Remove(id);
-        }
-
-        public bool Exists(string id)
-        {
-            if (Assets.ContainsKey(id))
+            //beefyLevel. mainContent.Load<T>(assetPath);
+            try
             {
                 return true;
             }
-            return false;
+            catch(Exception e)
+            {
+                return false;
+            }
+        }
+
+        public void Dispose()
+        {
+            mainContent.Unload();
+            mainContent.Dispose();
         }
     }
 
-    public class BeefySprite : IBeefyAsset
+    public class LevelData
     {
-        public string AssetName { get; set; }
-        public string AssetPath { get; set; }
-        public BeefyAssetType AssetType { get { return BeefyAssetType.Visual; } }
-        public Texture2D SpriteData { get; set; }
-        public float ImportScale { get; set; }
+        BeefyLevelSettings settings;
+        Dictionary<string, string> layers_objects;
+        Dictionary<string, int> layersID_layerNo;
+
+        public LevelData()
+        {
+
+        }
+
+        public LevelData(BeefyLevel bl)
+        {
+            settings = bl.Settings;
+            layers_objects = new Dictionary<string, string>();
+            foreach(BeefyLayer layer in bl.Layers)
+            {
+                foreach (BeefyObject bo in layer.BOC)
+                {
+                    layers_objects.Add(layer.LayerID, bo.ObjectID);
+                }
+            }
+        }
+
     }
 
-    public class BeefySound : IBeefyAsset
+    public class ObjectData
     {
-        public string AssetName { get; set; }
-        public string AssetPath { get; set; }
-        public BeefyAssetType AssetType { get { return BeefyAssetType.Auditory; } }
-        public SoundEffect AudioSource { get; set; }
+
     }
+
 }
