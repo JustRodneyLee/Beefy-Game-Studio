@@ -13,7 +13,8 @@ namespace BeefyGameStudio
 {
     public partial class NewProject : Form
     {
-        public string Path { get; set; }
+        public string ProjPath { get; set; }
+        public string ProjName { get; set; }
 
         public NewProject()
         {
@@ -27,31 +28,8 @@ namespace BeefyGameStudio
 
         private void buttonConfirm_Click(object sender, EventArgs e)
         {
-            if (textBoxName.Text.Replace(" ","")!="")
-            {
-                if (textBoxName.Text.Contains("|")||textBoxName.Text.Contains("\\")||textBoxName.Text.Contains("/") || textBoxName.Text.Contains("?") || textBoxName.Text.Contains("*") || textBoxName.Text.Contains(":") ||textBoxName.Text.Contains("<") || textBoxName.Text.Contains(">") || textBoxName.Text.Contains("\"")) //Illegal characters
-                {
-                    MessageBox.Show("Project name contains illegal characters!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                else
-                {
-                    if (Directory.Exists(comboBoxPath.SelectedItem.ToString() + "\\" + textBoxName.Text))
-                    {
-                        MessageBox.Show("Folder already exists!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    else
-                    {
-                        DialogResult = DialogResult.OK;
-                        Path = comboBoxPath.SelectedItem.ToString() + "\\" + textBoxName.Text;
-                        Close();
-                    }
-                }
-            }
-            else
-            {
-                MessageBox.Show("Project name cannot be empty!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);                
-            }
-        }
+            CreateProject();
+        }        
 
         private void NewProject_Load(object sender, EventArgs e)
         {
@@ -68,6 +46,41 @@ namespace BeefyGameStudio
                     comboBoxPath.Items.Add(folderBrowserDialog.SelectedPath);
                     comboBoxPath.SelectedItem = folderBrowserDialog.SelectedPath;
                 }
+            }
+        }
+
+        private void NewProject_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+                CreateProject();
+        }
+
+        private void CreateProject()
+        {
+            if (textBoxName.Text.Replace(" ", "") != "")
+            {
+                if (textBoxName.Text.Contains("|") || textBoxName.Text.Contains("\\") || textBoxName.Text.Contains("/") || textBoxName.Text.Contains("?") || textBoxName.Text.Contains("*") || textBoxName.Text.Contains(":") || textBoxName.Text.Contains("<") || textBoxName.Text.Contains(">") || textBoxName.Text.Contains("\"")) //Illegal characters
+                {
+                    MessageBox.Show("Project name contains illegal characters!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    if (Directory.Exists(comboBoxPath.SelectedItem.ToString() + "\\" + textBoxName.Text))
+                    {
+                        MessageBox.Show("Folder already exists!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    else
+                    {
+                        DialogResult = DialogResult.OK;
+                        ProjName = textBoxName.Text;
+                        ProjPath = comboBoxPath.SelectedItem.ToString() + "\\" + ProjName;
+                        Close();
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Project name cannot be empty!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

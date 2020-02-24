@@ -48,7 +48,7 @@
             // 
             this.buttonOpen.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.buttonOpen.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonOpen.Location = new System.Drawing.Point(360, 167);
+            this.buttonOpen.Location = new System.Drawing.Point(12, 167);
             this.buttonOpen.Name = "buttonOpen";
             this.buttonOpen.Size = new System.Drawing.Size(62, 62);
             this.buttonOpen.TabIndex = 1;

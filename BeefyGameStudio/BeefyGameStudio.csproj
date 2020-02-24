@@ -24,6 +24,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -42,8 +43,14 @@
     <Reference Include="MonoGame.Forms.DX, Version=2.3.8.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MonoGame.Forms.DX.2.3.8\lib\net451\MonoGame.Forms.DX.dll</HintPath>
     </Reference>
-    <Reference Include="MonoGame.Framework, Version=3.8.0.270, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MonoGame.Forms.DX.2.3.8\lib\net451\MonoGame.Framework.dll</HintPath>
+    <Reference Include="MonoGame.Framework, Version=3.8.0.60, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.RuntimeBuilder.1.0.0\lib\net461\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Framework.Content.Pipeline, Version=3.8.0.60, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.RuntimeBuilder.1.0.0\lib\net461\MonoGame.Framework.Content.Pipeline.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.RuntimeBuilder, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\MonoGame.RuntimeBuilder.1.0.0\lib\net461\MonoGame.RuntimeBuilder.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
       <HintPath>..\packages\MonoGame.Forms.DX.2.3.8\lib\net451\SharpDX.dll</HintPath>
@@ -79,15 +86,16 @@
     <Compile Include="AssetLibrary.Designer.cs">
       <DependentUpon>AssetLibrary.cs</DependentUpon>
     </Compile>
+    <Compile Include="AssetView.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="BeefyHub.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="BeefyHub.Designer.cs">
       <DependentUpon>BeefyHub.cs</DependentUpon>
     </Compile>
-    <Compile Include="BGS.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="BGS.cs" />
     <Compile Include="BGS.Designer.cs">
       <DependentUpon>BGS.cs</DependentUpon>
     </Compile>
@@ -152,6 +160,12 @@
     <Compile Include="Engine\BeefyScript.cs" />
     <Compile Include="Engine\BeefyShape.cs" />
     <Compile Include="Engine\BeefyUI.cs" />
+    <Compile Include="NameDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NameDialog.Designer.cs">
+      <DependentUpon>NameDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="NewProject.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -221,6 +235,9 @@
     <EmbeddedResource Include="Hotkeys.resx">
       <DependentUpon>Hotkeys.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="NameDialog.resx">
+      <DependentUpon>NameDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="NewProject.resx">
       <DependentUpon>NewProject.cs</DependentUpon>
     </EmbeddedResource>
@@ -278,7 +295,12 @@
   <ItemGroup>
     <None Include="Resources\HMGLogoWhiteOnDark.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\MainProgram.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BGS.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\MonoGame.Forms.DX.2.3.8\build\MonoGame.Forms.DX.targets" Condition="Exists('..\packages\MonoGame.Forms.DX.2.3.8\build\MonoGame.Forms.DX.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
@@ -286,5 +308,7 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\MonoGame.Forms.DX.2.3.8\build\MonoGame.Forms.DX.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MonoGame.Forms.DX.2.3.8\build\MonoGame.Forms.DX.targets'))" />
+    <Error Condition="!Exists('..\packages\MonoGame.RuntimeBuilder.1.0.0\build\MonoGame.RuntimeBuilder.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MonoGame.RuntimeBuilder.1.0.0\build\MonoGame.RuntimeBuilder.targets'))" />
   </Target>
+  <Import Project="..\packages\MonoGame.RuntimeBuilder.1.0.0\build\MonoGame.RuntimeBuilder.targets" Condition="Exists('..\packages\MonoGame.RuntimeBuilder.1.0.0\build\MonoGame.RuntimeBuilder.targets')" />
 </Project>

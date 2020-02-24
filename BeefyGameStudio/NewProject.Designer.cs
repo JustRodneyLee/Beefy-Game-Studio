@@ -122,9 +122,10 @@
             this.Name = "NewProject";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Beefy Game Studio - New Project";
             this.Load += new System.EventHandler(this.NewProject_Load);
+            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.NewProject_KeyPress);
             this.ResumeLayout(false);
             this.PerformLayout();
 

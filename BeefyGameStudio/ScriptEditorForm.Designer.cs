@@ -37,7 +37,7 @@
             this.scriptEditor.Location = new System.Drawing.Point(12, 12);
             this.scriptEditor.MouseHoverUpdatesOnly = false;
             this.scriptEditor.Name = "scriptEditor";
-            this.scriptEditor.Size = new System.Drawing.Size(472, 657);
+            this.scriptEditor.Size = new System.Drawing.Size(472, 384);
             this.scriptEditor.TabIndex = 0;
             this.scriptEditor.Text = "Script Editor";
             // 

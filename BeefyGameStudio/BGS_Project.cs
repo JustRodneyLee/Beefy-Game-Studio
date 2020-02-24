@@ -8,11 +8,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Build;
-using Microsoft.Build.Construction;
+using Microsoft.Xna.Framework.Content.Pipeline;
+using MonoGame.RuntimeBuilder;
 using BeefyEngine;
 
 namespace BeefyGameStudio
@@ -27,35 +28,54 @@ namespace BeefyGameStudio
 
     public class BeefyProject : ICloneable, IDisposable
     {        
-        /// Basic Info     
+        /// Basic Info             
         public string ProjectName { get; set; }
+        public string ProjectExe { get { return ProjectName + ".exe"; } }
         public List<string> ProjectDevelopers { get; set; }
         public Version ProjectVersion { get; set; }
-        public Image ProjectLogo { get; set; }
+        public string ProjectLogoPath { get; set; }
+        public string ProjectPath { get; set; }
+        public string RawPath { get { return ProjectPath + "\\Raw"; } }
+        public string LevelsPath { get { return RawPath + "\\Levels"; } }
+        public string AssetsPath { get { return RawPath + "\\Assets"; } }
+        public string TempPath { get { return ProjectPath + "\\Temp"; } }
+        public string ObjPath { get { return ProjectPath + "\\Obj"; } }
+        public string BuildPath { get { return ProjectPath + "\\Build"; } }
+        public string EnginePath { get { return ProjectPath + "\\Engine"; } }
+        public string CurrentLevelPath { get { return LevelsPath + "\\" + CurrentLevelID; } }
+        ///Editing Info
+        public string CurrentLevelID { get; set; }
         ///Game Settings
-        public bool PartialLoading { get; set; }
+        public bool PartialLoading { get; set; }   
+        public bool DeveloperMode { get; set; }
+        public List<string> LevelIDs { get; set; }
+        public string StartUpLevelID { get; set; }
+        
 
         public BeefyProject()
         {
             ProjectDevelopers = new List<string>();
-            ProjectLogo = Properties.Resources.BGS;
+            LevelIDs = new List<string>();
+            ProjectLogoPath = "";            
         }
 
         public object Clone()
         {
             BeefyProject project = new BeefyProject();
-            project.ProjectName = ProjectName;
-            
+            project.ProjectName = ProjectName;            
             project.ProjectVersion = ProjectVersion;
-            project.ProjectLogo = ProjectLogo;
+            project.ProjectDevelopers = (List<string>)ProjectDevelopers.Clone();
+            project.ProjectLogoPath = ProjectLogoPath;
             project.PartialLoading = PartialLoading;
+            project.DeveloperMode = DeveloperMode;
+            project.CurrentLevelID = CurrentLevelID;
+            project.LevelIDs = (List<string>)LevelIDs.Clone();
             return project;
         }
 
         public void Dispose()
         {
             ProjectDevelopers.Clear();
-            ProjectLogo.Dispose();
         }
     }
 
@@ -76,14 +96,14 @@ namespace BeefyGameStudio
             WaitToAdd,
         }
 
-        public BeefyProject currentProject;
+        public BeefyAssetLibrary AssetLib { get; set; }
 
-        public BeefyAssetLibrary assetLib;
-        public string currentLevelPath;
-
-        public string ExtractNameFromPath(string path)
+        public string ExtractNameFromPath(string path, bool keepExtension = false)
         {
-            return path.Split('\\').Last().Split('.').First();
+            if (keepExtension)
+                return path.Split('\\').Last();
+            else
+                return path.Split('\\').Last().Split('.').First();
         }
 
         public List<string> ExtractNamesFromPaths(string[] paths)
@@ -94,7 +114,7 @@ namespace BeefyGameStudio
                 names.Add(ExtractNameFromPath(path));
             }
             return names;
-        }
+        }   
 
         private Bitmap FitImage(Image image)
         {
@@ -137,8 +157,8 @@ namespace BeefyGameStudio
             List<string> imported = new List<string>();
             foreach (string path in paths)
             {
-                string aName = ExtractNameFromPath(path);
-                if (assetLib.Exists(aName))
+                string aName = Path.GetFileName(path);
+                if (AssetLib.Exists(aName))
                 {
                     imported.Add(aName);
                     continue;
@@ -146,26 +166,27 @@ namespace BeefyGameStudio
                 else
                     try
                     {
-                        using (FileStream stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                        {
+                        string aPath =  CurrentProject.AssetsPath + "\\" + aName;
+                        using (FileStream stream = File.Open(path, FileMode.Open))
+                        {   
                             switch (type)
                             {
                                 case BeefyAssetType.Visual:
-                                    BeefySprite bs = new BeefySprite() { AssetName = aName, AssetPath = path, SpriteData = Texture2D.FromStream(MainViewport.Editor.graphics, stream), ImportScale = EditorSettings.PixelScale };
-                                    assetLib.AddAsset(bs);
+                                    BeefySprite bs = new BeefySprite() { AssetName = aName, AssetPath = aPath, SpriteData = Texture2D.FromStream(MainViewport.Editor.graphics, stream), ImportScale = EditorSettings.PixelScale };
+                                    AssetLib.AddAsset(bs);
                                     AssetLibrary.LargeImageList.Images.Add(bs.AssetName, FitImage(Image.FromStream(stream)));
                                     AssetLibrary.Items.Add(bs.AssetName, bs.AssetName, bs.AssetName);
                                     break;
                                 case BeefyAssetType.Auditory:
-                                    assetLib.AddAsset(new BeefySound() { AssetName = aName, AssetPath = path, AudioSource = SoundEffect.FromStream(stream) });
+                                    AssetLib.AddAsset(new BeefySound() { AssetName = aName, AssetPath = aPath, AudioSource = SoundEffect.FromStream(stream) });
                                     //TODO
                                     break;
                                 case BeefyAssetType.Object:
-                                    assetLib.AddAsset(new BeefySprite() { AssetName = aName, AssetPath = path, SpriteData = Texture2D.FromStream(MainViewport.GraphicsDevice, stream) });
+                                    AssetLib.AddAsset(new BeefySprite() { AssetName = aName, AssetPath = aPath, SpriteData = Texture2D.FromStream(MainViewport.GraphicsDevice, stream) });
                                     //TODO
                                     break;
                             }
-                        }
+                        }                        
                     }
                     catch (Exception e)
                     {
@@ -182,17 +203,35 @@ namespace BeefyGameStudio
             return true;
         }
 
-        public void NewProject(string path)
+        public void NewProject(string name, string path)
         {
-            //SolutionFile solution;
-            //Use Microsoft.Build.Construction to create a new project file
             //TODO
             try
             {
-                Directory.CreateDirectory(path);
-                Directory.CreateDirectory(path + "\\Build");
-                Directory.CreateDirectory(path + "\\Raw");
-                Directory.CreateDirectory(path + "\\Engine");
+                BeefyProject project = new BeefyProject();
+                project.ProjectName = name;
+                project.ProjectPath = path;                
+                project.ProjectDevelopers.Add(Environment.UserName);                
+                Directory.CreateDirectory(project.ProjectPath);
+                using (StreamWriter writer = new StreamWriter(project.ProjectPath + "\\" + project.ProjectName + ".bgp"))
+                {
+                    XmlSerializer serializer = new XmlSerializer(typeof(BeefyProject));
+                    serializer.Serialize(writer, project);
+                }
+                Directory.CreateDirectory(project.BuildPath);                
+                Directory.CreateDirectory(project.ObjPath);
+                Directory.CreateDirectory(project.RawPath);
+                Directory.CreateDirectory(project.AssetsPath);
+                Directory.CreateDirectory(project.LevelsPath);
+                Directory.CreateDirectory(project.EnginePath);
+                Directory.SetCurrentDirectory(project.ProjectPath);
+                using (StreamWriter mainWriter = new StreamWriter(project.ProjectPath + "\\Program.cs"))
+                {
+                    
+                    //mainWriter.WriteLine(Properties.Resources.)
+                    
+                }
+                CurrentProject.SetProjectData(project);
             }
             catch(Exception e)
             {
@@ -200,8 +239,31 @@ namespace BeefyGameStudio
             }
             finally
             {
-
+                RefreshText();
             }
+        }
+
+        public void OpenProject(string path)
+        {
+            XmlSerializer xml;
+            using (StreamReader reader = new StreamReader(path))
+            {
+                xml = new XmlSerializer(typeof(BeefyProject));
+                CurrentProject.SetProjectData((BeefyProject)xml.Deserialize(reader));
+            }            
+            MainViewport.LoadLevel(CurrentProject.LevelsPath + "\\" + CurrentProject.CurrentLevelID + "\\" + CurrentProject.CurrentLevelID + ".bgl");
+            RefreshText();
+        }
+
+        public async void BuildAssets()
+        {
+            //TODO
+            RuntimeBuilder builder = new RuntimeBuilder(CurrentProject.TempPath, CurrentProject.ObjPath, CurrentProject.BuildPath, TargetPlatform.Windows, GraphicsProfile.HiDef, true) { Logger = new StringBuilderLogger() };            
+            foreach (IBeefyAsset iba in AssetLib.Assets.Values)
+            {
+                await builder.BuildContent(iba.AssetPath);
+            }
+            Directory.Delete(CurrentProject.TempPath, true);//Delete Temp Files
         }
 
         public bool SaveLevel(string path)

@@ -11,31 +11,21 @@ using MonoGame.Forms;
 using MonoGame.Forms.Components;
 using MonoGame.Forms.Controls;
 
-namespace BeefyGameStudio.ScriptEditor
+namespace BeefyGameStudio
 {
-    public class ScriptEditor : MonoGameControl
+    public class AssetView : MonoGameControl
     {
-
-        protected override void Initialize()
-        {            
-            base.Initialize();
-            Editor.BackgroundColor = new Color(50, 50, 50);
-        }        
-
-        public void LoadScript(BeefyScript script)
-        {
-            
-        }
+        public BGS MainForm { get; set; }
 
         protected override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
+            //MainForm.currentProject;
         }
 
         protected override void Draw()
         {
             base.Draw();
-            //TODO
         }
     }
 }

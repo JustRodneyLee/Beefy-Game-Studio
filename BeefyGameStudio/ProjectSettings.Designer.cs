@@ -35,17 +35,17 @@
             this.projectDeveloperLabel = new System.Windows.Forms.Label();
             this.projectDeveloperTextBox = new System.Windows.Forms.TextBox();
             this.VersionLabel = new System.Windows.Forms.Label();
-            this.fullContentLoadCheckBox = new System.Windows.Forms.CheckBox();
+            this.partialLoadingCheckBox = new System.Windows.Forms.CheckBox();
             this.versionMajorTextBox = new System.Windows.Forms.TextBox();
             this.versionMinorTextBox = new System.Windows.Forms.TextBox();
             this.versionBuildTextBox = new System.Windows.Forms.TextBox();
             this.versionRevisionTextBox = new System.Windows.Forms.TextBox();
             this.settingsGroupBox = new System.Windows.Forms.GroupBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.startLevelComboBox = new System.Windows.Forms.ComboBox();
+            this.developerModeCheckBox = new System.Windows.Forms.CheckBox();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.buttonSave = new System.Windows.Forms.Button();
-            this.developerModeCheckBox = new System.Windows.Forms.CheckBox();
-            this.startLevelComboBox = new System.Windows.Forms.ComboBox();
-            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.logoPictureBox)).BeginInit();
             this.settingsGroupBox.SuspendLayout();
             this.SuspendLayout();
@@ -106,17 +106,17 @@
             this.VersionLabel.TabIndex = 5;
             this.VersionLabel.Text = "Project Version";
             // 
-            // fullContentLoadCheckBox
+            // partialLoadingCheckBox
             // 
-            this.fullContentLoadCheckBox.AutoSize = true;
-            this.fullContentLoadCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.fullContentLoadCheckBox.Location = new System.Drawing.Point(6, 21);
-            this.fullContentLoadCheckBox.Name = "fullContentLoadCheckBox";
-            this.fullContentLoadCheckBox.Size = new System.Drawing.Size(109, 19);
-            this.fullContentLoadCheckBox.TabIndex = 7;
-            this.fullContentLoadCheckBox.Text = "Partial Loading";
-            this.fullContentLoadCheckBox.UseVisualStyleBackColor = true;
-            this.fullContentLoadCheckBox.CheckedChanged += new System.EventHandler(this.fullContentLoadCheckBox_CheckedChanged);
+            this.partialLoadingCheckBox.AutoSize = true;
+            this.partialLoadingCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.partialLoadingCheckBox.Location = new System.Drawing.Point(6, 21);
+            this.partialLoadingCheckBox.Name = "partialLoadingCheckBox";
+            this.partialLoadingCheckBox.Size = new System.Drawing.Size(109, 19);
+            this.partialLoadingCheckBox.TabIndex = 7;
+            this.partialLoadingCheckBox.Text = "Partial Loading";
+            this.partialLoadingCheckBox.UseVisualStyleBackColor = true;
+            this.partialLoadingCheckBox.CheckedChanged += new System.EventHandler(this.fullContentLoadCheckBox_CheckedChanged);
             // 
             // versionMajorTextBox
             // 
@@ -155,7 +155,7 @@
             this.settingsGroupBox.Controls.Add(this.label1);
             this.settingsGroupBox.Controls.Add(this.startLevelComboBox);
             this.settingsGroupBox.Controls.Add(this.developerModeCheckBox);
-            this.settingsGroupBox.Controls.Add(this.fullContentLoadCheckBox);
+            this.settingsGroupBox.Controls.Add(this.partialLoadingCheckBox);
             this.settingsGroupBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.settingsGroupBox.Location = new System.Drawing.Point(12, 147);
             this.settingsGroupBox.Name = "settingsGroupBox";
@@ -163,6 +163,35 @@
             this.settingsGroupBox.TabIndex = 12;
             this.settingsGroupBox.TabStop = false;
             this.settingsGroupBox.Text = "In-Game Settings";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(6, 296);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(82, 15);
+            this.label1.TabIndex = 10;
+            this.label1.Text = "Start-up Level";
+            // 
+            // startLevelComboBox
+            // 
+            this.startLevelComboBox.FormattingEnabled = true;
+            this.startLevelComboBox.Location = new System.Drawing.Point(94, 293);
+            this.startLevelComboBox.Name = "startLevelComboBox";
+            this.startLevelComboBox.Size = new System.Drawing.Size(168, 24);
+            this.startLevelComboBox.TabIndex = 9;
+            // 
+            // developerModeCheckBox
+            // 
+            this.developerModeCheckBox.AutoSize = true;
+            this.developerModeCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.developerModeCheckBox.Location = new System.Drawing.Point(145, 21);
+            this.developerModeCheckBox.Name = "developerModeCheckBox";
+            this.developerModeCheckBox.Size = new System.Drawing.Size(117, 19);
+            this.developerModeCheckBox.TabIndex = 8;
+            this.developerModeCheckBox.Text = "Developer Mode";
+            this.developerModeCheckBox.UseVisualStyleBackColor = true;
             // 
             // buttonCancel
             // 
@@ -188,35 +217,6 @@
             this.buttonSave.Text = "Save";
             this.buttonSave.UseVisualStyleBackColor = true;
             this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
-            // 
-            // developerModeCheckBox
-            // 
-            this.developerModeCheckBox.AutoSize = true;
-            this.developerModeCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.developerModeCheckBox.Location = new System.Drawing.Point(145, 21);
-            this.developerModeCheckBox.Name = "developerModeCheckBox";
-            this.developerModeCheckBox.Size = new System.Drawing.Size(117, 19);
-            this.developerModeCheckBox.TabIndex = 8;
-            this.developerModeCheckBox.Text = "Developer Mode";
-            this.developerModeCheckBox.UseVisualStyleBackColor = true;
-            // 
-            // startLevelComboBox
-            // 
-            this.startLevelComboBox.FormattingEnabled = true;
-            this.startLevelComboBox.Location = new System.Drawing.Point(94, 293);
-            this.startLevelComboBox.Name = "startLevelComboBox";
-            this.startLevelComboBox.Size = new System.Drawing.Size(168, 24);
-            this.startLevelComboBox.TabIndex = 9;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(6, 296);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(82, 15);
-            this.label1.TabIndex = 10;
-            this.label1.Text = "Start-up Level";
             // 
             // ProjectSettings
             // 
@@ -263,7 +263,7 @@
         private System.Windows.Forms.Label projectDeveloperLabel;
         private System.Windows.Forms.TextBox projectDeveloperTextBox;
         private System.Windows.Forms.Label VersionLabel;
-        private System.Windows.Forms.CheckBox fullContentLoadCheckBox;
+        private System.Windows.Forms.CheckBox partialLoadingCheckBox;
         private System.Windows.Forms.TextBox versionMajorTextBox;
         private System.Windows.Forms.TextBox versionMinorTextBox;
         private System.Windows.Forms.TextBox versionBuildTextBox;

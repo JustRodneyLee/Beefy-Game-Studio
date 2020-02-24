@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Beefy Game Studio")]
 [assembly: AssemblyDescription("A Game Editor for those who aspire to develop 2D Games")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Hoodie Men Games")]
+[assembly: AssemblyCompany("Rodney XMeintek Lee")]
 [assembly: AssemblyProduct("Beefy Game Studio")]
-[assembly: AssemblyCopyright("Copyright ©  2019")]
+[assembly: AssemblyCopyright("Copyright ©  2019 ~ 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

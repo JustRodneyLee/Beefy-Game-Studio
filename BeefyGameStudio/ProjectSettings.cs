@@ -14,24 +14,38 @@ namespace BeefyGameStudio
     public partial class ProjectSettings : Form
     {
         BeefyProject projClone;
-        BeefyProject project;
 
-        public ProjectSettings(BeefyProject proj)
+        public ProjectSettings()
         {
             InitializeComponent();
-            project = proj;
-            projClone = (BeefyProject)proj.Clone();
+            projClone = (BeefyProject)CurrentProject.Data.Clone();
         }
 
         private void ProjectSettings_Load(object sender, EventArgs e)
         {
             projectNameTextBox.Text = projClone.ProjectName;
+            if (projClone.ProjectDevelopers.Count > 1)
+            {
+                projectDeveloperLabel.Text = "Project Developers";
+            }
+            else
+            {
+                projectDeveloperLabel.Text = "Project Developer";
+            }
             foreach (string developer in projClone.ProjectDevelopers)
             {
                 projectDeveloperTextBox.Text += developer + ";";
             }
-            projectDeveloperTextBox.Text.Trim(';');
-            logoPictureBox.Image = projClone.ProjectLogo;
+            if (projClone.ProjectLogoPath=="")
+                logoPictureBox.Image = Properties.Resources.BGS;
+            else
+                logoPictureBox.Image = Image.FromFile(projClone.ProjectLogoPath);         
+            versionMajorTextBox.Text = projClone.ProjectVersion.Major.ToString();
+            versionMinorTextBox.Text = projClone.ProjectVersion.Minor.ToString();
+            versionRevisionTextBox.Text = projClone.ProjectVersion.Revision.ToString();
+            versionBuildTextBox.Text = projClone.ProjectVersion.Build.ToString();
+            partialLoadingCheckBox.Checked = projClone.PartialLoading;
+            developerModeCheckBox.Checked = projClone.DeveloperMode;
         }
 
         private void logoPictureBox_DoubleClick(object sender, EventArgs e)
@@ -41,7 +55,7 @@ namespace BeefyGameStudio
 
         private void fullContentLoadCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            projClone.PartialLoading = fullContentLoadCheckBox.Checked;
+            projClone.PartialLoading = partialLoadingCheckBox.Checked;
         }
 
         private void ProjectSettings_FormClosing(object sender, FormClosingEventArgs e)
@@ -76,7 +90,8 @@ namespace BeefyGameStudio
 
         private void buttonSave_Click(object sender, EventArgs e)
         {
-            project = projClone;
+            CurrentProject.SetProjectData(projClone);
+            //TODO : Change Directories
         }
     }
 }

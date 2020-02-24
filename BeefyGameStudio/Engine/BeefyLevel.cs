@@ -116,11 +116,6 @@ namespace BeefyEngine
 
         public BeefyScript Logic { get; }
 
-        private BeefyLevel()
-        {
-            //Parameterless constructor for XML serialization
-        }
-
         public BeefyLevel(string lvlName)
         {
             LevelID = lvlName;

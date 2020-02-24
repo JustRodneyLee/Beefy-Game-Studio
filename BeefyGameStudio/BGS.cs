@@ -1,13 +1,53 @@
 ﻿using BeefyEngine;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using System.CodeDom.Compiler;
+using System.Diagnostics;
+using Microsoft.CSharp;
 using BeefyGameStudio.Components;
 
 namespace BeefyGameStudio
 {
+    public static class CurrentProject
+    {
+        public static BeefyProject Data { get; internal set; }
+        public static bool IsNull
+        {
+            get { return Data == null; }
+        }
+
+        public static string ProjectName { get { return Data.ProjectName; } set { Data.ProjectName = value; } }
+        public static string ProjectExe { get { return Data.ProjectName; } }
+        public static List<string> ProjectDevelopers { get { return Data.ProjectDevelopers; } set { Data.ProjectDevelopers = value; } }
+        public static Version ProjectVersion { get { return Data.ProjectVersion; } set { Data.ProjectVersion = value; } }
+        public static string ProjectLogoPath { get { return Data.ProjectLogoPath; } set { Data.ProjectLogoPath = value; } }
+        public static string ProjectPath { get { return Data.ProjectPath; } set { Data.ProjectPath = value; } }
+        public static string RawPath { get { return Data.RawPath; } }
+        public static string LevelsPath { get { return Data.LevelsPath; } }
+        public static string AssetsPath { get { return Data.AssetsPath; } }
+        public static string TempPath { get { return Data.TempPath; } }
+        public static string ObjPath { get { return Data.ObjPath; } }
+        public static string BuildPath { get { return Data.BuildPath; } }
+        public static string EnginePath { get { return Data.EnginePath; } }
+        public static string CurrentLevelPath { get { return Data.CurrentLevelPath; } }
+        ///Editing Info
+        public static string CurrentLevelID { get { return Data.CurrentLevelID; } set { Data.CurrentLevelID = value; } }
+        ///Game Settings
+        public static bool PartialLoading { get { return Data.PartialLoading; } set { Data.PartialLoading = value; } }
+        public static bool DeveloperMode { get { return Data.DeveloperMode; } set { Data.DeveloperMode = value; } }
+        public static List<string> LevelIDs { get { return Data.LevelIDs; } set { Data.LevelIDs = value; } }
+        public static string StartUpLevelID { get { return Data.StartUpLevelID; } set { Data.StartUpLevelID = value; } }
+
+        public static void SetProjectData(BeefyProject project)
+        {
+            Data = project;
+        }
+    }
+
     public partial class BGS : Form
     {
         FileType fileType;
@@ -27,19 +67,28 @@ namespace BeefyGameStudio
             MainViewport.SetControls(ViewportAddMenuStrip, ViewportEditMenuStrip, LayerMenuStrip, InspectorLabel, InspectorPanel, addProperty, (ToolStripStatusLabel)StatusStrip.Items[0], AllLayersHierarchy);
             InitGameViewport();            
             InitAssetLib();
-            Text = "Beefy Game Studio v" + EditorSettings.Version + " - " + MainViewport.Level.LevelID;
+            RefreshText();
+            //MessageBox.Show(Properties.Resources.MainProgram);
+        }
+
+        public void RefreshText()
+        {
+            if (CurrentProject.IsNull)
+                Text = "Beefy Game Studio v" + EditorSettings.Version +" - " + MainViewport.Level.LevelID;
+            else
+                Text = "Beefy Game Studio v" + EditorSettings.Version + " - " + CurrentProject.ProjectName + " - " + MainViewport.Level.LevelID;
         }
 
         private void InitAssetLib()
         {
             AssetLibrary.LargeImageList = new ImageList();
             AssetLibrary.LargeImageList.ImageSize = new Size(72, 72);
-            assetLib = new BeefyAssetLibrary(MainViewport.Level.LevelID + "Library");
+            AssetLib = new BeefyAssetLibrary(MainViewport.Level.LevelID + "Library");
         }
 
         private void InitGameViewport()
         {
-            MainViewport.LoadLevel(new BeefyLevel("New Level"));
+            MainViewport.InternalLoad(new BeefyLevel("New Level"));
             MainViewport.Editor.Initialize();            
             lvlSaved = false;
             lvlModified = true;
@@ -211,10 +260,10 @@ namespace BeefyGameStudio
                                 break;
                             case ImportAction.AddToScene:
                                 //Add to scene                            
-                                MainViewport.AddBeefyObjects(assetLib.GetAssetsByIDs(ExtractNamesFromPaths(paths)), MainViewport.MousePos);
+                                MainViewport.AddBeefyObjects(AssetLib.GetAssetsByIDs(ExtractNamesFromPaths(paths)), MainViewport.MousePos);
                                 break;
                             case ImportAction.WaitToAdd:
-                                MainViewport.AddNewObjects(assetLib.GetAssetsByIDs(ExtractNamesFromPaths(paths)));
+                                MainViewport.AddNewObjects(AssetLib.GetAssetsByIDs(ExtractNamesFromPaths(paths)));
                                 break;
                         }
                     }
@@ -260,7 +309,7 @@ namespace BeefyGameStudio
                 {
                     if (lvlSaved)
                     {
-                        SaveLevel(currentLevelPath);
+                        SaveLevel(CurrentProject.CurrentLevelPath);
                     }
                     else
                     {
@@ -291,9 +340,46 @@ namespace BeefyGameStudio
 
         private void SaveLvlToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!lvlSaved)
+            if (CurrentProject.IsNull)
             {
-                SaveFileDialog.Title = "Beefy Game Studio - Save Level";
+                if (!lvlSaved)
+                {
+                    SaveFileDialog.Title = "Beefy Game Studio - Save Level";
+                    SaveFileDialog.Filter = "Beefy Game Levels|*.bgl";
+                    SaveFileDialog.DefaultExt = "bgl";
+                    fileType = FileType.Level;
+                    SaveFileDialog.ShowDialog();
+                }
+                else
+                {
+                    SaveLevel(CurrentProject.CurrentLevelPath);
+                }
+            }
+            else
+            {
+                NameDialog nd = new NameDialog("Save Current Level");
+                nd.ShowDialog();
+                if (nd.DialogResult == DialogResult.OK)
+                {
+                    if (CurrentProject.LevelIDs.Contains(nd.NameValue))
+                    {
+                        MessageBox.Show("A Level with this name already exists!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    else
+                    {
+                        nd.Close();
+                        MainViewport.Level.LevelID = nd.NameValue;
+                        SaveLevel(CurrentProject.LevelsPath + "\\" + nd.NameValue + ".bgl");
+                    }                    
+                }                    
+            }
+        }
+
+        private void SaveLvlAsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (CurrentProject.IsNull)
+            {
+                SaveFileDialog.Title = "Beefy Game Studio - Save Level As";
                 SaveFileDialog.Filter = "Beefy Game Levels|*.bgl";
                 SaveFileDialog.DefaultExt = "bgl";
                 fileType = FileType.Level;
@@ -301,17 +387,22 @@ namespace BeefyGameStudio
             }
             else
             {
-                SaveLevel(currentLevelPath);
+                NameDialog nd = new NameDialog("Save Current Level");
+                nd.ShowDialog();
+                if (nd.DialogResult == DialogResult.OK)
+                {
+                    if (CurrentProject.LevelIDs.Contains(nd.NameValue))
+                    {
+                        MessageBox.Show("A Level with this name already exists!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    else
+                    {
+                        nd.Close();
+                        MainViewport.Level.LevelID = nd.NameValue;
+                        SaveLevel(CurrentProject.LevelsPath + "\\" + nd.NameValue + ".bgl");
+                    }
+                }                
             }
-        }
-
-        private void SaveLvlAsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SaveFileDialog.Title = "Beefy Game Studio - Save Level As";
-            SaveFileDialog.Filter = "Beefy Game Levels|*.bgl";
-            SaveFileDialog.DefaultExt = "bgl";
-            fileType = FileType.Level;
-            SaveFileDialog.ShowDialog();
         }
 
         private void ClearToolStripMenuItem_Click(object sender, EventArgs e)
@@ -330,7 +421,7 @@ namespace BeefyGameStudio
                 {
                     if (lvlSaved)
                     {
-                        SaveLevel(currentLevelPath);
+                        SaveLevel(CurrentProject.CurrentLevelPath);
                     }
                     else
                     {
@@ -432,7 +523,7 @@ namespace BeefyGameStudio
 
         private void FromAssetsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            new AssetLibraryForm(assetLib, AssetLibrary, MainViewport, true).ShowDialog();
+            new AssetLibraryForm(AssetLib, AssetLibrary, MainViewport, true).ShowDialog();
         }
 
         private void BoxToolStripMenuItem_Click(object sender, EventArgs e)
@@ -485,7 +576,7 @@ namespace BeefyGameStudio
 
         private void AddFromAssetsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            new AssetLibraryForm(assetLib, AssetLibrary, MainViewport, false).ShowDialog();
+            new AssetLibraryForm(AssetLib, AssetLibrary, MainViewport, false).ShowDialog();
         }
 
         private void AddFromFileToolStripMenuItem_Click(object sender, EventArgs e)
@@ -608,16 +699,16 @@ namespace BeefyGameStudio
 
         private void ResetToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (assetLib.Assets.Count == 0)
+            if (AssetLib.Assets.Count == 0)
             {
-                assetLib.Reset();
+                AssetLib.Reset();
             }
             else
             {
-                DialogResult dr = MessageBox.Show("You are about to reset library " + assetLib.LibraryName + ", are you sure?", "Beefy Game Studio - Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                DialogResult dr = MessageBox.Show("You are about to reset library " + AssetLib.LibraryName + ", are you sure?", "Beefy Game Studio - Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (dr == DialogResult.Yes)
                 {
-                    assetLib.Reset();
+                    AssetLib.Reset();
                 }
             }
         }
@@ -701,7 +792,7 @@ namespace BeefyGameStudio
             NewProject np = new NewProject();
             if (np.ShowDialog()==DialogResult.OK)
             {
-                NewProject(np.Path);
+                NewProject(np.ProjName, np.ProjPath);
                 np.Dispose();
             }
         }
@@ -721,10 +812,10 @@ namespace BeefyGameStudio
 
         private void projSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (currentProject == null)
+            if (CurrentProject.IsNull)
                 MessageBox.Show("You are not editing a project!","Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             else
-                new ProjectSettings(currentProject).ShowDialog();            
+                new ProjectSettings().ShowDialog();            
         }
 
         private void CloseToolStripMenuItem_Click(object sender, EventArgs e)
@@ -749,17 +840,48 @@ namespace BeefyGameStudio
 
         private void buildProjectToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            StatusStrip.Text = "Building " + CurrentProject.ProjectName + "...";
+            //CSharpCodeProvider codeProvider = new CSharpCodeProvider();
+            //ICodeCompiler icc = codeProvider.CreateCompiler();
+            CodeDomProvider codeProvider = CodeDomProvider.CreateProvider("CSharp");
+            string output = CurrentProject.BuildPath + "\\" + CurrentProject.ProjectName + ".exe";
+            CompilerParameters parameters = new CompilerParameters();
+            parameters.GenerateExecutable = true;
+            parameters.OutputAssembly = output;
+            CompilerResults results = codeProvider.CompileAssemblyFromFile(parameters, "//TODO");
+            if (results.Errors.HasErrors)
+            {                
+                StatusStrip.Text = "Build failed.";
+                //TODO : Pop up errors
+                foreach (CompilerError error in results.Errors)
+                {
+                    
+                }
+            }
+            else
+            {
+                StatusStrip.Text = "Build Successful!";
+            }
         }
 
         private void buildAssetLibraryToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            BuildAssets();
+        }
 
+        private void runProjectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Process process = Process.Start(CurrentProject.BuildPath + "\\" + CurrentProject.ProjectExe);
+            StatusStrip.Text = CurrentProject.ProjectName + " Running.";
+            if (process.HasExited)
+            {
+                //TODO
+            }
         }
 
         private void folderToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            
+            //TODO
         }
 
         /// <summary>
@@ -768,6 +890,6 @@ namespace BeefyGameStudio
         private void scriptToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
-        }
+        }        
     }
 }

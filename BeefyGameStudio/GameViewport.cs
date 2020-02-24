@@ -131,6 +131,7 @@ namespace BeefyGameStudio
         protected override void Initialize()
         {
             base.Initialize();
+            Editor.BackgroundColor = new Color(50, 50, 50);
             View = new Camera2D();
             View.Position = new Vector2(0, 0);
             View.Zoom = 32f;
@@ -161,7 +162,7 @@ namespace BeefyGameStudio
             return rtrn;
         }
 
-        public void LoadLevel(BeefyLevel level)
+        public void InternalLoad(BeefyLevel level)
         {
             Level = level;
             SwitchToLayer(level.Layers.First().LayerID);
@@ -171,7 +172,7 @@ namespace BeefyGameStudio
 
         public void ClearLevel()
         {
-            LoadLevel(new BeefyLevel(Level.LevelID));
+            InternalLoad(new BeefyLevel(Level.LevelID));
         }
 
         public void SetControls(ContextMenuStrip addCMS, ContextMenuStrip editCMS, ContextMenuStrip layerCMS, Label il /*Inspector Label*/, Panel ip/*Inspector Panel*/, Button btn /*AddPropertyButton*/, ToolStripStatusLabel sb, TreeView hr)
@@ -1172,7 +1173,7 @@ namespace BeefyGameStudio
             }
             if (lvl != null)
             {
-                LoadLevel(lvl);
+                InternalLoad(lvl);
                 return true;
             }
             else
@@ -1645,8 +1646,7 @@ namespace BeefyGameStudio
         /// +X -Y Coords used for drawing!
         /// </summary>
         protected override void Draw()
-        {
-            Editor.BackgroundColor = new Color(50, 50, 50);
+        {            
             base.Draw();
             Editor.BeginCamera2D(SpriteSortMode.BackToFront, BlendState.NonPremultiplied, SamplerState.PointClamp);
             Editor.Cam.Position = View.Position * View.Zoom;
