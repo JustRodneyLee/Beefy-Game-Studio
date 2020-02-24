@@ -1377,6 +1377,7 @@
             this.ClientSize = new System.Drawing.Size(1920, 1061);
             this.Controls.Add(this.MainLayout);
             this.Controls.Add(this.MainMenu);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.MainMenuStrip = this.EditorMenu;
             this.MinimumSize = new System.Drawing.Size(1024, 876);

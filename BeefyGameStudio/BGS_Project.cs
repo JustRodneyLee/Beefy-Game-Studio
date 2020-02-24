@@ -26,8 +26,44 @@ namespace BeefyGameStudio
         }
     }
 
+    public static class CurrentProject
+    {
+        public static BeefyProject Data { get; internal set; }
+        public static bool IsNull
+        {
+            get { return Data == null; }
+        }
+
+        public static string ProjectName { get { return Data.ProjectName; } set { Data.ProjectName = value; } }
+        public static string ProjectExe { get { return Data.ProjectName; } }
+        public static List<string> ProjectDevelopers { get { return Data.ProjectDevelopers; } set { Data.ProjectDevelopers = value; } }
+        public static Version ProjectVersion { get { return Data.ProjectVersion; } set { Data.ProjectVersion = value; } }
+        public static string ProjectLogoPath { get { return Data.ProjectLogoPath; } set { Data.ProjectLogoPath = value; } }
+        public static string ProjectPath { get { return Data.ProjectPath; } set { Data.ProjectPath = value; } }
+        public static string RawPath { get { return Data.RawPath; } }
+        public static string LevelsPath { get { return Data.LevelsPath; } }
+        public static string AssetsPath { get { return Data.AssetsPath; } }
+        public static string TempPath { get { return Data.TempPath; } }
+        public static string ObjPath { get { return Data.ObjPath; } }
+        public static string BuildPath { get { return Data.BuildPath; } }
+        public static string EnginePath { get { return Data.EnginePath; } }
+        public static string CurrentLevelPath { get { return Data.CurrentLevelPath; } }
+        ///Editing Info
+        public static string CurrentLevelID { get { return Data.CurrentLevelID; } set { Data.CurrentLevelID = value; } }
+        ///Game Settings
+        public static bool PartialLoading { get { return Data.PartialLoading; } set { Data.PartialLoading = value; } }
+        public static bool DeveloperMode { get { return Data.DeveloperMode; } set { Data.DeveloperMode = value; } }
+        public static List<string> LevelIDs { get { return Data.LevelIDs; } set { Data.LevelIDs = value; } }
+        public static string StartUpLevelID { get { return Data.StartUpLevelID; } set { Data.StartUpLevelID = value; } }
+
+        public static void SetProjectData(BeefyProject project)
+        {
+            Data = project;
+        }
+    }
+
     public class BeefyProject : ICloneable, IDisposable
-    {        
+    {
         /// Basic Info             
         public string ProjectName { get; set; }
         public string ProjectExe { get { return ProjectName + ".exe"; } }
@@ -46,23 +82,23 @@ namespace BeefyGameStudio
         ///Editing Info
         public string CurrentLevelID { get; set; }
         ///Game Settings
-        public bool PartialLoading { get; set; }   
+        public bool PartialLoading { get; set; }
         public bool DeveloperMode { get; set; }
         public List<string> LevelIDs { get; set; }
         public string StartUpLevelID { get; set; }
-        
+
 
         public BeefyProject()
         {
             ProjectDevelopers = new List<string>();
             LevelIDs = new List<string>();
-            ProjectLogoPath = "";            
+            ProjectLogoPath = "";
         }
 
         public object Clone()
         {
             BeefyProject project = new BeefyProject();
-            project.ProjectName = ProjectName;            
+            project.ProjectName = ProjectName;
             project.ProjectVersion = ProjectVersion;
             project.ProjectDevelopers = (List<string>)ProjectDevelopers.Clone();
             project.ProjectLogoPath = ProjectLogoPath;

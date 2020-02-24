@@ -30,16 +30,26 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ScriptEditorForm));
             this.scriptEditor = new BeefyGameStudio.ScriptEditor.ScriptEditor();
+            this.MainMenu = new System.Windows.Forms.MenuStrip();
             this.SuspendLayout();
             // 
             // scriptEditor
             // 
-            this.scriptEditor.Location = new System.Drawing.Point(12, 12);
+            this.scriptEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.scriptEditor.Location = new System.Drawing.Point(0, 24);
             this.scriptEditor.MouseHoverUpdatesOnly = false;
             this.scriptEditor.Name = "scriptEditor";
-            this.scriptEditor.Size = new System.Drawing.Size(472, 384);
+            this.scriptEditor.Size = new System.Drawing.Size(496, 657);
             this.scriptEditor.TabIndex = 0;
             this.scriptEditor.Text = "Script Editor";
+            // 
+            // MainMenu
+            // 
+            this.MainMenu.Location = new System.Drawing.Point(0, 0);
+            this.MainMenu.Name = "MainMenu";
+            this.MainMenu.Size = new System.Drawing.Size(496, 24);
+            this.MainMenu.TabIndex = 1;
+            this.MainMenu.Text = "menuStrip1";
             // 
             // ScriptEditorForm
             // 
@@ -47,16 +57,20 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(496, 681);
             this.Controls.Add(this.scriptEditor);
+            this.Controls.Add(this.MainMenu);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MainMenuStrip = this.MainMenu;
             this.Name = "ScriptEditorForm";
             this.Text = "Beefy Game Studio - Script Editor";
             this.Load += new System.EventHandler(this.ScriptEditor_Load);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
         private ScriptEditor.ScriptEditor scriptEditor;
+        private System.Windows.Forms.MenuStrip MainMenu;
     }
 }

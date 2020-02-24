@@ -95,7 +95,9 @@
     <Compile Include="BeefyHub.Designer.cs">
       <DependentUpon>BeefyHub.cs</DependentUpon>
     </Compile>
-    <Compile Include="BGS.cs" />
+    <Compile Include="BGS.cs">
+		<SubType>Form</SubType>
+	</Compile>
     <Compile Include="BGS.Designer.cs">
       <DependentUpon>BGS.cs</DependentUpon>
     </Compile>
