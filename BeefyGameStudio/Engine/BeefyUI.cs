@@ -42,38 +42,38 @@ namespace BeefyEngine
                 if (ui.Collider.ContainsPoint(Input.MousePosition))
                 {
                     if (ui.MouseInControl)
-                        ui.Events.Invoke("MouseEnter");
+                        ui.Events.RunFunction("MouseEnter");
                     ui.MouseInControl = true;
                     if (Input.IsDown(MouseButton.Right))
                     {
-                        ui.Events.Invoke("MouseRightDown");
+                        ui.Events.RunFunction("MouseRightDown");
                     }
                     if (Input.IsDown(MouseButton.Left))
                     {
-                        ui.Events.Invoke("MouseLeftDown");
+                        ui.Events.RunFunction("MouseLeftDown");
                         FocusedObject = bo;
                     }
                     if (Input.IsUp(MouseButton.Right))
                     {
-                        ui.Events.Invoke("MouseRightClicked");
+                        ui.Events.RunFunction("MouseRightClicked");
                     }
                     if (Input.IsUp(MouseButton.Left))
                     {
-                        ui.Events.Invoke("MouseLeftClicked");
+                        ui.Events.RunFunction("MouseLeftClicked");
                     }            
                     if (Input.IsAnyKeyDown)
                     {                        
-                        ui.Events.Invoke("KeyPress", Input.PressedKeys);
+                        ui.Events.RunFunction("KeyPress", new ParameterCollection(Input.PressedKeys));
                     }
                     if (Input.MouseScroll != 0)
                     {
-                        ui.Events.Invoke("MouseScroll", Input.MouseScroll);
+                        ui.Events.RunFunction("MouseScroll", new ParameterCollection(Input.MouseScroll));
                     }
                 }
                 else
                 {
                     if (ui.MouseInControl)
-                        ui.Events.Invoke("MouseLeave");
+                        ui.Events.RunFunction("MouseLeave");
                     ui.MouseInControl = false;
                 }                
             }

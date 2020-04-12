@@ -1,14 +1,10 @@
 ﻿using BeefyEngine;
 using System;
-using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
-using System.CodeDom.Compiler;
-using System.Diagnostics;
-using Microsoft.CSharp;
-using BeefyGameStudio.Components;
 
 namespace BeefyGameStudio
 {
@@ -18,7 +14,9 @@ namespace BeefyGameStudio
         ImportAction importAction;
         
         bool lvlSaved;
-        bool lvlModified;        
+        bool lvlModified;
+
+        ScriptEditorForm scriptEditor;
 
         public BGS()
         {
@@ -32,6 +30,7 @@ namespace BeefyGameStudio
             InitGameViewport();            
             InitAssetLib();
             RefreshText();
+            BeefyPresets.SetGraphicsDevice(MainViewport.Editor.graphics);
             //MessageBox.Show(Properties.Resources.MainProgram);
         }
 
@@ -492,17 +491,17 @@ namespace BeefyGameStudio
 
         private void BoxToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            BeefyObject Box = new BeefyObject("Box");
-            Box.AddComponent(new BeefyRenderer2D(Box));
-            Box.AddComponent(new BeefyPhysics(Box));
+            BeefyObject Box = new BeefyPresets.Box();
+            Box.GetComponent<BeefyTransform>().Coordinates = MainViewport.MousePos;
+            Box.GetComponent<BeefyTransform>().LastCoordinates = MainViewport.MousePos;
             MainViewport.AddBeefyObject(Box);
         }
 
         private void CircleToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            BeefyObject Circle = new BeefyObject("Circle");
-            Circle.AddComponent(new BeefyRenderer2D(Circle));
-            Circle.AddComponent(new BeefyPhysics(Circle));
+            BeefyObject Circle = new BeefyPresets.Circle();
+            Circle.GetComponent<BeefyTransform>().Coordinates = MainViewport.MousePos;
+            Circle.GetComponent<BeefyTransform>().LastCoordinates = MainViewport.MousePos;
             MainViewport.AddBeefyObject(Circle);
         }
 
@@ -516,15 +515,13 @@ namespace BeefyGameStudio
 
         private void AddBoxToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            BeefyObject Box = new BeefyPresets.Box();
+            BeefyObject Box = new BeefyPresets.Box();            
             MainViewport.AddNewObject(Box);
         }
 
         private void AddCircleToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            BeefyObject Circle = new BeefyObject("Circle");
-            Circle.AddComponent(new BeefyRenderer2D(Circle));
-            Circle.AddComponent(new BeefyPhysics(Circle));
+            BeefyObject Circle = new BeefyPresets.Circle();            
             MainViewport.AddNewObject(Circle);
         }
 
@@ -765,7 +762,7 @@ namespace BeefyGameStudio
         {
             OpenFileDialog.Multiselect = false;
             OpenFileDialog.Title = "Beefy Game Studio - Open Project";
-            OpenFileDialog.Filter = "Beefy Game Project|*.bgp";
+            OpenFileDialog.Filter = "Beefy Game Project(*.bgp)|*.bgp";
             OpenFileDialog.ShowDialog();
         }
 
@@ -804,28 +801,7 @@ namespace BeefyGameStudio
 
         private void buildProjectToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            StatusStrip.Text = "Building " + CurrentProject.ProjectName + "...";
-            //CSharpCodeProvider codeProvider = new CSharpCodeProvider();
-            //ICodeCompiler icc = codeProvider.CreateCompiler();
-            CodeDomProvider codeProvider = CodeDomProvider.CreateProvider("CSharp");
-            string output = CurrentProject.BuildPath + "\\" + CurrentProject.ProjectName + ".exe";
-            CompilerParameters parameters = new CompilerParameters();
-            parameters.GenerateExecutable = true;
-            parameters.OutputAssembly = output;
-            CompilerResults results = codeProvider.CompileAssemblyFromFile(parameters, "//TODO");
-            if (results.Errors.HasErrors)
-            {                
-                StatusStrip.Text = "Build failed.";
-                //TODO : Pop up errors
-                foreach (CompilerError error in results.Errors)
-                {
-                    
-                }
-            }
-            else
-            {
-                StatusStrip.Text = "Build Successful!";
-            }
+            BuildProject();
         }
 
         private void buildAssetLibraryToolStripMenuItem_Click(object sender, EventArgs e)
@@ -835,11 +811,34 @@ namespace BeefyGameStudio
 
         private void runProjectToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Process process = Process.Start(CurrentProject.BuildPath + "\\" + CurrentProject.ProjectExe);
-            StatusStrip.Text = CurrentProject.ProjectName + " Running.";
-            if (process.HasExited)
+            if (CurrentProject.ProjectBuilt)
             {
-                //TODO
+                Process process = Process.Start(CurrentProject.BuildPath + "\\" + CurrentProject.ProjectExe);
+                StatusStrip.Text = CurrentProject.ProjectName + " Running.";
+                if (process.HasExited)
+                {
+                    //TODO
+                }
+            }
+            else
+            {
+                DialogResult dr = MessageBox.Show("Do you want to rebuild your project or run the last built version?","Beefy Game Studio - Request to Build Project", MessageBoxButtons.YesNoCancel);
+                if (dr == DialogResult.Yes)
+                {
+                   
+                }
+                else if (dr == DialogResult.No)
+                {
+
+                }
+                else if (dr == DialogResult.Cancel)
+                {
+
+                }
+                else
+                {
+
+                }
             }
         }
 
@@ -853,7 +852,127 @@ namespace BeefyGameStudio
         /// </summary>
         private void scriptToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            ShowScriptEditor();            
+        }
 
-        }        
+        #region Viewport Mode
+
+        private void normalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            normalToolStripMenuItem.Checked = true;
+            renderedToolStripMenuItem.Checked = false;
+            collisionsToolStripMenuItem.Checked = false;
+            lightmapToolStripMenuItem.Checked = false;
+            commentaryToolStripMenuItem.Checked = false;
+            MainViewport.editorView = GameViewport.EditorView.Normal;
+        }
+
+        private void renderedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            normalToolStripMenuItem.Checked = false;
+            renderedToolStripMenuItem.Checked = true;
+            collisionsToolStripMenuItem.Checked = false;
+            lightmapToolStripMenuItem.Checked = false;
+            commentaryToolStripMenuItem.Checked = false;
+            MainViewport.editorView = GameViewport.EditorView.Rendered;
+        }
+
+        private void collisionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            normalToolStripMenuItem.Checked = false;
+            renderedToolStripMenuItem.Checked = false;
+            collisionsToolStripMenuItem.Checked = true;
+            lightmapToolStripMenuItem.Checked = false;
+            commentaryToolStripMenuItem.Checked = false;
+            MainViewport.editorView = GameViewport.EditorView.Wireframe;
+        }
+
+        private void lightmapToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            normalToolStripMenuItem.Checked = false;
+            renderedToolStripMenuItem.Checked = false;
+            collisionsToolStripMenuItem.Checked = false;
+            lightmapToolStripMenuItem.Checked = true;
+            commentaryToolStripMenuItem.Checked = false;
+            MainViewport.editorView = GameViewport.EditorView.Lightmap;
+        }
+
+        private void commentaryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            normalToolStripMenuItem.Checked = false;
+            renderedToolStripMenuItem.Checked = false;
+            collisionsToolStripMenuItem.Checked = false;
+            lightmapToolStripMenuItem.Checked = false;
+            commentaryToolStripMenuItem.Checked = true;
+            MainViewport.editorView = GameViewport.EditorView.Commentary;            
+        }
+
+        #endregion
+
+        public bool scriptEditorShown { get; set; }
+
+        private void scriptEditorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ShowScriptEditor();
+        }
+
+        private void viewLogicToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ShowScriptEditor();
+            foreach (BeefyObject bo in MainViewport.ReturnSelected())
+            {
+                scriptEditor.LoadScript(bo.Script.Name);
+            }
+        }
+
+        public void ShowScriptEditor()
+        {
+            if (scriptEditorShown == false)
+            {
+                scriptEditor = new ScriptEditorForm(this);
+                scriptEditor.Show();
+                scriptEditorShown = true;
+            }
+        }
+
+        private void cutEditToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void copyEditToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pasteEditToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void deleteEditToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void bringToFrontToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void sendToBackToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lockSelectedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MainViewport.Lock(MainViewport.ReturnSelected());
+        }
+
+        private void unlockSelectedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MainViewport.Unlock(MainViewport.ReturnSelected());
+        }
     }
 }

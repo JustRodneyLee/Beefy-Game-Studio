@@ -49,6 +49,8 @@ namespace BeefyEngine
         public Vector2 Scale { get; set; }        
         public int Rotation { get; set; }
         public int LastRotation { get; set; }
+        public Vector2 UpVector { get { return new Vector2(0, (float)Math.Sin(Rotation)); } }
+        public Vector2 RightVector { get { return new Vector2((float)Math.Cos(Rotation), 0); } }
 
         private BeefyTransform()
         {

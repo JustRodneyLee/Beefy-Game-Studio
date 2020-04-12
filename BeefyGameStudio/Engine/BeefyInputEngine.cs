@@ -17,10 +17,10 @@ namespace BeefyEngine
     {
         public IBeefyInput Input;
         public InputCondition Condition;
-        public string Action;
+        public event EventHandler Action;
         public float HoldTime;
 
-        public BeefyInputBinding(Keys key, string action, InputCondition inputCondition, float holdTime = 0)
+        public BeefyInputBinding(Keys key, EventHandler action, InputCondition inputCondition, float holdTime = 0)
         {
             Input = new BKey(key);
             Condition = inputCondition;
@@ -28,7 +28,7 @@ namespace BeefyEngine
             HoldTime = holdTime;
         }
 
-        public BeefyInputBinding(MouseButton button, string action, InputCondition inputCondition, float holdTime = 0)
+        public BeefyInputBinding(MouseButton button, EventHandler action, InputCondition inputCondition, float holdTime = 0)
         {
             Input = new BMouseBtn();
             Condition = inputCondition;
@@ -37,12 +37,17 @@ namespace BeefyEngine
         }        
 
         //TODO : Mouse Move
-        public BeefyInputBinding(MouseAxis mouseAxis, string action)
+        public BeefyInputBinding(MouseAxis mouseAxis, EventHandler action)
         {
             Input = new BMouseMove(mouseAxis);
             Condition = InputCondition.Move;
             Action = action;
             HoldTime = 0;
+        }
+
+        public void DoAction()
+        {
+            Action?.Invoke(this, new EventArgs());            
         }
     }
 
@@ -168,17 +173,17 @@ namespace BeefyEngine
             Bindings.Add(bib);
         }
 
-        public void AddInputBinding(Keys key, string action, InputCondition condition, float time = 0)
+        public void AddInputBinding(Keys key, EventHandler action, InputCondition condition, float time = 0)
         {
             Bindings.Add(new BeefyInputBinding(key, action, condition, time));
         }
 
-        public void AddInputBinding(MouseButton btn, string action, InputCondition condition, float time = 0)
+        public void AddInputBinding(MouseButton btn, EventHandler action, InputCondition condition, float time = 0)
         {
             Bindings.Add(new BeefyInputBinding(btn, action, condition, time));
         }
 
-        public void AddInputBinding(MouseAxis axis, string action)
+        public void AddInputBinding(MouseAxis axis, EventHandler action)
         {
             Bindings.Add(new BeefyInputBinding(axis, action));
         }
@@ -475,19 +480,19 @@ namespace BeefyEngine
                                 case InputCondition.Down:
                                     if (Input.IsDown(((BKey)BIB.Input).KeyCode))
                                     {
-                                        BIC.ControllerScript.Invoke(BIB.Action);
+                                        BIB.DoAction();
                                     }
                                     break;
                                 case InputCondition.Up:
                                     if (Input.IsUp(((BKey)BIB.Input).KeyCode))
                                     {
-                                        BIC.ControllerScript.Invoke(BIB.Action);
+                                        BIB.DoAction();
                                     }
                                     break;
                                 case InputCondition.Hold:
                                     if (Input.GetHeldTime(((BKey)BIB.Input).KeyCode) == BIB.HoldTime)
                                     {
-                                        BIC.ControllerScript.Invoke(BIB.Action);
+                                        BIB.DoAction();
                                     }
                                     break;
                             }
@@ -498,19 +503,19 @@ namespace BeefyEngine
                                 case InputCondition.Down:
                                     if (Input.IsDown(((BMouseBtn)BIB.Input).MouseButton))
                                     {
-                                        BIC.ControllerScript.Invoke(BIB.Action);
+                                        BIB.DoAction();                                        
                                     }
                                     break;
                                 case InputCondition.Up:
                                     if (Input.IsUp(((BMouseBtn)BIB.Input).MouseButton))
                                     {
-                                        BIC.ControllerScript.Invoke(BIB.Action);
+                                        BIB.DoAction();
                                     }
                                     break;
                                 case InputCondition.Hold:
                                     if (Input.GetHeldTime(((BMouseBtn)BIB.Input).MouseButton) == BIB.HoldTime)
                                     {
-                                        BIC.ControllerScript.Invoke(BIB.Action);
+                                        BIB.DoAction();
                                     }
                                     break;
                                 case InputCondition.Move:
@@ -518,16 +523,16 @@ namespace BeefyEngine
                                     {
                                         case MouseAxis.X:
                                             if (Input.DeltaX != 0)
-                                                BIC.ControllerScript.Invoke(BIB.Action);
+                                                BIB.DoAction();
                                             break;
                                         case MouseAxis.Y:
                                             if (Input.DeltaY != 0)
-                                                BIC.ControllerScript.Invoke(BIB.Action);
+                                                BIB.DoAction();
                                             break;
                                     }
                                     break;
                                 case InputCondition.Scroll:
-                                    BIC.ControllerScript.Invoke(BIB.Action, Input.MouseScroll);
+                                    BIB.DoAction();
                                     break;
                             }
                             break;

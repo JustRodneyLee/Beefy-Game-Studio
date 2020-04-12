@@ -250,6 +250,18 @@ namespace BeefyEngine
             origin = new Vector2(averageX, averageY);
         }
 
+        public Rectangle GetBoundingRectangle() //+X +Y
+        {
+            int x = (int)GetFarthestVertexInDirection(new Vector2(-1, 0)).X;
+            int y = (int)GetFarthestVertexInDirection(new Vector2(0, -1)).Y;
+            return new Rectangle(
+                x, 
+                y,
+                (int)(GetFarthestVertexInDirection(new Vector2(1, 0)).X - x),
+                (int)(GetFarthestVertexInDirection(new Vector2(0, 1)).Y - y)
+                );
+        }
+
         public BeefyVertex GetFarthestVertexInDirection(Vector2 vec)
         {   
             int index = 0;
@@ -435,9 +447,10 @@ namespace BeefyEngine
         }
     }
 
-    public class BeefyRectangle : BeefyShape
+    public class BeefyRectangle : BeefyShape, ICloneable
     {
         bool RectangleConstructed;
+        public Vector2 Location { get { return new Vector2(X,Y); } }
         public float X { get { if (RectangleConstructed) return vertexSet.First().X; else return 0; } set { if (RectangleConstructed) vertexSet.First().X = value; } }
         public float Y { get { if (RectangleConstructed) return vertexSet.First().Y; else return 0; } set { if (RectangleConstructed) vertexSet.First().Y = value; } }
 
@@ -469,6 +482,16 @@ namespace BeefyEngine
             origin = (v1 + v2) / 2;
             RectangleConstructed = true;
         }
+
+        public BeefyRectangle Clone()
+        {
+            BeefyRectangle br;
+            if (RectangleConstructed)
+                br = new BeefyRectangle(vertexSet.First().ToVector2(), vertexSet[2].ToVector2());
+            else
+                br = new BeefyRectangle();
+            return br;
+        }
     }
 
     public class GraphingTools
@@ -477,26 +500,26 @@ namespace BeefyEngine
         SpriteBatch canvas;
         Texture2D pixel;
         int thickness;
-        Color color;
+        Color penColor;
 
         public GraphingTools(GraphicsDevice gd, SpriteBatch batch, int brushThickness, Color brushColor)
         {
             graphics = gd;
             canvas = batch;
             thickness = brushThickness;
-            color = brushColor;
+            penColor = brushColor;
             pixel = new Texture2D(graphics, 1, 1);
             pixel.SetData(new Color[1] { Color.White });
         }
 
         public void SetColor(Color target)
         {
-            color = target;
+            penColor = target;
         }
 
         public void PlotPoint(int x, int y, Single depth = 0f)
         {
-            canvas.Draw(pixel, new Rectangle(x - (int)(thickness/2f), - y - (int)(thickness/2f), thickness, thickness), null, color, 0f, Vector2.Zero, SpriteEffects.None, depth);
+            canvas.Draw(pixel, new Rectangle(x - (int)(thickness/2f), - y - (int)(thickness/2f), thickness, thickness), null, penColor, 0f, Vector2.Zero, SpriteEffects.None, depth);
         }
 
         public void PlotLine(Vector2 p1, Vector2 p2, Single depth = 0f)
@@ -553,6 +576,47 @@ namespace BeefyEngine
                     PlotLine(shape.VertexSet.First().ToVector2(), shape.VertexSet[i].ToVector2(), depth);
                 else
                     PlotLine(shape.VertexSet[i].ToVector2(), shape.VertexSet[i + 1].ToVector2(), depth);
+            }
+        }
+
+        public void PlotRectangle(BeefyRectangle rect, bool fill = true, Color fill_color = default, Single depth = 0f)
+        {
+            PlotShape(rect, depth);
+            if (fill)
+            {
+                if (fill_color != default)
+                    penColor = fill_color;
+                int width = (int)Math.Abs(rect.Width);
+                int height = (int)Math.Abs(rect.Height);
+                if (width < 1) width = 1;
+                if (height < 1) height = 1;
+                Texture2D fillTex = new Texture2D(graphics, width, height);
+                Color[] cData = new Color[width * height];
+                for (int i = 0; i < width; i++)
+                    for (int j = 0; j < height; j++)
+                        cData[i + j * width] = penColor;
+                fillTex.SetData(cData);
+                Vector2 dest = new Vector2(rect.X, -rect.Y);
+                if (rect.Width < 0)
+                    dest = new Vector2(dest.X - width, dest.Y);
+                if(rect.Height > 0)
+                    dest = new Vector2(dest.X, dest.Y - height);
+                canvas.Draw(fillTex, dest, Color.White);
+                /*
+                if (fill_color!=default)
+                {
+                    penColor = fill_color;
+                }                
+                float strokes = Math.Abs(rect.Height / thickness);
+                int strokeWidth;
+                if (rect.Height < 0)
+                    strokeWidth = -thickness;
+                else
+                    strokeWidth = thickness;
+                for (uint i = 1; i < strokes; i++)
+                {
+                    PlotLine(new Vector2(rect.X, rect.Y + strokeWidth * i), new Vector2(rect.X + rect.Width, rect.Y + strokeWidth * i));
+                }*/
             }
         }
     }

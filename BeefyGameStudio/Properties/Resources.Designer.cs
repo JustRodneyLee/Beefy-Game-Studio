@@ -101,6 +101,36 @@ namespace BeefyGameStudio.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to using System;
+        ///
+        ///namespace |Name|
+        ///{
+        ///    /// &lt;summary&gt;
+        ///    /// The main class.
+        ///    /// &lt;/summary&gt;
+        ///    public static class Program
+        ///    {
+        ///        /// &lt;summary&gt;
+        ///        /// The main entry point for the application.
+        ///        /// &lt;/summary&gt;       
+        ///        [STAThread]
+        ///        static void Main()
+        ///        {
+        ///            using (var game = new |Name|())
+        ///            {
+        ///                game.Run();
+        ///            }
+        ///        }
+        ///    }
+        ///}.
+        /// </summary>
+        internal static string Main {
+            get {
+                return ResourceManager.GetString("Main", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap Maximize {

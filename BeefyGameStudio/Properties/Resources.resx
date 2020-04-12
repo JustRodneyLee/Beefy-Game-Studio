@@ -136,4 +136,28 @@
   <data name="BGS_Icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\BGS.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Main" xml:space="preserve">
+    <value>using System;
+
+namespace |Name|
+{
+    /// &lt;summary&gt;
+    /// The main class.
+    /// &lt;/summary&gt;
+    public static class Program
+    {
+        /// &lt;summary&gt;
+        /// The main entry point for the application.
+        /// &lt;/summary&gt;       
+        [STAThread]
+        static void Main()
+        {
+            using (var game = new |Name|())
+            {
+                game.Run();
+            }
+        }
+    }
+}</value>
+  </data>
 </root>

@@ -63,6 +63,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.DirectoryServices" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -96,8 +97,8 @@
       <DependentUpon>BeefyHub.cs</DependentUpon>
     </Compile>
     <Compile Include="BGS.cs">
-		<SubType>Form</SubType>
-	</Compile>
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="BGS.Designer.cs">
       <DependentUpon>BGS.cs</DependentUpon>
     </Compile>
@@ -156,7 +157,7 @@
     <Compile Include="Engine\BeefyNetworkEngine.cs" />
     <Compile Include="Engine\BeefyObject.cs" />
     <Compile Include="Engine\BeefyPhysicsEngine.cs" />
-    <Compile Include="Engine\BeefyPresets.cs" />
+    <Compile Include="BeefyPresets.cs" />
     <Compile Include="Engine\BeefyRenderingEngine.cs" />
     <Compile Include="Engine\BeefyLevel.cs" />
     <Compile Include="Engine\BeefyScript.cs" />
@@ -174,9 +175,19 @@
     <Compile Include="NewProject.Designer.cs">
       <DependentUpon>NewProject.cs</DependentUpon>
     </Compile>
-    <Compile Include="ScriptEditor.cs">
-      <SubType>Component</SubType>
+    <Compile Include="OutputConsole.cs">
+      <SubType>Form</SubType>
     </Compile>
+    <Compile Include="OutputConsole.Designer.cs">
+      <DependentUpon>OutputConsole.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ScriptDocument.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ScriptDocument.Designer.cs">
+      <DependentUpon>ScriptDocument.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ScriptEditor.cs" />
     <Compile Include="ScriptEditorForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -243,6 +254,9 @@
     <EmbeddedResource Include="NewProject.resx">
       <DependentUpon>NewProject.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="OutputConsole.resx">
+      <DependentUpon>OutputConsole.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ProjectSettings.resx">
       <DependentUpon>ProjectSettings.cs</DependentUpon>
     </EmbeddedResource>
@@ -256,6 +270,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="ScriptDocument.resx">
+      <DependentUpon>ScriptDocument.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ScriptEditorForm.resx">
       <DependentUpon>ScriptEditorForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -296,9 +313,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\HMGLogoWhiteOnDark.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\MainProgram.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\BGS.ico" />

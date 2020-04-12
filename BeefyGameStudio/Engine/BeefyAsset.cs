@@ -61,8 +61,9 @@ namespace BeefyEngine
             {
                 foreach (BeefyObject bo in layer.BOC)
                 {
-                    layers_objects.Add(layer.LayerID, bo.ObjectID);
+                    layers_objects.Add(bo.ObjectID, layer.LayerID);
                 }
+                layersID_layerNo.Add(layer.LayerID, layer.LayerNo);
             }
         }
 
@@ -73,4 +74,8 @@ namespace BeefyEngine
 
     }
 
+    public class ScriptData
+    {
+        
+    }
 }

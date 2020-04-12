@@ -62,6 +62,7 @@ namespace BeefyEngine
         public string ObjectID { get; internal set; }
         public bool IsAbstract { get; internal set; } //Determines if this Object is tangible
         public readonly List<IBeefyComponent> Components;
+        public BeefyScript Script { get; internal set; }
 
         private BeefyObject()
         {

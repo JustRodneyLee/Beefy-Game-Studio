@@ -59,6 +59,7 @@ namespace BeefyEngine
             Alpha = 1;
             Origin = Vector2.Zero;
             intTint = Color.White;
+            PixelScaling = 1;
             Enable();
         }
 

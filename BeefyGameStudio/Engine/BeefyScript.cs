@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
+using System.Collections;
 
 namespace BeefyEngine
 {
@@ -40,73 +41,75 @@ namespace BeefyEngine
         }
     }
 
-    public class BeefyScript
+    public class ParameterCollection
     {
+        Dictionary<string, object> parameters;
+
+        public ParameterCollection(object s)
+        {
+            parameters = new Dictionary<string, object>();
+        }
+
+        public object this[string index]
+        {
+            get { return parameters[index]; }
+        }
+
+        public void SetParameter()
+        {
+
+        }
+    }
+
+    public class BeefyScript : IEnumerable<BeefyScript.BeefyFunction>
+    {
+        public string Name { get; set; }
         public object Parent { get; set; }
+        public List<BeefyFunction> Functions { get; }
 
         public BeefyScript(object parent)
         {
-            Parent = parent;
+            Parent = parent;            
         }
 
-        public object Invoke(string actionName)
+        public void AddFunction(string name)
         {
-            return Invoke(actionName, null);
+            Functions.Add(new BeefyFunction(name));
         }
 
-        public object Invoke(string actionName, object param1)
+        public void RemoveFunction(string name)
         {
-            return Invoke(actionName, new object[1] { param1 });
+            Functions.Remove(Functions.Find(x => x.FunctionName == name));
         }
 
-        public object Invoke(string actionName, object param1, object param2)
+        public void RunFunction(string name, ParameterCollection pc = null)
         {
-            return Invoke(actionName, new object[2] { param1, param2 });
+            Functions.Find(x => x.FunctionName == name).Run(pc);
         }
 
-        public object Invoke(string actionName, object param1, object param2, object param3)
+        public IEnumerator<BeefyFunction> GetEnumerator()
         {
-            return Invoke(actionName, new object[3] { param1, param2, param3 });
+            return Functions.GetEnumerator();
         }
 
-        public object Invoke(string actionName, object param1, object param2, object param3, object param4)
+        IEnumerator IEnumerable.GetEnumerator()
         {
-            return Invoke(actionName, new object[4] { param1, param2, param3, param4 });
+            return Functions.GetEnumerator();
         }
 
-        public object Invoke(string actionName, object param1, object param2, object param3, object param4, object param5)
+        public class BeefyFunction
         {
-            return Invoke(actionName, new object[5] { param1, param2, param3, param4, param5 });
-        }
+            public string FunctionName { get; internal set; }
 
-        public object Invoke(string actionName, object param1, object param2, object param3, object param4, object param5, object param6)
-        {
-            return Invoke(actionName, new object[6] { param1, param2, param3, param4, param5, param6 });
-        }
-
-        public object Invoke(string actionName, object param1, object param2, object param3, object param4, object param5, object param6, object param7)
-        {
-            return Invoke(actionName, new object[7] { param1, param2, param3, param4, param5, param6, param7 });
-        }
-
-        public object Invoke(string actionName, object param1, object param2, object param3, object param4, object param5, object param6, object param7, object param8)
-        {
-            return Invoke(actionName, new object[8] { param1, param2, param3, param4, param5, param6, param7, param8 });
-        }
-
-        public object Invoke(string actionName, object[] parameters = null)
-        {
-            Type thisType = this.GetType();
-            MethodInfo info = thisType.GetMethod(actionName);
-            try
+            public BeefyFunction(string name)
             {
-                return info.Invoke(this, parameters);
+                FunctionName = name;
             }
-            catch(Exception e)
+
+            public virtual void Run(ParameterCollection pc = null)
             {
-                Console.WriteLine(e.ToString());
+
             }
-            return null;
         }
     }
 }

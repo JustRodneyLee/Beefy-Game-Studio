@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom.Compiler;
 using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -55,6 +56,9 @@ namespace BeefyGameStudio
         public static bool DeveloperMode { get { return Data.DeveloperMode; } set { Data.DeveloperMode = value; } }
         public static List<string> LevelIDs { get { return Data.LevelIDs; } set { Data.LevelIDs = value; } }
         public static string StartUpLevelID { get { return Data.StartUpLevelID; } set { Data.StartUpLevelID = value; } }
+        public static bool ProjectBuilt { get; set; }
+        public static bool AssetsBuilt { get; set; }
+        public static bool Saved { get; set; }
 
         public static void SetProjectData(BeefyProject project)
         {
@@ -86,7 +90,6 @@ namespace BeefyGameStudio
         public bool DeveloperMode { get; set; }
         public List<string> LevelIDs { get; set; }
         public string StartUpLevelID { get; set; }
-
 
         public BeefyProject()
         {
@@ -133,7 +136,7 @@ namespace BeefyGameStudio
         }
 
         public BeefyAssetLibrary AssetLib { get; set; }
-
+        
         public string ExtractNameFromPath(string path, bool keepExtension = false)
         {
             if (keepExtension)
@@ -193,7 +196,7 @@ namespace BeefyGameStudio
             List<string> imported = new List<string>();
             foreach (string path in paths)
             {
-                string aName = Path.GetFileName(path);
+                string aName = ExtractNameFromPath(path);
                 if (AssetLib.Exists(aName))
                 {
                     imported.Add(aName);
@@ -261,13 +264,13 @@ namespace BeefyGameStudio
                 Directory.CreateDirectory(project.LevelsPath);
                 Directory.CreateDirectory(project.EnginePath);
                 Directory.SetCurrentDirectory(project.ProjectPath);
-                using (StreamWriter mainWriter = new StreamWriter(project.ProjectPath + "\\Program.cs"))
-                {
-                    
-                    //mainWriter.WriteLine(Properties.Resources.)
-                    
-                }
                 CurrentProject.SetProjectData(project);
+                /*using (StreamWriter mainWriter = new StreamWriter(project.ProjectPath + "\\Main.cs"))
+                {
+                    string mainprg = Properties.Resources.Main;
+                    mainprg.Replace("|Name|", CurrentProject.ProjectName);
+                    mainWriter.Write(mainprg);
+                }*/
             }
             catch(Exception e)
             {
@@ -279,27 +282,99 @@ namespace BeefyGameStudio
             }
         }
 
+        public void SaveProject()
+        {
+            //TODO
+        }
+
         public void OpenProject(string path)
         {
-            XmlSerializer xml;
-            using (StreamReader reader = new StreamReader(path))
+            if (CurrentProject.Saved)
             {
-                xml = new XmlSerializer(typeof(BeefyProject));
-                CurrentProject.SetProjectData((BeefyProject)xml.Deserialize(reader));
-            }            
-            MainViewport.LoadLevel(CurrentProject.LevelsPath + "\\" + CurrentProject.CurrentLevelID + "\\" + CurrentProject.CurrentLevelID + ".bgl");
-            RefreshText();
+                XmlSerializer xml;
+                using (StreamReader reader = new StreamReader(path))
+                {
+                    xml = new XmlSerializer(typeof(BeefyProject));
+                    CurrentProject.SetProjectData((BeefyProject)xml.Deserialize(reader));
+                }
+                MainViewport.LoadLevel(CurrentProject.LevelsPath + "\\" + CurrentProject.CurrentLevelID + "\\" + CurrentProject.CurrentLevelID + ".bgl");
+                RefreshText();
+            }
+            else
+            {
+                DialogResult dr = MessageBox.Show("You haven't saved your current Project! Do you wish to save it now?", "Beefy Game Studio - Save Project", MessageBoxButtons.YesNoCancel);
+                if (dr == DialogResult.Yes)
+                {
+                    SaveProject();
+                }else if (dr == DialogResult.No)
+                {
+                    
+                }else if (dr == DialogResult.Cancel)
+                {
+                    //Do nothing
+                }
+                else
+                {
+                    //Do nothing
+                }
+            }
         }
 
         public async void BuildAssets()
         {
             //TODO
-            RuntimeBuilder builder = new RuntimeBuilder(CurrentProject.TempPath, CurrentProject.ObjPath, CurrentProject.BuildPath, TargetPlatform.Windows, GraphicsProfile.HiDef, true) { Logger = new StringBuilderLogger() };            
-            foreach (IBeefyAsset iba in AssetLib.Assets.Values)
+            if (!CurrentProject.AssetsBuilt)
             {
-                await builder.BuildContent(iba.AssetPath);
+                RuntimeBuilder builder = new RuntimeBuilder(CurrentProject.TempPath, CurrentProject.ObjPath, CurrentProject.BuildPath, TargetPlatform.Windows, GraphicsProfile.HiDef, true) { Logger = new StringBuilderLogger() };
+                foreach (IBeefyAsset iba in AssetLib.Assets.Values)
+                {
+                    await builder.BuildContent(iba.AssetPath);
+                }
+                Directory.Delete(CurrentProject.TempPath, true);//Delete Temp Files
+                MessageBox.Show("Asset build successful.");
             }
-            Directory.Delete(CurrentProject.TempPath, true);//Delete Temp Files
+            else
+            {
+                MessageBox.Show("Your assets have already been built!");
+            }
+        }
+
+        public bool BuildProject()
+        {
+            BuildAssets();
+            StatusStrip.Text = "Building " + CurrentProject.ProjectName + "...";
+            //CSharpCodeProvider codeProvider = new CSharpCodeProvider();
+            //ICodeCompiler icc = codeProvider.CreateCompiler();
+            CodeDomProvider codeProvider = CodeDomProvider.CreateProvider("CSharp");
+            string output = CurrentProject.BuildPath + "\\" + CurrentProject.ProjectName + ".exe";
+            CompilerParameters parameters = new CompilerParameters();
+            parameters.GenerateExecutable = true;
+            parameters.OutputAssembly = output;
+            CompilerResults results = codeProvider.CompileAssemblyFromFile(parameters, "//TODO");
+            if (results.Errors.HasErrors)
+            {
+                StatusStrip.Text = "Build failed.";
+                //TODO : Pop up errors
+                List<CompilerError> errors = new List<CompilerError>();
+                List<CompilerError> warnings = new List<CompilerError>();
+                foreach (CompilerError error in results.Errors)
+                {
+                    if (!error.IsWarning)
+                        errors.Add(error);
+                    else
+                        warnings.Add(error);
+                }
+                errors.AddRange(warnings);
+                OutputConsole console = new OutputConsole(errors);
+                warnings.Clear();
+                errors.Clear(); //Attempt to dispose
+                return false;
+            }
+            else
+            {
+                StatusStrip.Text = "Build uccessful!";
+                return true;
+            }            
         }
 
         public bool SaveLevel(string path)
