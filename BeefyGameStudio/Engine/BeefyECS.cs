@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework.Input;
 /// This is the ECS System of the BeefyEngine
 /// </summary>
 
-namespace BeefyEngine
+namespace BeefyGameEngine
 {  
     /// <summary>
     /// System that reacts to Components

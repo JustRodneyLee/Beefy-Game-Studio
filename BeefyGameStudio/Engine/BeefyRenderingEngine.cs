@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace BeefyEngine
+namespace BeefyGameEngine
 {
     /// <summary>
     /// Sprites and Textures Rendering
@@ -266,18 +266,24 @@ namespace BeefyEngine
     {
         public BeefyEngine Core { get; }
         public BeefyCamera2D Camera { get; set; }
-        public Texture2D LightMap { get; }
+        public Texture2D LightMap { get; }        
         SpriteBatch renderer;
+        GraphicsDevice graphics;
 
         public BeefyRenderingEngine(BeefyEngine core)
         {
             Core = core;
-            Camera = new BeefyCamera2D(Core.GraphicsDevice.Viewport);
-            renderer = new SpriteBatch(Core.GraphicsDevice);
+        }
+
+        public void SetGraphicsDevice(GraphicsDevice gd)
+        {
+            graphics = gd;
+            renderer = new SpriteBatch(gd);
+            Camera = new BeefyCamera2D(gd.Viewport);            
         }
 
         public string Update(BeefyLevel Level)
-        {
+        {            
             foreach (BeefyLayer BL in Level.Layers)
             {
                 foreach (BeefyObject BO in BL.BOC)
@@ -301,7 +307,8 @@ namespace BeefyEngine
         
         public void Dispose()
         {            
-            renderer.Dispose();            
+            renderer.Dispose();
+            graphics.Dispose();
         }
     }
 }

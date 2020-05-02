@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace BeefyEngine
+namespace BeefyGameEngine
 {   
     /// <summary>
     /// Keyboard Inputs are defined as BKey

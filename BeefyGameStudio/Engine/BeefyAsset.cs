@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace BeefyEngine
+namespace BeefyGameEngine
 {
     public class BeefyAssetManager
     {        
@@ -57,7 +57,8 @@ namespace BeefyEngine
         {
             settings = bl.Settings;
             layers_objects = new Dictionary<string, string>();
-            foreach(BeefyLayer layer in bl.Layers)
+            layersID_layerNo = new Dictionary<string, int>();
+            foreach (BeefyLayer layer in bl.Layers)
             {
                 foreach (BeefyObject bo in layer.BOC)
                 {

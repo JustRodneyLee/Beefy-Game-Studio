@@ -8,14 +8,16 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using MonoGame.RuntimeBuilder;
-using BeefyEngine;
+using BeefyGameEngine;
+using Microsoft.Xna.Framework.Input;
+using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace BeefyGameStudio
 {
@@ -25,7 +27,7 @@ namespace BeefyGameStudio
         {
             return listToClone.Select(item => (T)item.Clone()).ToList();
         }
-    }
+    }    
 
     public static class CurrentProject
     {
@@ -35,7 +37,7 @@ namespace BeefyGameStudio
             get { return Data == null; }
         }
 
-        public static string ProjectName { get { return Data.ProjectName; } set { Data.ProjectName = value; } }
+        public static string ProjectName { get { if (Data == null) return "Untitled Game"; else return Data.ProjectName; } set { Data.ProjectName = value; } }
         public static string ProjectExe { get { return Data.ProjectName; } }
         public static List<string> ProjectDevelopers { get { return Data.ProjectDevelopers; } set { Data.ProjectDevelopers = value; } }
         public static Version ProjectVersion { get { return Data.ProjectVersion; } set { Data.ProjectVersion = value; } }
@@ -54,11 +56,16 @@ namespace BeefyGameStudio
         ///Game Settings
         public static bool PartialLoading { get { return Data.PartialLoading; } set { Data.PartialLoading = value; } }
         public static bool DeveloperMode { get { return Data.DeveloperMode; } set { Data.DeveloperMode = value; } }
+        public static bool RunFullscreen { get { return Data.RunFullScreen; } set { Data.RunFullScreen = value; } }
+        public static bool RunBorderless { get { return Data.RunBorderless; } set { Data.RunBorderless = value; } }
+        public static bool ShowMouseCursor { get { return Data.ShowMouseCursor; } set { Data.ShowMouseCursor = value; } }
         public static List<string> LevelIDs { get { return Data.LevelIDs; } set { Data.LevelIDs = value; } }
         public static string StartUpLevelID { get { return Data.StartUpLevelID; } set { Data.StartUpLevelID = value; } }
         public static bool ProjectBuilt { get; set; }
         public static bool AssetsBuilt { get; set; }
         public static bool Saved { get; set; }
+
+        public static GameState ProjectState { get; set; }
 
         public static void SetProjectData(BeefyProject project)
         {
@@ -88,6 +95,10 @@ namespace BeefyGameStudio
         ///Game Settings
         public bool PartialLoading { get; set; }
         public bool DeveloperMode { get; set; }
+        public bool RunFullScreen { get; set; }
+        public bool RunBorderless { get; set; }
+        public bool ShowMouseCursor { get; set; }
+        public Point Resolution { get; set; }
         public List<string> LevelIDs { get; set; }
         public string StartUpLevelID { get; set; }
 
@@ -95,7 +106,7 @@ namespace BeefyGameStudio
         {
             ProjectDevelopers = new List<string>();
             LevelIDs = new List<string>();
-            ProjectLogoPath = "";
+            ProjectLogoPath = ""; 
         }
 
         public object Clone()
@@ -109,7 +120,7 @@ namespace BeefyGameStudio
             project.DeveloperMode = DeveloperMode;
             project.CurrentLevelID = CurrentLevelID;
             project.LevelIDs = (List<string>)LevelIDs.Clone();
-            return project;
+            return project;            
         }
 
         public void Dispose()
@@ -282,14 +293,31 @@ namespace BeefyGameStudio
             }
         }
 
+        public void ExportAssetLib(string path)
+        {
+
+        }
+
+        public void ImportAssetLib(string path)
+        {
+
+        }
+
         public void SaveProject()
         {
             //TODO
+            ExportAssetLib(CurrentProject.RawPath);
+            using (StreamWriter writer = new StreamWriter(CurrentProject.ProjectPath + "\\" + CurrentProject.ProjectName + ".bgp"))
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(BeefyProject));
+                serializer.Serialize(writer, CurrentProject.Data);
+            }
+            CurrentProject.Saved = true;
         }
 
         public void OpenProject(string path)
         {
-            if (CurrentProject.Saved)
+            void ReadProject()
             {
                 XmlSerializer xml;
                 using (StreamReader reader = new StreamReader(path))
@@ -297,8 +325,18 @@ namespace BeefyGameStudio
                     xml = new XmlSerializer(typeof(BeefyProject));
                     CurrentProject.SetProjectData((BeefyProject)xml.Deserialize(reader));
                 }
-                MainViewport.LoadLevel(CurrentProject.LevelsPath + "\\" + CurrentProject.CurrentLevelID + "\\" + CurrentProject.CurrentLevelID + ".bgl");
+                if (CurrentProject.CurrentLevelID == "")
+                {
+                    MainViewport.InternalLoad(new BeefyLevel("New Level"));
+                }
+                else
+                    MainViewport.LoadLevel(CurrentProject.LevelsPath + "\\" + CurrentProject.CurrentLevelID + "\\" + CurrentProject.CurrentLevelID + ".bgl");
                 RefreshText();
+            }
+
+            if (CurrentProject.Saved||CurrentProject.Data == null)
+            {
+                ReadProject();
             }
             else
             {
@@ -306,10 +344,12 @@ namespace BeefyGameStudio
                 if (dr == DialogResult.Yes)
                 {
                     SaveProject();
+                    ReadProject();
                 }else if (dr == DialogResult.No)
                 {
-                    
-                }else if (dr == DialogResult.Cancel)
+                    ReadProject();
+                }
+                else if (dr == DialogResult.Cancel)
                 {
                     //Do nothing
                 }
@@ -372,7 +412,7 @@ namespace BeefyGameStudio
             }
             else
             {
-                StatusStrip.Text = "Build uccessful!";
+                StatusStrip.Text = "Build Successful!";
                 return true;
             }            
         }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using BeefyEngine;
+using BeefyGameEngine;
 
 namespace BeefyGameStudio
 {
@@ -42,7 +42,7 @@ namespace BeefyGameStudio
 
         public class Circle : BeefyObject
         {
-            public Circle(string name = "Circle", Color circleColor = default, float radius = 10f)
+            public Circle(string name = "Circle", Color circleColor = default, float radius = 2.5f)
             {
                 int texRadius = (int)radius * 50;
                 ObjectID = name;
@@ -57,7 +57,7 @@ namespace BeefyGameStudio
                 boxTex.SetData(data);
                 GetComponent<BeefyRenderer2D>().SetTexture(boxTex);
                 GetComponent<BeefyRenderer2D>().PixelScaling = texRadius / radius;
-                //GetComponent<BeefyRenderer2D>().Origin = new Vector2(radius);
+                GetComponent<BeefyRenderer2D>().Origin = new Vector2(radius);
                 AddComponent(new BeefyPhysics(this));
             }
         }

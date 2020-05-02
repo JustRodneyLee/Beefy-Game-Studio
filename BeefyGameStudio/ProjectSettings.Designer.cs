@@ -46,6 +46,9 @@
             this.developerModeCheckBox = new System.Windows.Forms.CheckBox();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.buttonSave = new System.Windows.Forms.Button();
+            this.fullscreencheckBox = new System.Windows.Forms.CheckBox();
+            this.showMousecheckBox = new System.Windows.Forms.CheckBox();
+            this.borderlesscheckBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.logoPictureBox)).BeginInit();
             this.settingsGroupBox.SuspendLayout();
             this.SuspendLayout();
@@ -152,6 +155,9 @@
             // 
             // settingsGroupBox
             // 
+            this.settingsGroupBox.Controls.Add(this.borderlesscheckBox);
+            this.settingsGroupBox.Controls.Add(this.showMousecheckBox);
+            this.settingsGroupBox.Controls.Add(this.fullscreencheckBox);
             this.settingsGroupBox.Controls.Add(this.label1);
             this.settingsGroupBox.Controls.Add(this.startLevelComboBox);
             this.settingsGroupBox.Controls.Add(this.developerModeCheckBox);
@@ -218,6 +224,42 @@
             this.buttonSave.UseVisualStyleBackColor = true;
             this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
             // 
+            // fullscreencheckBox
+            // 
+            this.fullscreencheckBox.AutoSize = true;
+            this.fullscreencheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.fullscreencheckBox.Location = new System.Drawing.Point(6, 46);
+            this.fullscreencheckBox.Name = "fullscreencheckBox";
+            this.fullscreencheckBox.Size = new System.Drawing.Size(109, 19);
+            this.fullscreencheckBox.TabIndex = 11;
+            this.fullscreencheckBox.Text = "Run Fullscreen";
+            this.fullscreencheckBox.UseVisualStyleBackColor = true;
+            this.fullscreencheckBox.CheckedChanged += new System.EventHandler(this.fullscreencheckBox_CheckedChanged);
+            // 
+            // showMousecheckBox
+            // 
+            this.showMousecheckBox.AutoSize = true;
+            this.showMousecheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.showMousecheckBox.Location = new System.Drawing.Point(145, 46);
+            this.showMousecheckBox.Name = "showMousecheckBox";
+            this.showMousecheckBox.Size = new System.Drawing.Size(98, 19);
+            this.showMousecheckBox.TabIndex = 12;
+            this.showMousecheckBox.Text = "Show Mouse";
+            this.showMousecheckBox.UseVisualStyleBackColor = true;
+            this.showMousecheckBox.CheckedChanged += new System.EventHandler(this.showMousecheckBox_CheckedChanged);
+            // 
+            // borderlesscheckBox
+            // 
+            this.borderlesscheckBox.AutoSize = true;
+            this.borderlesscheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.borderlesscheckBox.Location = new System.Drawing.Point(6, 71);
+            this.borderlesscheckBox.Name = "borderlesscheckBox";
+            this.borderlesscheckBox.Size = new System.Drawing.Size(111, 19);
+            this.borderlesscheckBox.TabIndex = 13;
+            this.borderlesscheckBox.Text = "Run Borderless";
+            this.borderlesscheckBox.UseVisualStyleBackColor = true;
+            this.borderlesscheckBox.CheckedChanged += new System.EventHandler(this.borderlesscheckBox_CheckedChanged);
+            // 
             // ProjectSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -274,5 +316,8 @@
         private System.Windows.Forms.ComboBox startLevelComboBox;
         private System.Windows.Forms.CheckBox developerModeCheckBox;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.CheckBox showMousecheckBox;
+        private System.Windows.Forms.CheckBox fullscreencheckBox;
+        private System.Windows.Forms.CheckBox borderlesscheckBox;
     }
 }

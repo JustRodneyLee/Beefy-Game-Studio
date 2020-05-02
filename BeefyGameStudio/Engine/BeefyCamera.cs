@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace BeefyEngine
+namespace BeefyGameEngine
 {
     /// <summary>
     /// 2D Camera

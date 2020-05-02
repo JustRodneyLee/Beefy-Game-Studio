@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 
-namespace BeefyEngine
+namespace BeefyGameEngine
 {
     /// <summary>
     /// Audio or Music playing

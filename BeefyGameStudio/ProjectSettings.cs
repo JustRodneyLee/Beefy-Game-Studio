@@ -46,6 +46,7 @@ namespace BeefyGameStudio
             versionBuildTextBox.Text = projClone.ProjectVersion.Build.ToString();
             partialLoadingCheckBox.Checked = projClone.PartialLoading;
             developerModeCheckBox.Checked = projClone.DeveloperMode;
+            
         }
 
         private void logoPictureBox_DoubleClick(object sender, EventArgs e)
@@ -92,6 +93,21 @@ namespace BeefyGameStudio
         {
             CurrentProject.SetProjectData(projClone);
             //TODO : Change Directories
+        }
+
+        private void fullscreencheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            projClone.RunFullScreen = fullscreencheckBox.Checked;
+        }
+
+        private void showMousecheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            projClone.ShowMouseCursor = showMousecheckBox.Checked;
+        }
+
+        private void borderlesscheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            projClone.RunBorderless = borderlesscheckBox.Checked;
         }
     }
 }

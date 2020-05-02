@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Lidgren.Network;
 using Microsoft.Xna.Framework;
 
-namespace BeefyEngine
+namespace BeefyGameEngine
 {    
 
     public class BeefyNetworkEngine

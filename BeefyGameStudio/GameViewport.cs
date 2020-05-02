@@ -7,7 +7,7 @@ using System.Xml.Serialization;
 using System.Text;
 using System.Windows.Forms;
 using System.Threading.Tasks;
-using BeefyEngine;
+using BeefyGameEngine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -125,6 +125,9 @@ namespace BeefyGameStudio
         BeefyLayer currentLayer;
         bool showAllLayers;
         public BeefyLevel Level;
+
+        //Runtime Simulation
+
 
         protected override void Initialize()
         {
@@ -697,6 +700,7 @@ namespace BeefyGameStudio
                     if (SnapToGrid)
                     {
                         //TODOs
+                        
                     }
                     if (potentialSelect&&!selection_multiSelect)
                     {                        
@@ -1212,6 +1216,7 @@ namespace BeefyGameStudio
             foreach (BeefyLayer bl in Level.Layers)
             {
                 string layerPath = lvlPath + "\\" + bl.LayerID;
+                Directory.CreateDirectory(layerPath);
                 foreach (BeefyObject bo in bl.BOC)
                 {
                     using (StreamWriter file = new StreamWriter(layerPath + "\\" + bo.ObjectID + ".bgo"))
@@ -1665,141 +1670,152 @@ namespace BeefyGameStudio
         /// +X -Y Coords used for drawing!
         /// </summary>
         protected override void Draw()
-        {            
-            base.Draw();
-            Editor.BeginCamera2D(SpriteSortMode.BackToFront, BlendState.NonPremultiplied, SamplerState.PointClamp);
-            Editor.Cam.Position = View.Position * View.Zoom;
-            ///Underlying grid           
-            if (editorView != EditorView.Rendered)
+        {                        
+            switch (CurrentProject.ProjectState)
             {
-                int minorGridSize = (int)(EditorSettings.GridSize * View.Zoom);
-                int majorGridSize = 10 * minorGridSize;
-                Color minorColor = Color.Gray;                
-                for (int i = minorGridSize; i < (int)(VPWidth + Editor.Cam.Position.X); i += minorGridSize)
-                {
-                    Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle(i, (int)Editor.Cam.Position.Y - VPHeight / 2, 1, VPHeight), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
-                }
-                for (int i = -minorGridSize; i > (int)(Editor.Cam.Position.X - VPWidth); i -= minorGridSize)
-                {
-                    Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle(i, (int)Editor.Cam.Position.Y - VPHeight / 2, 1, VPHeight), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
-                }
-                for (int i = minorGridSize; i < (int)(VPHeight + Editor.Cam.Position.Y); i += minorGridSize)
-                {
-                    Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle((int)Editor.Cam.Position.X - VPWidth / 2, i, VPWidth, 1), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
-                }
-                for (int i = -minorGridSize; i > (int)(Editor.Cam.Position.Y - VPHeight); i -= minorGridSize)
-                {
-                    Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle((int)Editor.Cam.Position.X - VPWidth / 2, i, VPWidth, 1), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
-                }
-                ///X-Y Axis & Origin            
-                if (CullingRect.Y >= 0 && (CullingRect.Y - CullingRect.Height) <= 0)
-                    Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle((int)Editor.Cam.Position.X - VPWidth / 2, 0, VPWidth, 1), null, EditorSettings.XAxisColor * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9997f); //X-Axis
-                if (CullingRect.X <= 0 && (CullingRect.X + CullingRect.Width) >= 0)
-                    Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle(0, (int)Editor.Cam.Position.Y - VPHeight / 2, 1, VPHeight), null, EditorSettings.YAxisColor * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9997f); //Y-Axis
-                for (int i = -2; i < 3; i++)
-                    for (int j = -2; j < 3; j++)
-                        if ((i * i + j * j) != 8)
-                            Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle(i, j, 1, 1), null, EditorSettings.OriginColor, 0, default(Vector2), SpriteEffects.None, 0.9996f);
-            }            
-            ///Level Elements
-            foreach (BeefyObject bo in DrawnObjects)
-            {
-                switch (editorView)
-                {
-                    case EditorView.Normal:
-                        if (bo.IsAbstract)
+                case GameState.Aborted:
+                    base.Draw();
+                    Editor.BeginCamera2D(SpriteSortMode.BackToFront, BlendState.NonPremultiplied, SamplerState.PointClamp);
+                    Editor.Cam.Position = View.Position * View.Zoom;
+                    ///Underlying grid                       
+                    if (editorView != EditorView.Rendered)
+                    {
+                        int minorGridSize = (int)(EditorSettings.GridSize * View.Zoom);
+                        int majorGridSize = 10 * minorGridSize;
+                        int noOfGrids = VPWidth / minorGridSize;
+                        Color minorColor = Color.Gray;
+                        for (int i = minorGridSize; i < (int)(VPWidth + Editor.Cam.Position.X); i += minorGridSize)
                         {
-                            EditorDraw(AbstractIcon, bo.GetComponent<BeefyTransform>().Coordinates, new Vector2(33, 33), new Vector2(1) / EditorSettings.PixelScale, 0f, Color.White * GetObjectLayer(bo).LayerAlpha, bo.GetComponent<BeefyTransform>().Depth);
+                            Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle(i, (int)Editor.Cam.Position.Y - VPHeight / 2, 1, VPHeight), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
                         }
-                        else
+                        for (int i = -minorGridSize; i > (int)(Editor.Cam.Position.X - VPWidth); i -= minorGridSize)
                         {
-                            if (bo.GetComponent<BeefyRenderer2D>() != null && bo.GetComponent<BeefyRenderer2D>().Enabled)
-                                EditorDraw(bo);
+                            Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle(i, (int)Editor.Cam.Position.Y - VPHeight / 2, 1, VPHeight), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
                         }
-                        if (SelectedObjects.Exists(x => x.ObjectID == bo.ObjectID))
+                        for (int i = minorGridSize; i < (int)(VPHeight + Editor.Cam.Position.Y); i += minorGridSize)
                         {
-                            #region Draw Object Boundary
-                            BeefyShape bs = (BeefyShape)SelectionBoundaries[bo.ObjectID].Clone();
-                            bs.SetOrigin(Vector2.Zero);
-                            bs.Scale(View.Zoom, false);
-                            if (editorAction == EditorAction.Move || editorAction == EditorAction.Rotate || editorAction == EditorAction.Scale)
-                                GraphingTools.SetColor(Color.White);
-                            else
-                                GraphingTools.SetColor(Color.Orange);
-                            GraphingTools.PlotShape(bs, 0.01f);
-                            #endregion
-                            #region Draw Object Origin
-                            bs.SetOrigin(SelectionBoundaries[bo.ObjectID].Origin);
-                            Vector2 o = bs.Origin;
-                            o *= View.Zoom;
-                            for (int i = -2; i < 3; i++)
-                                for (int j = -2; j < 3; j++)
-                                    if ((i * i + j * j) != 8)
-                                    {
-                                        GraphingTools.SetColor(Color.Orange);
-                                        GraphingTools.PlotPoint((int)o.X + i, (int)o.Y + j, 0.005f);
-                                    }
+                            Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle((int)Editor.Cam.Position.X - VPWidth / 2, i, VPWidth, 1), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
+                        }
+                        for (int i = -minorGridSize; i > (int)(Editor.Cam.Position.Y - VPHeight); i -= minorGridSize)
+                        {
+                            Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle((int)Editor.Cam.Position.X - VPWidth / 2, i, VPWidth, 1), null, Color.Gray * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9998f);
+                        }
+                        ///X-Y Axis & Origin            
+                        if (CullingRect.Y >= 0 && (CullingRect.Y - CullingRect.Height) <= 0)
+                            Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle((int)Editor.Cam.Position.X - VPWidth / 2, 0, VPWidth, 1), null, EditorSettings.XAxisColor * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9997f); //X-Axis
+                        if (CullingRect.X <= 0 && (CullingRect.X + CullingRect.Width) >= 0)
+                            Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle(0, (int)Editor.Cam.Position.Y - VPHeight / 2, 1, VPHeight), null, EditorSettings.YAxisColor * 0.85f, 0, default(Vector2), SpriteEffects.None, 0.9997f); //Y-Axis
+                        for (int i = -2; i < 3; i++)
+                            for (int j = -2; j < 3; j++)
+                                if ((i * i + j * j) != 8)
+                                    Editor.spriteBatch.Draw(Editor.Pixel, new Rectangle(i, j, 1, 1), null, EditorSettings.OriginColor, 0, default(Vector2), SpriteEffects.None, 0.9996f);
+                    }
+                    ///Level Elements
+                    foreach (BeefyObject bo in DrawnObjects)
+                    {
+                        switch (editorView)
+                        {
+                            case EditorView.Normal:
+                                if (bo.IsAbstract)
+                                {
+                                    EditorDraw(AbstractIcon, bo.GetComponent<BeefyTransform>().Coordinates, new Vector2(33, 33), new Vector2(1) / EditorSettings.PixelScale, 0f, Color.White * GetObjectLayer(bo).LayerAlpha, bo.GetComponent<BeefyTransform>().Depth);
+                                }
+                                else
+                                {
+                                    if (bo.GetComponent<BeefyRenderer2D>() != null && bo.GetComponent<BeefyRenderer2D>().Enabled)
+                                        EditorDraw(bo);
+                                }
+                                if (SelectedObjects.Exists(x => x.ObjectID == bo.ObjectID))
+                                {
+                                    #region Draw Object Boundary
+                                    BeefyShape bs = (BeefyShape)SelectionBoundaries[bo.ObjectID].Clone();
+                                    bs.SetOrigin(Vector2.Zero);
+                                    bs.Scale(View.Zoom, false);
+                                    if (editorAction == EditorAction.Move || editorAction == EditorAction.Rotate || editorAction == EditorAction.Scale)
+                                        GraphingTools.SetColor(Color.White);
                                     else
-                                    {
-                                        GraphingTools.SetColor(Color.Black);
-                                        GraphingTools.PlotPoint((int)o.X + i, (int)o.Y + j, 0.0075f);
-                                    }
-                            GraphingTools.SetColor(Color.Black);
-                            for (int i = -1; i < 2; i++)
-                                GraphingTools.PlotPoint((int)o.X + i, (int)o.Y - 3, 0.0075f);
-                            for (int i = -1; i < 2; i++)
-                                GraphingTools.PlotPoint((int)o.X + i, (int)o.Y + 3, 0.0075f);
-                            for (int i = -1; i < 2; i++)
-                                GraphingTools.PlotPoint((int)o.X - 3, (int)o.Y + i, 0.0075f);
-                            for (int i = -1; i < 2; i++)
-                                GraphingTools.PlotPoint((int)o.X + 3, (int)o.Y + i, 0.0075f);
-                            #endregion
+                                        GraphingTools.SetColor(Color.Orange);
+                                    GraphingTools.PlotShape(bs, 0.01f);
+                                    #endregion
+                                    #region Draw Object Origin
+                                    bs.SetOrigin(SelectionBoundaries[bo.ObjectID].Origin);
+                                    Vector2 o = bs.Origin;
+                                    o *= View.Zoom;
+                                    for (int i = -2; i < 3; i++)
+                                        for (int j = -2; j < 3; j++)
+                                            if ((i * i + j * j) != 8)
+                                            {
+                                                GraphingTools.SetColor(Color.Orange);
+                                                GraphingTools.PlotPoint((int)o.X + i, (int)o.Y + j, 0.005f);
+                                            }
+                                            else
+                                            {
+                                                GraphingTools.SetColor(Color.Black);
+                                                GraphingTools.PlotPoint((int)o.X + i, (int)o.Y + j, 0.0075f);
+                                            }
+                                    GraphingTools.SetColor(Color.Black);
+                                    for (int i = -1; i < 2; i++)
+                                        GraphingTools.PlotPoint((int)o.X + i, (int)o.Y - 3, 0.0075f);
+                                    for (int i = -1; i < 2; i++)
+                                        GraphingTools.PlotPoint((int)o.X + i, (int)o.Y + 3, 0.0075f);
+                                    for (int i = -1; i < 2; i++)
+                                        GraphingTools.PlotPoint((int)o.X - 3, (int)o.Y + i, 0.0075f);
+                                    for (int i = -1; i < 2; i++)
+                                        GraphingTools.PlotPoint((int)o.X + 3, (int)o.Y + i, 0.0075f);
+                                    #endregion
+                                }
+                                break;
+                            case EditorView.Rendered:
+                                if (!bo.IsAbstract)
+                                {
+                                    if (bo.GetComponent<BeefyRenderer2D>() != null && bo.GetComponent<BeefyRenderer2D>().Enabled)
+                                        EditorDraw(bo);
+                                }
+                                //TODO Lightmaps
+                                break;
+                            case EditorView.Wireframe:
+                                if (bo.HasComponent<BeefyPhysics>())
+                                {
+                                    GraphingTools.SetColor(Color.Cyan);
+                                    GraphingTools.PlotShape(bo.GetComponent<BeefyPhysics>().Collider);
+                                }
+                                break;
+                            case EditorView.Lightmap:
+                                break;
+                            case EditorView.Commentary:
+                                break;
                         }
-                        break;
-                    case EditorView.Rendered:
-                        if (!bo.IsAbstract)
-                        {
-                            if (bo.GetComponent<BeefyRenderer2D>() != null && bo.GetComponent<BeefyRenderer2D>().Enabled)
-                                EditorDraw(bo);
-                        }
-                        //TODO Lightmaps
-                        break;
-                    case EditorView.Wireframe:
-                        if (bo.HasComponent<BeefyPhysics>())
-                        {
-                            GraphingTools.SetColor(Color.Cyan);
-                            GraphingTools.PlotShape(bo.GetComponent<BeefyPhysics>().Collider);
-                        }
-                        break;
-                    case EditorView.Lightmap:
-                        break;
-                    case EditorView.Commentary:
-                        break;
-                }               
-            }
-            Editor.EndCamera2D();
-            Editor.BeginCamera2D(SpriteSortMode.BackToFront, BlendState.AlphaBlend);
-            switch (editorAction)
-            {
-                //Box Select GUI
-                case EditorAction.BoxSelect:
-                    GraphingTools.SetColor(Color.LightSteelBlue);                    
-                    BeefyRectangle sBox = selection_Box.Clone();
-                    sBox.SetOrigin(Vector2.Zero);
-                    sBox.Scale(View.Zoom, false); ;
-                    GraphingTools.PlotRectangle(sBox, true, Color.LightSteelBlue * 0.15f);
+                    }
+                    Editor.EndCamera2D();
+                    Editor.BeginCamera2D(SpriteSortMode.BackToFront, BlendState.AlphaBlend);
+                    switch (editorAction)
+                    {
+                        //Box Select GUI
+                        case EditorAction.BoxSelect:
+                            GraphingTools.SetColor(Color.LightSteelBlue);
+                            BeefyRectangle sBox = selection_Box.Clone();
+                            sBox.SetOrigin(Vector2.Zero);
+                            sBox.Scale(View.Zoom, false); ;
+                            GraphingTools.PlotRectangle(sBox, true, Color.LightSteelBlue * 0.15f);
+                            break;
+                    }
+                    Editor.EndCamera2D();
+                    #region Draw Editor HUD
+                    Editor.spriteBatch.Begin();
+                    Editor.spriteBatch.DrawString(Editor.Font, "Scale:" + View.Zoom + "x", new Vector2(0, 0), Color.White);
+                    Editor.spriteBatch.DrawString(Editor.Font, MousePosStr, new Vector2((int)((VPWidth - Editor.Font.MeasureString(MousePosStr).X) / 2), 0), Color.White);
+                    Editor.spriteBatch.DrawString(Editor.Font, selection_Box.ToString(), new Vector2(0, Editor.FontHeight), Color.White);
+                    if (SnapToGrid)
+                        Editor.spriteBatch.DrawString(Editor.Font, "Grid Snap On", new Vector2(0, Editor.FontHeight), Color.White);
+                    Editor.spriteBatch.End();
+                    #endregion
+                    break;
+                case GameState.Running:
+
+                    break;
+                case GameState.Paused:
                     break;
             }
-            Editor.EndCamera2D();
-            #region Draw Editor HUD
-            Editor.spriteBatch.Begin();
-            Editor.spriteBatch.DrawString(Editor.Font, "Scale:" + View.Zoom + "x", new Vector2(0, 0), Color.White);
-            Editor.spriteBatch.DrawString(Editor.Font, MousePosStr, new Vector2((int)((VPWidth - Editor.Font.MeasureString(MousePosStr).X)/2), 0), Color.White);
-            Editor.spriteBatch.DrawString(Editor.Font, selection_Box.ToString(), new Vector2(0, Editor.FontHeight), Color.White);
-            if (SnapToGrid)
-                Editor.spriteBatch.DrawString(Editor.Font, "Grid Snap On", new Vector2(0, Editor.FontHeight), Color.White);
-            Editor.spriteBatch.End();
-            #endregion            
         }
     }
 }

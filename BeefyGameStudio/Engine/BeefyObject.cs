@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BeefyEngine
+namespace BeefyGameEngine
 {
     /*public class BeefyObjectCollection : ICollection<BeefyObject>
     {

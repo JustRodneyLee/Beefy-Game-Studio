@@ -35,7 +35,7 @@
             this.State = new System.Windows.Forms.ToolStripStatusLabel();
             this.MainLayout = new System.Windows.Forms.TableLayoutPanel();
             this.ViewportVSInspector = new System.Windows.Forms.SplitContainer();
-            this.MainViewport = new BeefyGameStudio.GameViewport();
+            this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.EditorMenu = new System.Windows.Forms.MenuStrip();
             this.addAssetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.textureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -49,7 +49,9 @@
             this.addCircleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addContentToolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.addCharacterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.lightSourceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addContentToolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.addFromAssetsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addFromFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewportModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -59,6 +61,19 @@
             this.lightmapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.commentaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.levelSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.lightmapResolutionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem_5by5 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem_10by10 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem_50by50 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem_100by100 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem_500by500 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem_1000by1000 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStrip_Runtime = new System.Windows.Forms.ToolStrip();
+            this.toolStripLabel_Simulation = new System.Windows.Forms.ToolStripLabel();
+            this.toolStripButton_RunLevel = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton_PauseLevel = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton_StopLevel = new System.Windows.Forms.ToolStripButton();
+            this.MainViewport = new BeefyGameStudio.GameViewport();
             this.LibraryVSHierarchy = new System.Windows.Forms.SplitContainer();
             this.AssetLibrary = new System.Windows.Forms.ListView();
             this.LibraryMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -149,7 +164,7 @@
             this.preferencesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.scriptEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.collisionEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.objEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.buildToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.buildAssetLibraryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.buildProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -188,7 +203,9 @@
             this.ViewportVSInspector.Panel1.SuspendLayout();
             this.ViewportVSInspector.Panel2.SuspendLayout();
             this.ViewportVSInspector.SuspendLayout();
+            this.tableLayoutPanel.SuspendLayout();
             this.EditorMenu.SuspendLayout();
+            this.toolStrip_Runtime.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.LibraryVSHierarchy)).BeginInit();
             this.LibraryVSHierarchy.Panel1.SuspendLayout();
             this.LibraryVSHierarchy.Panel2.SuspendLayout();
@@ -261,8 +278,8 @@
             // 
             // ViewportVSInspector.Panel1
             // 
+            this.ViewportVSInspector.Panel1.Controls.Add(this.tableLayoutPanel);
             this.ViewportVSInspector.Panel1.Controls.Add(this.MainViewport);
-            this.ViewportVSInspector.Panel1.Controls.Add(this.EditorMenu);
             // 
             // ViewportVSInspector.Panel2
             // 
@@ -271,21 +288,24 @@
             this.ViewportVSInspector.SplitterDistance = 1527;
             this.ViewportVSInspector.TabIndex = 6;
             // 
-            // MainViewport
+            // tableLayoutPanel
             // 
-            this.MainViewport.AllowDrop = true;
-            this.MainViewport.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MainViewport.Location = new System.Drawing.Point(0, 24);
-            this.MainViewport.MouseHoverUpdatesOnly = false;
-            this.MainViewport.Name = "MainViewport";
-            this.MainViewport.Size = new System.Drawing.Size(1527, 984);
-            this.MainViewport.TabIndex = 0;
-            this.MainViewport.Text = "Main";
-            this.MainViewport.DragEnter += new System.Windows.Forms.DragEventHandler(this.MainViewport_DragEnter);
-            this.MainViewport.Resize += new System.EventHandler(this.MainViewport_Resize);
+            this.tableLayoutPanel.ColumnCount = 2;
+            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 84.8723F));
+            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15.1277F));
+            this.tableLayoutPanel.Controls.Add(this.EditorMenu, 0, 0);
+            this.tableLayoutPanel.Controls.Add(this.toolStrip_Runtime, 1, 0);
+            this.tableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.tableLayoutPanel.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel.Name = "tableLayoutPanel";
+            this.tableLayoutPanel.RowCount = 1;
+            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel.Size = new System.Drawing.Size(1527, 29);
+            this.tableLayoutPanel.TabIndex = 2;
             // 
             // EditorMenu
             // 
+            this.EditorMenu.Dock = System.Windows.Forms.DockStyle.Fill;
             this.EditorMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.addAssetToolStripMenuItem,
             this.addContentToLevelToolStripMenuItem,
@@ -294,7 +314,7 @@
             this.EditorMenu.Location = new System.Drawing.Point(0, 0);
             this.EditorMenu.Name = "EditorMenu";
             this.EditorMenu.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.EditorMenu.Size = new System.Drawing.Size(1527, 24);
+            this.EditorMenu.Size = new System.Drawing.Size(1296, 29);
             this.EditorMenu.TabIndex = 1;
             // 
             // addAssetToolStripMenuItem
@@ -306,7 +326,7 @@
             this.objectToLibToolStripMenuItem,
             this.scriptToLibToolStripMenuItem});
             this.addAssetToolStripMenuItem.Name = "addAssetToolStripMenuItem";
-            this.addAssetToolStripMenuItem.Size = new System.Drawing.Size(126, 20);
+            this.addAssetToolStripMenuItem.Size = new System.Drawing.Size(126, 25);
             this.addAssetToolStripMenuItem.Text = "Add Asset To Library";
             // 
             // textureToolStripMenuItem
@@ -350,11 +370,13 @@
             this.addCircleToolStripMenuItem,
             this.addContentToolStripSeparator,
             this.addCharacterToolStripMenuItem,
+            this.lightSourceToolStripMenuItem,
             this.addObjectToolStripMenuItem,
+            this.addContentToolStripSeparator2,
             this.addFromAssetsToolStripMenuItem,
             this.addFromFileToolStripMenuItem});
             this.addContentToLevelToolStripMenuItem.Name = "addContentToLevelToolStripMenuItem";
-            this.addContentToLevelToolStripMenuItem.Size = new System.Drawing.Size(132, 20);
+            this.addContentToLevelToolStripMenuItem.Size = new System.Drawing.Size(132, 25);
             this.addContentToLevelToolStripMenuItem.Text = "Add Content To Level";
             // 
             // addAbstractToolStripMenuItem
@@ -390,12 +412,23 @@
             this.addCharacterToolStripMenuItem.Text = "Character";
             this.addCharacterToolStripMenuItem.Click += new System.EventHandler(this.AddCharacterToolStripMenuItem_Click);
             // 
+            // lightSourceToolStripMenuItem
+            // 
+            this.lightSourceToolStripMenuItem.Name = "lightSourceToolStripMenuItem";
+            this.lightSourceToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
+            this.lightSourceToolStripMenuItem.Text = "Light Source";
+            // 
             // addObjectToolStripMenuItem
             // 
             this.addObjectToolStripMenuItem.Name = "addObjectToolStripMenuItem";
             this.addObjectToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
             this.addObjectToolStripMenuItem.Text = "Object";
             this.addObjectToolStripMenuItem.Click += new System.EventHandler(this.AddObjectToolStripMenuItem_Click);
+            // 
+            // addContentToolStripSeparator2
+            // 
+            this.addContentToolStripSeparator2.Name = "addContentToolStripSeparator2";
+            this.addContentToolStripSeparator2.Size = new System.Drawing.Size(144, 6);
             // 
             // addFromAssetsToolStripMenuItem
             // 
@@ -420,7 +453,7 @@
             this.lightmapToolStripMenuItem,
             this.commentaryToolStripMenuItem});
             this.viewportModeToolStripMenuItem.Name = "viewportModeToolStripMenuItem";
-            this.viewportModeToolStripMenuItem.Size = new System.Drawing.Size(100, 20);
+            this.viewportModeToolStripMenuItem.Size = new System.Drawing.Size(100, 25);
             this.viewportModeToolStripMenuItem.Text = "Viewport Mode";
             // 
             // normalToolStripMenuItem
@@ -464,9 +497,125 @@
             // 
             // levelSettingsToolStripMenuItem
             // 
+            this.levelSettingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.lightmapResolutionToolStripMenuItem});
             this.levelSettingsToolStripMenuItem.Name = "levelSettingsToolStripMenuItem";
-            this.levelSettingsToolStripMenuItem.Size = new System.Drawing.Size(91, 20);
+            this.levelSettingsToolStripMenuItem.Size = new System.Drawing.Size(91, 25);
             this.levelSettingsToolStripMenuItem.Text = "Level Settings";
+            // 
+            // lightmapResolutionToolStripMenuItem
+            // 
+            this.lightmapResolutionToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem_5by5,
+            this.toolStripMenuItem_10by10,
+            this.toolStripMenuItem_50by50,
+            this.toolStripMenuItem_100by100,
+            this.toolStripMenuItem_500by500,
+            this.toolStripMenuItem_1000by1000});
+            this.lightmapResolutionToolStripMenuItem.Name = "lightmapResolutionToolStripMenuItem";
+            this.lightmapResolutionToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.lightmapResolutionToolStripMenuItem.Text = "Lightmap Resolution";
+            // 
+            // toolStripMenuItem_5by5
+            // 
+            this.toolStripMenuItem_5by5.Name = "toolStripMenuItem_5by5";
+            this.toolStripMenuItem_5by5.Size = new System.Drawing.Size(127, 22);
+            this.toolStripMenuItem_5by5.Text = "5*5";
+            // 
+            // toolStripMenuItem_10by10
+            // 
+            this.toolStripMenuItem_10by10.Name = "toolStripMenuItem_10by10";
+            this.toolStripMenuItem_10by10.Size = new System.Drawing.Size(127, 22);
+            this.toolStripMenuItem_10by10.Text = "10*10";
+            // 
+            // toolStripMenuItem_50by50
+            // 
+            this.toolStripMenuItem_50by50.Name = "toolStripMenuItem_50by50";
+            this.toolStripMenuItem_50by50.Size = new System.Drawing.Size(127, 22);
+            this.toolStripMenuItem_50by50.Text = "50*50";
+            // 
+            // toolStripMenuItem_100by100
+            // 
+            this.toolStripMenuItem_100by100.Name = "toolStripMenuItem_100by100";
+            this.toolStripMenuItem_100by100.Size = new System.Drawing.Size(127, 22);
+            this.toolStripMenuItem_100by100.Text = "100*100";
+            // 
+            // toolStripMenuItem_500by500
+            // 
+            this.toolStripMenuItem_500by500.Name = "toolStripMenuItem_500by500";
+            this.toolStripMenuItem_500by500.Size = new System.Drawing.Size(127, 22);
+            this.toolStripMenuItem_500by500.Text = "500*500";
+            // 
+            // toolStripMenuItem_1000by1000
+            // 
+            this.toolStripMenuItem_1000by1000.Name = "toolStripMenuItem_1000by1000";
+            this.toolStripMenuItem_1000by1000.Size = new System.Drawing.Size(127, 22);
+            this.toolStripMenuItem_1000by1000.Text = "1000*1000";
+            // 
+            // toolStrip_Runtime
+            // 
+            this.toolStrip_Runtime.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.toolStrip_Runtime.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripLabel_Simulation,
+            this.toolStripButton_RunLevel,
+            this.toolStripButton_PauseLevel,
+            this.toolStripButton_StopLevel});
+            this.toolStrip_Runtime.Location = new System.Drawing.Point(1296, 0);
+            this.toolStrip_Runtime.Name = "toolStrip_Runtime";
+            this.toolStrip_Runtime.Size = new System.Drawing.Size(231, 29);
+            this.toolStrip_Runtime.TabIndex = 2;
+            this.toolStrip_Runtime.Text = "Runtime Simulation";
+            // 
+            // toolStripLabel_Simulation
+            // 
+            this.toolStripLabel_Simulation.Name = "toolStripLabel_Simulation";
+            this.toolStripLabel_Simulation.Size = new System.Drawing.Size(112, 26);
+            this.toolStripLabel_Simulation.Text = "Runtime Simulation";
+            // 
+            // toolStripButton_RunLevel
+            // 
+            this.toolStripButton_RunLevel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButton_RunLevel.Image = global::BeefyGameStudio.Properties.Resources.RunBtn;
+            this.toolStripButton_RunLevel.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton_RunLevel.Name = "toolStripButton_RunLevel";
+            this.toolStripButton_RunLevel.Size = new System.Drawing.Size(23, 26);
+            this.toolStripButton_RunLevel.Text = "Run Level";
+            this.toolStripButton_RunLevel.Click += new System.EventHandler(this.toolStripButton_RunLevel_Click);
+            // 
+            // toolStripButton_PauseLevel
+            // 
+            this.toolStripButton_PauseLevel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButton_PauseLevel.Enabled = false;
+            this.toolStripButton_PauseLevel.Image = global::BeefyGameStudio.Properties.Resources.PauseBtn;
+            this.toolStripButton_PauseLevel.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton_PauseLevel.Name = "toolStripButton_PauseLevel";
+            this.toolStripButton_PauseLevel.Size = new System.Drawing.Size(23, 26);
+            this.toolStripButton_PauseLevel.Text = "Pause Level";
+            this.toolStripButton_PauseLevel.Click += new System.EventHandler(this.toolStripButton_PauseLevel_Click);
+            // 
+            // toolStripButton_StopLevel
+            // 
+            this.toolStripButton_StopLevel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButton_StopLevel.Enabled = false;
+            this.toolStripButton_StopLevel.Image = global::BeefyGameStudio.Properties.Resources.StopBtn;
+            this.toolStripButton_StopLevel.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton_StopLevel.Name = "toolStripButton_StopLevel";
+            this.toolStripButton_StopLevel.Size = new System.Drawing.Size(23, 26);
+            this.toolStripButton_StopLevel.Text = "Stop Level";
+            this.toolStripButton_StopLevel.Click += new System.EventHandler(this.toolStripButton_StopLevel_Click);
+            // 
+            // MainViewport
+            // 
+            this.MainViewport.AllowDrop = true;
+            this.MainViewport.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MainViewport.Location = new System.Drawing.Point(0, 0);
+            this.MainViewport.MouseHoverUpdatesOnly = false;
+            this.MainViewport.Name = "MainViewport";
+            this.MainViewport.Size = new System.Drawing.Size(1527, 1008);
+            this.MainViewport.TabIndex = 0;
+            this.MainViewport.Text = "Main";
+            this.MainViewport.DragEnter += new System.Windows.Forms.DragEventHandler(this.MainViewport_DragEnter);
+            this.MainViewport.Resize += new System.EventHandler(this.MainViewport_Resize);
             // 
             // LibraryVSHierarchy
             // 
@@ -1262,7 +1411,7 @@
             // 
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.scriptEditorToolStripMenuItem,
-            this.collisionEditorToolStripMenuItem});
+            this.objEditorToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
@@ -1270,15 +1419,15 @@
             // scriptEditorToolStripMenuItem
             // 
             this.scriptEditorToolStripMenuItem.Name = "scriptEditorToolStripMenuItem";
-            this.scriptEditorToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+            this.scriptEditorToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
             this.scriptEditorToolStripMenuItem.Text = "Script Editor";
             this.scriptEditorToolStripMenuItem.Click += new System.EventHandler(this.scriptEditorToolStripMenuItem_Click);
             // 
-            // collisionEditorToolStripMenuItem
+            // objEditorToolStripMenuItem
             // 
-            this.collisionEditorToolStripMenuItem.Name = "collisionEditorToolStripMenuItem";
-            this.collisionEditorToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
-            this.collisionEditorToolStripMenuItem.Text = "Collision Editor";
+            this.objEditorToolStripMenuItem.Name = "objEditorToolStripMenuItem";
+            this.objEditorToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
+            this.objEditorToolStripMenuItem.Text = "Object Editor";
             // 
             // buildToolStripMenuItem
             // 
@@ -1542,12 +1691,15 @@
             this.MainLayout.ResumeLayout(false);
             this.MainLayout.PerformLayout();
             this.ViewportVSInspector.Panel1.ResumeLayout(false);
-            this.ViewportVSInspector.Panel1.PerformLayout();
             this.ViewportVSInspector.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.ViewportVSInspector)).EndInit();
             this.ViewportVSInspector.ResumeLayout(false);
+            this.tableLayoutPanel.ResumeLayout(false);
+            this.tableLayoutPanel.PerformLayout();
             this.EditorMenu.ResumeLayout(false);
             this.EditorMenu.PerformLayout();
+            this.toolStrip_Runtime.ResumeLayout(false);
+            this.toolStrip_Runtime.PerformLayout();
             this.LibraryVSHierarchy.Panel1.ResumeLayout(false);
             this.LibraryVSHierarchy.Panel1.PerformLayout();
             this.LibraryVSHierarchy.Panel2.ResumeLayout(false);
@@ -1727,13 +1879,28 @@
         private System.Windows.Forms.ToolStripMenuItem commentaryToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem scriptEditorToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem collisionEditorToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem objEditorToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem mainlockSelectedToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem mainunlockSelectedToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator editingtoolStripSeparator3;
         private System.Windows.Forms.ToolStripSeparator editMenuStripToolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem lockSelectedToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem unlockSelectedToolStripMenuItem;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel;
+        private System.Windows.Forms.ToolStrip toolStrip_Runtime;
+        private System.Windows.Forms.ToolStripButton toolStripButton_RunLevel;
+        private System.Windows.Forms.ToolStripButton toolStripButton_PauseLevel;
+        private System.Windows.Forms.ToolStripButton toolStripButton_StopLevel;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel_Simulation;
+        private System.Windows.Forms.ToolStripMenuItem lightmapResolutionToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_5by5;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_10by10;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_50by50;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_100by100;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_500by500;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_1000by1000;
+        private System.Windows.Forms.ToolStripMenuItem lightSourceToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator addContentToolStripSeparator2;
     }
 }
 

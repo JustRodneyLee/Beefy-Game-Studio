@@ -181,6 +181,12 @@
     <Compile Include="OutputConsole.Designer.cs">
       <DependentUpon>OutputConsole.cs</DependentUpon>
     </Compile>
+    <Compile Include="ProgressForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ProgressForm.Designer.cs">
+      <DependentUpon>ProgressForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ScriptDocument.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -257,6 +263,9 @@
     <EmbeddedResource Include="OutputConsole.resx">
       <DependentUpon>OutputConsole.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ProgressForm.resx">
+      <DependentUpon>ProgressForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ProjectSettings.resx">
       <DependentUpon>ProjectSettings.cs</DependentUpon>
     </EmbeddedResource>
@@ -316,6 +325,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\BGS.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PauseBtn.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\RunBtn.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StopBtn.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\MonoGame.Forms.DX.2.3.8\build\MonoGame.Forms.DX.targets" Condition="Exists('..\packages\MonoGame.Forms.DX.2.3.8\build\MonoGame.Forms.DX.targets')" />

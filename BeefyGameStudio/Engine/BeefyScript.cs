@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using System.Collections;
 
-namespace BeefyEngine
+namespace BeefyGameEngine
 {
     public class BeefyScriptComponent : IBeefyComponent
     {

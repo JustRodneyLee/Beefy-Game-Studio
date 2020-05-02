@@ -5,8 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
+using System.Runtime.Remoting.Messaging;
 
-namespace BeefyEngine
+namespace BeefyGameEngine
 {
     public class BeefyLayer : IEquatable<BeefyLayer>
     {
