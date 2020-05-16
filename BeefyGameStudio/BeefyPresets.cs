@@ -36,7 +36,8 @@ namespace BeefyGameStudio
                 boxTex.SetData(data);
                 GetComponent<BeefyRenderer2D>().SetTexture(boxTex);
                 GetComponent<BeefyRenderer2D>().Origin = new Vector2(width/2, height/2);
-                AddComponent(new BeefyPhysics(this));                
+                AddComponent(new BeefyPhysics(this));
+                GetComponent<BeefyPhysics>().Collider = new BeefyShape();
             }            
         }
 
@@ -59,7 +60,24 @@ namespace BeefyGameStudio
                 GetComponent<BeefyRenderer2D>().PixelScaling = texRadius / radius;
                 GetComponent<BeefyRenderer2D>().Origin = new Vector2(radius);
                 AddComponent(new BeefyPhysics(this));
+                
             }
         }
+
+        #region Beefy Script Functions
+
+        public class Jump : BeefyScript.IBeefyFunction
+        {
+            public string FunctionName { get { return "Character Jump"; } }
+            public ParameterCollection Parameters { get; set; }
+        }
+
+        public class Move : BeefyScript.IBeefyFunction
+        {
+            public string FunctionName { get { return "Character Move"; } }
+            public ParameterCollection Parameters { get; set; }
+        }
+
+        #endregion
     }
 }

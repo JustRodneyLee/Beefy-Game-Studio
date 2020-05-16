@@ -39,6 +39,7 @@ namespace BeefyGameEngine
             {
                 BeefyUI ui = bo.GetComponent<BeefyUI>();
                 //TODO
+                /**
                 if (ui.Collider.ContainsPoint(Input.MousePosition))
                 {
                     if (ui.MouseInControl)
@@ -75,7 +76,7 @@ namespace BeefyGameEngine
                     if (ui.MouseInControl)
                         ui.Events.RunFunction("MouseLeave");
                     ui.MouseInControl = false;
-                }                
+                }  **/              
             }
             return null;
         }

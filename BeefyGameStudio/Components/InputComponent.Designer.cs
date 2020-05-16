@@ -31,11 +31,13 @@
             this.inputComponentGroupBox = new System.Windows.Forms.GroupBox();
             this.addInputBindingButton = new System.Windows.Forms.Button();
             this.enabledCheckBox = new System.Windows.Forms.CheckBox();
+            this.bindingsPanel = new System.Windows.Forms.Panel();
             this.inputComponentGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // inputComponentGroupBox
             // 
+            this.inputComponentGroupBox.Controls.Add(this.bindingsPanel);
             this.inputComponentGroupBox.Controls.Add(this.addInputBindingButton);
             this.inputComponentGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.inputComponentGroupBox.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -56,6 +58,7 @@
             this.addInputBindingButton.TabIndex = 1;
             this.addInputBindingButton.Text = "Add New Input Binding";
             this.addInputBindingButton.UseVisualStyleBackColor = true;
+            this.addInputBindingButton.Click += new System.EventHandler(this.addInputBindingButton_Click);
             // 
             // enabledCheckBox
             // 
@@ -68,6 +71,15 @@
             this.enabledCheckBox.TabIndex = 0;
             this.enabledCheckBox.UseVisualStyleBackColor = true;
             this.enabledCheckBox.CheckedChanged += new System.EventHandler(this.enabledCheckBox_CheckedChanged);
+            // 
+            // bindingsPanel
+            // 
+            this.bindingsPanel.AutoScroll = true;
+            this.bindingsPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.bindingsPanel.Location = new System.Drawing.Point(3, 53);
+            this.bindingsPanel.Name = "bindingsPanel";
+            this.bindingsPanel.Size = new System.Drawing.Size(344, 174);
+            this.bindingsPanel.TabIndex = 2;
             // 
             // InputComponent
             // 
@@ -89,5 +101,6 @@
         private System.Windows.Forms.GroupBox inputComponentGroupBox;
         private System.Windows.Forms.CheckBox enabledCheckBox;
         private System.Windows.Forms.Button addInputBindingButton;
+        private System.Windows.Forms.Panel bindingsPanel;
     }
 }

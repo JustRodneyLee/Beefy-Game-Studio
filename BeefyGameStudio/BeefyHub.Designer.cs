@@ -32,7 +32,6 @@
             this.buttonNew = new System.Windows.Forms.Button();
             this.buttonOpen = new System.Windows.Forms.Button();
             this.titleLabel = new System.Windows.Forms.Label();
-            this.separatorLabel = new System.Windows.Forms.Label();
             this.exitbutton = new System.Windows.Forms.Button();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.SuspendLayout();
@@ -71,15 +70,6 @@
             this.titleLabel.TabIndex = 2;
             this.titleLabel.Text = "Beefy Game Studio Hub";
             // 
-            // separatorLabel
-            // 
-            this.separatorLabel.AutoSize = true;
-            this.separatorLabel.Location = new System.Drawing.Point(-1, 37);
-            this.separatorLabel.Name = "separatorLabel";
-            this.separatorLabel.Size = new System.Drawing.Size(317, 12);
-            this.separatorLabel.TabIndex = 3;
-            this.separatorLabel.Text = "----------------------------------------------------";
-            // 
             // exitbutton
             // 
             this.exitbutton.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
@@ -103,7 +93,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(310, 191);
             this.Controls.Add(this.exitbutton);
-            this.Controls.Add(this.separatorLabel);
             this.Controls.Add(this.titleLabel);
             this.Controls.Add(this.buttonOpen);
             this.Controls.Add(this.buttonNew);
@@ -113,6 +102,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Beefy Game Studio Hub";
             this.Load += new System.EventHandler(this.BeefyHub_Load);
+            this.VisibleChanged += new System.EventHandler(this.BeefyHub_VisibleChanged);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -123,7 +113,6 @@
         private System.Windows.Forms.Button buttonNew;
         private System.Windows.Forms.Button buttonOpen;
         private System.Windows.Forms.Label titleLabel;
-        private System.Windows.Forms.Label separatorLabel;
         private System.Windows.Forms.Button exitbutton;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
     }

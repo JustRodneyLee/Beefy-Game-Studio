@@ -25,10 +25,13 @@ namespace BeefyGameStudio.Components
 
         public void UpdateParameters()
         {
+            //physics.Velocity
         }
 
         public void TransferParameters()
         {
+            //physics.Velocity = 
+            
         }
 
         private void enabledCheckBox_CheckedChanged(object sender, EventArgs e)

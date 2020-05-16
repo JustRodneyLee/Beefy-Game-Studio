@@ -22,26 +22,34 @@ namespace BeefyGameStudio
         public BGS(BeefyHub hub)
         {
             InitializeComponent();
-            beefyHub = hub;
+            beefyHub = hub;                   
         }
 
         private void BGS_Load(object sender, EventArgs e)
-        {            
-            EditorSettings.Init();
+        {
             MainViewport.SetControls(ViewportAddMenuStrip, ViewportEditMenuStrip, LayerMenuStrip, InspectorLabel, InspectorPanel, addProperty, (ToolStripStatusLabel)StatusStrip.Items[0], AllLayersHierarchy);
-            InitGameViewport();            
+            InitGameViewport();
             InitAssetLib();
-            RefreshText();
+            InspectorPanel.HorizontalScroll.Enabled = false;
+            RefreshTitleText();
             BeefyPresets.SetGraphicsDevice(MainViewport.Editor.graphics);
-            //MessageBox.Show(Properties.Resources.MainProgram);
         }
 
-        public void RefreshText()
+        /// <summary>
+        /// Refreshes BGS's Title Text
+        /// </summary>
+        public void RefreshTitleText()
         {
-            if (CurrentProject.IsNull)
-                Text = "Beefy Game Studio v" + EditorSettings.Version +" - " + MainViewport.Level.LevelID;
+            if (MainViewport.Level != null)
+            {
+                if (CurrentProject.IsNull)
+                    Text = "Beefy Game Studio v" + EditorSettings.Version + " - " + MainViewport.Level.LevelID;
+                else
+                    Text = "Beefy Game Studio v" + EditorSettings.Version + " - " + CurrentProject.ProjectName + " - " + MainViewport.Level.LevelID;
+            }
             else
-                Text = "Beefy Game Studio v" + EditorSettings.Version + " - " + CurrentProject.ProjectName + " - " + MainViewport.Level.LevelID;
+                Text = "Beefy Game Studio v" + EditorSettings.Version;
+                
         }
 
         private void InitAssetLib()
@@ -54,7 +62,7 @@ namespace BeefyGameStudio
         private void InitGameViewport()
         {
             MainViewport.InternalLoad(new BeefyLevel("New Level"));
-            MainViewport.Editor.Initialize();            
+            MainViewport.Editor.Initialize();                  
             lvlSaved = false;
             lvlModified = true;
         }
@@ -321,24 +329,34 @@ namespace BeefyGameStudio
                 else
                 {
                     SaveLevel(CurrentProject.CurrentLevelPath);
+                    RefreshTitleText();
                 }
             }
             else
             {
-                NameDialog nd = new NameDialog("Save Current Level");
-                nd.ShowDialog();
-                if (nd.DialogResult == DialogResult.OK)
+                if (!lvlSaved)
                 {
-                    if (CurrentProject.LevelIDs.Contains(nd.NameValue))
+                    NameDialog nd = new NameDialog("Save Current Level");
+                    nd.ShowDialog();
+                    if (nd.DialogResult == DialogResult.OK)
                     {
-                        MessageBox.Show("A Level with this name already exists!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        if (CurrentProject.LevelIDs.Contains(nd.NameValue))
+                        {
+                            MessageBox.Show("A Level with this name already exists!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        else
+                        {
+                            nd.Close();
+                            MainViewport.Level.LevelID = nd.NameValue;
+                            SaveLevel(CurrentProject.LevelsPath + "\\" + nd.NameValue + ".bgl");
+                            RefreshTitleText();
+                        }
                     }
-                    else
-                    {
-                        nd.Close();
-                        MainViewport.Level.LevelID = nd.NameValue;
-                        SaveLevel(CurrentProject.LevelsPath + "\\" + nd.NameValue + ".bgl");
-                    }
+                }
+                else
+                {
+                    SaveLevel(CurrentProject.CurrentLevelPath);
+                    RefreshTitleText();
                 }
             }
         }
@@ -944,10 +962,11 @@ namespace BeefyGameStudio
                 scriptEditorShown = true;
             }
         }
-
+        
         private void cutEditToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            Clipboard.SetDataObject(MainViewport.ReturnSelected());
+            MainViewport.ReturnSelected().Clear();
         }
 
         private void copyEditToolStripMenuItem_Click(object sender, EventArgs e)
@@ -957,7 +976,8 @@ namespace BeefyGameStudio
 
         private void pasteEditToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            if (Clipboard.GetDataObject() is List<BeefyObject>)
+                MainViewport.AddBeefyObjects((List<BeefyObject>)Clipboard.GetDataObject());
         }
 
         private void deleteEditToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1007,6 +1027,11 @@ namespace BeefyGameStudio
             toolStripButton_PauseLevel.Enabled = false;
             toolStripButton_StopLevel.Enabled = false;
             CurrentProject.ProjectState = GameState.Aborted;
+        }
+
+        private void toolStripComboBox_Environment_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }    
 }

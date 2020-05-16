@@ -12,24 +12,20 @@ using MonoGame.Forms;
 using MonoGame.Forms.Components;
 using MonoGame.Forms.Controls;
 
-namespace BeefyGameStudio.ScriptEditor
+namespace BeefyGameStudio
 {
-    public class ScriptNode
-    {
-
-    }
-
-    public class ScriptEditor : MonoGameControl
+    public class CollisionEditor : MonoGameControl
     {
         enum EditorAction
         {
             None,
             Pan,
             Move,
-            NodeEdit,
         }
 
-        public BeefyScript Script { get; set; }
+        public BeefyShape Collider;
+        List<BeefyVertex> SelectedVertices;
+        EditorAction editorAction;
         public Camera2D View;
         float lX, lY; //Last Absolute Mouse Position
         Vector2 EditorMousePos; //+X +Y Position
@@ -42,24 +38,31 @@ namespace BeefyGameStudio.ScriptEditor
         int VPWidth { get { return Editor.graphics.Viewport.Width; } }
         int VPHeight { get { return Editor.graphics.Viewport.Height; } }
 
-        EditorAction editorAction;
-
         protected override void Initialize()
-        {            
+        {
             base.Initialize();
             Editor.BackgroundColor = new Color(50, 50, 50);
             View = new Camera2D();
             editorAction = EditorAction.None;
-        }        
-
-        public void LoadScript(string fileName)
-        {
-            
+            SelectedVertices = new List<BeefyVertex>();
         }
 
-        public void AddCodeBlock(string blockName)
+        public void GetEditorMousePos(MouseEventArgs e)
         {
+            if (IsMouseInsideControl)
+                EditorMousePos = new Vector2((float)Math.Round((Editor.Cam.Position.X + e.X - VPWidth / 2) / View.Zoom, 2), (float)Math.Round((-Editor.Cam.Position.Y - e.Y + VPHeight / 2) / View.Zoom, 2));
+        }
 
+        public BeefyVertex GetVertex(Vector2 pos)
+        {
+            foreach (BeefyVertex bv in Collider.VertexSet)
+            {
+                if (Vector2.Distance(bv.ToVector2(), pos) < 10 / View.Zoom)
+                {
+                    return bv;
+                }
+            }
+            return null;
         }
 
         protected override void Update(GameTime gameTime)
@@ -72,7 +75,12 @@ namespace BeefyGameStudio.ScriptEditor
             switch (editorAction)
             {
                 case EditorAction.None:
-                    editorAction = EditorAction.Pan;
+                    if (GetVertex(EditorMousePos) != null)
+                    {
+                        //TODO
+                    }
+                    else
+                        editorAction = EditorAction.Pan;
                     break;
                 case EditorAction.Pan:
                     break;
@@ -96,7 +104,7 @@ namespace BeefyGameStudio.ScriptEditor
                 case EditorAction.Move:
                     break;
             }
-            
+
             lX = e.X; lY = e.Y;
             base.OnMouseMove(e);
         }

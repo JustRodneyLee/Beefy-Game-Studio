@@ -71,6 +71,11 @@ namespace BeefyGameStudio
         {
             Data = project;
         }
+
+        public static void Reset()
+        {
+            Data = null;
+        }
     }
 
     public class BeefyProject : ICloneable, IDisposable
@@ -106,7 +111,8 @@ namespace BeefyGameStudio
         {
             ProjectDevelopers = new List<string>();
             LevelIDs = new List<string>();
-            ProjectLogoPath = ""; 
+            ProjectLogoPath = "";
+            ProjectVersion = new Version(1, 0, 0, 0);
         }
 
         public object Clone()
@@ -289,7 +295,7 @@ namespace BeefyGameStudio
             }
             finally
             {
-                RefreshText();
+                RefreshTitleText();
             }
         }
 
@@ -315,28 +321,52 @@ namespace BeefyGameStudio
             CurrentProject.Saved = true;
         }
 
-        public void OpenProject(string path)
+        public string OpenProject(string path)
         {
-            void ReadProject()
+            string returnMsg;
+            int loadStatus;
+
+            string ReadProject()
             {
                 XmlSerializer xml;
-                using (StreamReader reader = new StreamReader(path))
+                try
                 {
-                    xml = new XmlSerializer(typeof(BeefyProject));
-                    CurrentProject.SetProjectData((BeefyProject)xml.Deserialize(reader));
+                    using (StreamReader reader = new StreamReader(path))
+                    {
+                        xml = new XmlSerializer(typeof(BeefyProject));
+                        CurrentProject.SetProjectData((BeefyProject)xml.Deserialize(reader));
+                    }
                 }
-                if (CurrentProject.CurrentLevelID == "")
+                catch
+                {
+                    return "Cannot read project file!"; //.bgp file corrupt
+                }
+                Console.WriteLine(CurrentProject.CurrentLevelID);
+                if (CurrentProject.CurrentLevelID is null)
                 {
                     MainViewport.InternalLoad(new BeefyLevel("New Level"));
-                }
+                    return "OK";
+                }                    
                 else
-                    MainViewport.LoadLevel(CurrentProject.LevelsPath + "\\" + CurrentProject.CurrentLevelID + "\\" + CurrentProject.CurrentLevelID + ".bgl");
-                RefreshText();
+                {
+                    int ret = MainViewport.LoadLevel(CurrentProject.LevelsPath + "\\" + CurrentProject.CurrentLevelID + "\\" + CurrentProject.CurrentLevelID + ".bgl");
+                    switch (ret)
+                    {
+                        case 0:
+                            return "OK";
+                        case 1:
+                            return "Cannot read level file!";
+                        case -1:
+                            return "Default level is null!";
+                        default:
+                            return "Unhandled";
+                    }
+                }
             }
 
             if (CurrentProject.Saved||CurrentProject.Data == null)
             {
-                ReadProject();
+                returnMsg = ReadProject();                           
             }
             else
             {
@@ -344,20 +374,28 @@ namespace BeefyGameStudio
                 if (dr == DialogResult.Yes)
                 {
                     SaveProject();
-                    ReadProject();
-                }else if (dr == DialogResult.No)
+                    returnMsg = ReadProject();
+                }
+                else if (dr == DialogResult.No)
                 {
-                    ReadProject();
+                    returnMsg = ReadProject();
                 }
                 else if (dr == DialogResult.Cancel)
                 {
-                    //Do nothing
+                    //Do nothing  
+                    returnMsg = "Canceled";
                 }
                 else
                 {
                     //Do nothing
+                    returnMsg = "Unhandled";
                 }
             }
+            if (returnMsg.Contains("OK"))
+            {
+                RefreshTitleText();
+            }
+            return returnMsg;
         }
 
         public async void BuildAssets()
@@ -390,6 +428,9 @@ namespace BeefyGameStudio
             CompilerParameters parameters = new CompilerParameters();
             parameters.GenerateExecutable = true;
             parameters.OutputAssembly = output;
+            parameters.ReferencedAssemblies.Add("System.dll");
+            parameters.ReferencedAssemblies.Add("MonoGame.Framework.dll");
+            parameters.ReferencedAssemblies.Add("Lidgren.Network.dll");
             CompilerResults results = codeProvider.CompileAssemblyFromFile(parameters, "//TODO");
             if (results.Errors.HasErrors)
             {

@@ -55,11 +55,12 @@ namespace BeefyGameStudio
             X, Y, XY
         }
 
-        public Camera2D View;        
         public EditorAction editorAction;
         public EditorAction lastAction;
         public EditorManipulator editorManipulator;
-        public EditorView editorView;        
+        public EditorView editorView;
+
+        public Camera2D View;                      
         float lX, lY; //Last Absolute Mouse Position
         Vector2 EditorMousePos; //+X +Y Position
         string MousePosStr; //Mouse Position string
@@ -126,9 +127,6 @@ namespace BeefyGameStudio
         bool showAllLayers;
         public BeefyLevel Level;
 
-        //Runtime Simulation
-
-
         protected override void Initialize()
         {
             base.Initialize();
@@ -150,6 +148,9 @@ namespace BeefyGameStudio
             axis = EditorAxis.XY;
             MousePosStr = "Mouse Pos:[" + Math.Round(EditorMousePos.X, 2).ToString() + "," + Math.Round(EditorMousePos.Y, 2).ToString() + "]";
             RecalculateCulling();
+            GraphingTools = new GraphingTools(Editor.graphics, Editor.spriteBatch, EditorSettings.SelectionBorderWidth, EditorSettings.SelectionBorderColor);
+            Console.WriteLine(GraphingTools.ToString());
+            Console.WriteLine(GraphingTools.PenColor.ToString());
         }
 
         private Texture2D SysBmpToTex2D(System.Drawing.Bitmap bmp)
@@ -167,8 +168,7 @@ namespace BeefyGameStudio
         {
             Level = level;
             SwitchToLayer(level.Layers.First().LayerID);
-            ToggleAllLayers(true);
-            GraphingTools = new GraphingTools(Editor.graphics, Editor.spriteBatch, EditorSettings.SelectionBorderWidth, EditorSettings.SelectionBorderColor);
+            ToggleAllLayers(true);            
         }
 
         public void ClearLevel()
@@ -202,7 +202,7 @@ namespace BeefyGameStudio
         }
 
         public void Inspect(BeefyObject bo)
-        {
+        {            
             if (bo != null)
             {
                 InspectorPanel.Controls.Clear();
@@ -1183,21 +1183,29 @@ namespace BeefyGameStudio
             }
         }
 
-        public bool LoadLevel(string path)
+        public int LoadLevel(string path)
         {
             BeefyLevel lvl;
-            using (StreamReader file = new StreamReader(path))
+            try
             {
-                lvl = new BeefyLevel(file.ReadLine());
+                using (StreamReader file = new StreamReader(path))
+                {
+                    lvl = new BeefyLevel(file.ReadLine());
+                    //TODO
+                }
+            }
+            catch
+            {
+                return 1; //Cannot load level file!
             }
             if (lvl != null)
             {
                 InternalLoad(lvl);
-                return true;
+                return 0; //OK
             }
             else
             {
-                return false;
+                return -1; //Level is Null
             }
         }
 
@@ -1575,94 +1583,105 @@ namespace BeefyGameStudio
         protected override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            MousePosStr = "Mouse Pos:[" + Math.Round(EditorMousePos.X, 2).ToString() + "," + Math.Round(EditorMousePos.Y, 2).ToString() + "]";
-            Editor.Cam.Position = View.Position * View.Zoom;
-            RecalculateCulling();
-            DrawnObjects = new List<BeefyObject>();
-            if (showAllLayers)
+            switch (CurrentProject.ProjectState)
             {
-                foreach (BeefyObject bo in Level.BOC)
-                {
-                    if (!CheckCulling(bo))
-                        DrawnObjects.Add(bo);
-                }
-            }
-            else
-            {
-                foreach (BeefyObject bo in currentLayer.BOC)
-                {
-                    if (!CheckCulling(bo))
-                        DrawnObjects.Add(bo);
-                }
-            }
-            InspectorUpdate();
-            if (Focused)
-            switch (editorAction)
-            {
-                case EditorAction.None:
-                    Mouse.SetCursor(MouseCursor.Arrow);
-                    switch (editorManipulator)
-                    {
-                        case EditorManipulator.NoEdit:
-                            Status.Text = "Ready";
-                            break;
-                        case EditorManipulator.Rotation:
-                            Status.Text = "Ready - Rotation standby";
-                            break;
-                        case EditorManipulator.Scaling:
-                            Status.Text = "Ready - Scaling standby";
-                            break;
-                        case EditorManipulator.Translation:
-                            Status.Text = "Ready - Translation standby";
-                            break;
-                    }
+                case GameState.Running:
+                    //Engine.RunOneFrame();
                     break;
-                case EditorAction.BoxSelect:
-                    Mouse.SetCursor(MouseCursor.Crosshair);
-                    if (selection_firstPointSet)
+                case GameState.Paused:
+                    break;
+                case GameState.Aborted:
+                    MousePosStr = "Mouse Pos:[" + Math.Round(EditorMousePos.X, 2).ToString() + "," + Math.Round(EditorMousePos.Y, 2).ToString() + "]";
+                    Editor.Cam.Position = View.Position * View.Zoom;
+                    RecalculateCulling();
+                    DrawnObjects = new List<BeefyObject>();
+                    if (showAllLayers)
                     {
-                        Status.Text = "Box Select - " + selection_Box.Location + " to " + EditorMousePos;
+                        foreach (BeefyObject bo in Level.BOC)
+                        {
+                            if (!CheckCulling(bo))
+                                DrawnObjects.Add(bo);
+                        }
                     }
                     else
                     {
-                        Status.Text = "Box Select - " + EditorMousePos;
+                        foreach (BeefyObject bo in currentLayer.BOC)
+                        {
+                            if (!CheckCulling(bo))
+                                DrawnObjects.Add(bo);
+                        }
                     }
-                    break;
-                case EditorAction.Move:
-                    Mouse.SetCursor(MouseCursor.SizeAll);
-                    if (axis == EditorAxis.X)
-                        Status.Text = "Translating - " + "X:" + translation.X;
-                    else if (axis == EditorAxis.Y)
-                        Status.Text = "Translating - " + "Y:" + translation.Y;
-                    else if (axis == EditorAxis.XY)
-                        Status.Text = "Translating - " + translation;
-                    break;
-                case EditorAction.Scale:
-                    Mouse.SetCursor(MouseCursor.SizeNESW);
-                    if (axis == EditorAxis.X)
-                        Status.Text = "Scaling - " + "X:" + sXY;
-                    else if (axis == EditorAxis.Y)
-                        Status.Text = "Scaling - " + "Y:" + sXY;
-                    else if (axis == EditorAxis.XY)
-                        Status.Text = "Scaling - " + sXY;
-                    break;
-                case EditorAction.Rotate:
-                    Mouse.SetCursor(MouseCursor.SizeNS);
-                    Status.Text = "Rotating - " + ToDegrees(rotation - startRotation) + "°";
-                    break;
-                case EditorAction.EditOrigin:
-                    Mouse.SetCursor(MouseCursor.Hand);
-                    Status.Text = "Moving Origin - " + EditorMousePos;
-                    break;
-                case EditorAction.AddNew:
-                    Mouse.SetCursor(MouseCursor.Crosshair);
-                    Status.Text = "Add New " + statVar + " At " + EditorMousePos;
-                    break;
-                case EditorAction.Draw:
-                    Mouse.SetCursor(MouseCursor.Crosshair);
-                    Status.Text = "Drawing Commentary";
+                    InspectorUpdate();
+                    if (Focused)
+                        switch (editorAction)
+                        {
+                            case EditorAction.None:
+                                Mouse.SetCursor(MouseCursor.Arrow);
+                                switch (editorManipulator)
+                                {
+                                    case EditorManipulator.NoEdit:
+                                        Status.Text = "Ready";
+                                        break;
+                                    case EditorManipulator.Rotation:
+                                        Status.Text = "Ready - Rotation standby";
+                                        break;
+                                    case EditorManipulator.Scaling:
+                                        Status.Text = "Ready - Scaling standby";
+                                        break;
+                                    case EditorManipulator.Translation:
+                                        Status.Text = "Ready - Translation standby";
+                                        break;
+                                }
+                                break;
+                            case EditorAction.BoxSelect:
+                                Mouse.SetCursor(MouseCursor.Crosshair);
+                                if (selection_firstPointSet)
+                                {
+                                    Status.Text = "Box Select - " + selection_Box.Location + " to " + EditorMousePos;
+                                }
+                                else
+                                {
+                                    Status.Text = "Box Select - " + EditorMousePos;
+                                }
+                                break;
+                            case EditorAction.Move:
+                                Mouse.SetCursor(MouseCursor.SizeAll);
+                                if (axis == EditorAxis.X)
+                                    Status.Text = "Translating - " + "X:" + translation.X;
+                                else if (axis == EditorAxis.Y)
+                                    Status.Text = "Translating - " + "Y:" + translation.Y;
+                                else if (axis == EditorAxis.XY)
+                                    Status.Text = "Translating - " + translation;
+                                break;
+                            case EditorAction.Scale:
+                                Mouse.SetCursor(MouseCursor.SizeNESW);
+                                if (axis == EditorAxis.X)
+                                    Status.Text = "Scaling - " + "X:" + sXY;
+                                else if (axis == EditorAxis.Y)
+                                    Status.Text = "Scaling - " + "Y:" + sXY;
+                                else if (axis == EditorAxis.XY)
+                                    Status.Text = "Scaling - " + sXY;
+                                break;
+                            case EditorAction.Rotate:
+                                Mouse.SetCursor(MouseCursor.SizeNS);
+                                Status.Text = "Rotating - " + ToDegrees(rotation - startRotation) + "°";
+                                break;
+                            case EditorAction.EditOrigin:
+                                Mouse.SetCursor(MouseCursor.Hand);
+                                Status.Text = "Moving Origin - " + EditorMousePos;
+                                break;
+                            case EditorAction.AddNew:
+                                Mouse.SetCursor(MouseCursor.Crosshair);
+                                Status.Text = "Add New " + statVar + " At " + EditorMousePos;
+                                break;
+                            case EditorAction.Draw:
+                                Mouse.SetCursor(MouseCursor.Crosshair);
+                                Status.Text = "Drawing Commentary";
+                                break;
+                        }
                     break;
             }
+            
         }
 
         /// <summary>

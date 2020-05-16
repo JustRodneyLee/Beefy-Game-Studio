@@ -24,11 +24,11 @@ namespace BeefyGameStudio
             NewProject np = new NewProject();
             if (np.ShowDialog() == DialogResult.OK)
             {
+                Hide();
                 gs.Show();
                 gs.NewProject(np.ProjName, np.ProjPath);
                 np.Dispose();
-                DialogResult = DialogResult.Yes;
-                Hide();
+                DialogResult = DialogResult.Yes;                
             }            
         }
 
@@ -45,15 +45,36 @@ namespace BeefyGameStudio
 
         private void openFileDialog_FileOk(object sender, CancelEventArgs e)
         {
-            gs.Show();
-            gs.OpenProject(openFileDialog.FileName);
-            DialogResult = DialogResult.Yes;
-            Hide();
+            string attempt = gs.OpenProject(openFileDialog.FileName);
+            if (attempt.Contains("OK"))
+            {                
+                DialogResult = DialogResult.Yes;
+                Hide();
+            }
+            else
+            {
+                MessageBox.Show("Failed to open project! " + attempt, "Beefy Game Studio - Error", MessageBoxButtons.OK);
+                CurrentProject.Reset();
+            }
         }
 
         private void BeefyHub_Load(object sender, EventArgs e)
         {
             gs = new BGS(this);
+        }
+
+        private void BeefyHub_VisibleChanged(object sender, EventArgs e)
+        {
+            if (!Visible)
+                if (DialogResult == DialogResult.Yes || DialogResult == DialogResult.OK)
+                {
+                    EditorSettings.Init();
+                    gs.Show();
+                }
+                else
+                {
+                    Application.Exit();
+                }
         }
     }
 }

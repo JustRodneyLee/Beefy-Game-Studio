@@ -499,27 +499,27 @@ namespace BeefyGameEngine
         GraphicsDevice graphics;
         SpriteBatch canvas;
         Texture2D pixel;
-        int thickness;
-        Color penColor;
+        public int Thickness { get; set; }
+        public Color PenColor { get; set; }
 
         public GraphingTools(GraphicsDevice gd, SpriteBatch batch, int brushThickness, Color brushColor)
         {
             graphics = gd;
             canvas = batch;
-            thickness = brushThickness;
-            penColor = brushColor;
+            Thickness = brushThickness;
+            PenColor = brushColor;
             pixel = new Texture2D(graphics, 1, 1);
             pixel.SetData(new Color[1] { Color.White });
         }
 
         public void SetColor(Color target)
         {
-            penColor = target;
+            PenColor = target;
         }
 
         public void PlotPoint(int x, int y, Single depth = 0f)
         {
-            canvas.Draw(pixel, new Rectangle(x - (int)(thickness/2f), - y - (int)(thickness/2f), thickness, thickness), null, penColor, 0f, Vector2.Zero, SpriteEffects.None, depth);
+            canvas.Draw(pixel, new Rectangle(x - (int)(Thickness/2f), - y - (int)(Thickness/2f), Thickness, Thickness), null, PenColor, 0f, Vector2.Zero, SpriteEffects.None, depth);
         }
 
         public void PlotLine(Vector2 p1, Vector2 p2, Single depth = 0f)
@@ -560,7 +560,7 @@ namespace BeefyGameEngine
                 while (error >= 0.5)
                 {                    
                     y += Math.Sign(gradient);
-                    if (dGrad != 0 && y == targetY + Math.Sign(gradient)*thickness)
+                    if (dGrad != 0 && y == targetY + Math.Sign(gradient)*Thickness)
                         return;
                     PlotPoint(i, y, depth);
                     error -= 1f;
@@ -585,7 +585,7 @@ namespace BeefyGameEngine
             if (fill)
             {
                 if (fill_color != default)
-                    penColor = fill_color;
+                    PenColor = fill_color;
                 int width = (int)Math.Abs(rect.Width);
                 int height = (int)Math.Abs(rect.Height);
                 if (width < 1) width = 1;
@@ -594,7 +594,7 @@ namespace BeefyGameEngine
                 Color[] cData = new Color[width * height];
                 for (int i = 0; i < width; i++)
                     for (int j = 0; j < height; j++)
-                        cData[i + j * width] = penColor;
+                        cData[i + j * width] = PenColor;
                 fillTex.SetData(cData);
                 Vector2 dest = new Vector2(rect.X, -rect.Y);
                 if (rect.Width < 0)

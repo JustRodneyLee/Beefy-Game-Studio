@@ -61,20 +61,20 @@ namespace BeefyGameEngine
         }
     }
 
-    public class BeefyScript : IEnumerable<BeefyScript.BeefyFunction>
+    public class BeefyScript : IEnumerable<BeefyScript.IBeefyFunction>
     {
         public string Name { get; set; }
         public object Parent { get; set; }
-        public List<BeefyFunction> Functions { get; }
+        public List<IBeefyFunction> Functions { get; }
 
         public BeefyScript(object parent)
         {
             Parent = parent;            
         }
 
-        public void AddFunction(string name)
+        public void AddFunction(IBeefyFunction ibf)
         {
-            Functions.Add(new BeefyFunction(name));
+            Functions.Add(ibf);
         }
 
         public void RemoveFunction(string name)
@@ -82,12 +82,7 @@ namespace BeefyGameEngine
             Functions.Remove(Functions.Find(x => x.FunctionName == name));
         }
 
-        public void RunFunction(string name, ParameterCollection pc = null)
-        {
-            Functions.Find(x => x.FunctionName == name).Run(pc);
-        }
-
-        public IEnumerator<BeefyFunction> GetEnumerator()
+        public IEnumerator<IBeefyFunction> GetEnumerator()
         {
             return Functions.GetEnumerator();
         }
@@ -97,19 +92,10 @@ namespace BeefyGameEngine
             return Functions.GetEnumerator();
         }
 
-        public class BeefyFunction
+        public interface IBeefyFunction
         {
-            public string FunctionName { get; internal set; }
-
-            public BeefyFunction(string name)
-            {
-                FunctionName = name;
-            }
-
-            public virtual void Run(ParameterCollection pc = null)
-            {
-
-            }
+            string FunctionName { get; }
+            ParameterCollection Parameters { get; }
         }
     }
 }

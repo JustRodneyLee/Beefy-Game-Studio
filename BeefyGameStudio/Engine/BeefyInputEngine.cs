@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
@@ -13,15 +14,18 @@ namespace BeefyGameEngine
     /// Mouse Button Inputs are defined as BMouseBtn
     /// </summary>
 
-    public struct BeefyInputBinding
+    public class BeefyInputBinding
     {
-        public IBeefyInput Input;
-        public InputCondition Condition;
+        public string Name { get; set; }
+        public bool Enabled { get; set; }
+        public IBeefyInput Input { get; set; }
+        public InputCondition Condition { get; set; }
         public event EventHandler Action;
-        public float HoldTime;
+        public float HoldTime { get; set; }
 
         public BeefyInputBinding(Keys key, EventHandler action, InputCondition inputCondition, float holdTime = 0)
         {
+            Enabled = true;
             Input = new BKey(key);
             Condition = inputCondition;
             Action = action;
@@ -30,6 +34,7 @@ namespace BeefyGameEngine
 
         public BeefyInputBinding(MouseButton button, EventHandler action, InputCondition inputCondition, float holdTime = 0)
         {
+            Enabled = true;
             Input = new BMouseBtn();
             Condition = inputCondition;
             Action = action;
@@ -39,6 +44,7 @@ namespace BeefyGameEngine
         //TODO : Mouse Move
         public BeefyInputBinding(MouseAxis mouseAxis, EventHandler action)
         {
+            Enabled = true;
             Input = new BMouseMove(mouseAxis);
             Condition = InputCondition.Move;
             Action = action;
@@ -149,11 +155,12 @@ namespace BeefyGameEngine
         public bool Enabled { get; private set; }
         public BeefyObject Entity { get; set; }
         public List<BeefyInputBinding> Bindings;
-        public BeefyScript ControllerScript { get; private set; }
+        public BeefyScript ControllerScript { get; private set; }        
 
         public BeefyInputController(BeefyObject parent)
         {
-            Entity = parent;            
+            Entity = parent;
+            Bindings = new List<BeefyInputBinding>();
         }
 
         /// <summary>
@@ -264,11 +271,11 @@ namespace BeefyGameEngine
 
         public static void Initialize(BeefyEngine Core)
         {
-
             LeftMouseButton = new BMouseBtn(MouseButton.Left);
             MiddleMouseButton = new BMouseBtn(MouseButton.Middle);
             RightMouseButton = new BMouseBtn(MouseButton.Right);
             //Initialize Key Array
+            //TODO : Can be optimized to only check binded inputs
             BeefyKeys = new List<BKey>();
             foreach (Keys e in Enum.GetValues(typeof(Keys)))
             {
@@ -472,6 +479,7 @@ namespace BeefyGameEngine
                 BeefyInputController BIC = BO.GetComponent<BeefyInputController>();
                 foreach (BeefyInputBinding BIB in BIC.Bindings)
                 {
+                    if (BIB.Enabled)
                     switch (BIB.Input.InputDevice)
                     {
                         case InputDevice.Keyboard:

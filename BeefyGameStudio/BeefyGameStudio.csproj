@@ -103,17 +103,32 @@
       <DependentUpon>BGS.cs</DependentUpon>
     </Compile>
     <Compile Include="BGS_Project.cs" />
+    <Compile Include="CollisionEditor.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Components\AudioComponent.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Components\AudioComponent.Designer.cs">
       <DependentUpon>AudioComponent.cs</DependentUpon>
     </Compile>
+    <Compile Include="Components\InputBindingControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Components\InputBindingControl.Designer.cs">
+      <DependentUpon>InputBindingControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Components\InputComponent.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Components\InputComponent.Designer.cs">
       <DependentUpon>InputComponent.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Components\InputEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Components\InputEditor.Designer.cs">
+      <DependentUpon>InputEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Components\InspectorComponent.cs">
       <SubType>Component</SubType>
@@ -239,8 +254,14 @@
     <EmbeddedResource Include="BGS.resx">
       <DependentUpon>BGS.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Components\InputBindingControl.resx">
+      <DependentUpon>InputBindingControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Components\InputComponent.resx">
       <DependentUpon>InputComponent.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Components\InputEditor.resx">
+      <DependentUpon>InputEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Components\PhysicsComponent.resx">
       <DependentUpon>PhysicsComponent.cs</DependentUpon>

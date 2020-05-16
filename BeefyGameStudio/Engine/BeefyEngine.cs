@@ -13,7 +13,7 @@ namespace BeefyGameEngine
         Aborted,
         Running,
         Paused,        
-    }
+    }    
 
     public class BeefyEngine : Game
     {
@@ -44,7 +44,7 @@ namespace BeefyGameEngine
         }
 
         protected override void Initialize()
-        {
+        {            
             if (!Initialized)
             {                
                 BeefyDebugger.LogInternal("Beefy Engine Initializing...");
@@ -74,7 +74,7 @@ namespace BeefyGameEngine
         protected override void LoadContent() //Load all or load portion of game data?
         {
             BRenderer.SetGraphicsDevice(GraphicsDevice);
-            //TODO
+            //TODO            
             base.LoadContent();
             Window.Title = GameName;
         }

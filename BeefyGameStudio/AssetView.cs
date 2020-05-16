@@ -20,7 +20,7 @@ namespace BeefyGameStudio
         protected override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            //MainForm.currentProject;
+            //MainForm.AssetLib;
         }
 
         protected override void Draw()
