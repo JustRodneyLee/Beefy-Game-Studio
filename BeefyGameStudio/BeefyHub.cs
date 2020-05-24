@@ -24,11 +24,10 @@ namespace BeefyGameStudio
             NewProject np = new NewProject();
             if (np.ShowDialog() == DialogResult.OK)
             {
+                DialogResult = DialogResult.Yes;
                 Hide();
-                gs.Show();
                 gs.NewProject(np.ProjName, np.ProjPath);
                 np.Dispose();
-                DialogResult = DialogResult.Yes;                
             }            
         }
 

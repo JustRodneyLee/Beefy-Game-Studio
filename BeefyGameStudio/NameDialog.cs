@@ -35,5 +35,10 @@ namespace BeefyGameStudio
         {
             NameValue = textBoxName.Text;
         }
+
+        private void NameDialog_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

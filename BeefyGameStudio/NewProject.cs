@@ -34,6 +34,7 @@ namespace BeefyGameStudio
         private void NewProject_Load(object sender, EventArgs e)
         {
             comboBoxPath.Items.Add("<Browse...>");
+            Focus();
         }
 
         private void comboBoxPath_SelectedValueChanged(object sender, EventArgs e)
@@ -49,12 +50,6 @@ namespace BeefyGameStudio
             }
         }
 
-        private void NewProject_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar == (char)Keys.Enter)
-                CreateProject();
-        }
-
         private void CreateProject()
         {
             if (textBoxName.Text.Replace(" ", "") != "")
@@ -65,23 +60,48 @@ namespace BeefyGameStudio
                 }
                 else
                 {
-                    if (Directory.Exists(comboBoxPath.SelectedItem.ToString() + "\\" + textBoxName.Text))
-                    {
-                        MessageBox.Show("Folder already exists!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                    if (comboBoxPath.SelectedItem is null)
+                        MessageBox.Show("Please select a valid path!");
                     else
                     {
-                        DialogResult = DialogResult.OK;
-                        ProjName = textBoxName.Text;
-                        ProjPath = comboBoxPath.SelectedItem.ToString() + "\\" + ProjName;
-                        Close();
-                    }
+                        try
+                        {
+                            Path.GetFullPath(comboBoxPath.SelectedItem.ToString());
+                            if (Directory.Exists(comboBoxPath.SelectedItem.ToString() + "\\" + textBoxName.Text))
+                            {
+                                MessageBox.Show("Folder already exists!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            }
+                            else
+                            {
+                                DialogResult = DialogResult.OK;
+                                ProjName = textBoxName.Text;
+                                ProjPath = comboBoxPath.SelectedItem.ToString() + "\\" + ProjName;
+                                Close();
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show("Please select a valid path!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }                    
                 }
             }
             else
             {
                 MessageBox.Show("Project name cannot be empty!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void textBoxName_KeyPress(object sender, KeyPressEventArgs e)
+        {            
+            if (e.KeyChar == (char)Keys.Enter)
+                CreateProject();
+        }
+
+        private void comboBoxPath_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)Keys.Enter)
+                CreateProject();
         }
     }
 }

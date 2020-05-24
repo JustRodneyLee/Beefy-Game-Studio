@@ -53,6 +53,7 @@ namespace BeefyGameStudio
         public static string CurrentLevelPath { get { return Data.CurrentLevelPath; } }
         ///Editing Info
         public static string CurrentLevelID { get { return Data.CurrentLevelID; } set { Data.CurrentLevelID = value; } }
+        public static Dictionary<int, BeefyLevel> Levels { get { return Data.Levels; } set { Data.Levels = value; } } //Level Priority + Level Id
         ///Game Settings
         public static bool PartialLoading { get { return Data.PartialLoading; } set { Data.PartialLoading = value; } }
         public static bool DeveloperMode { get { return Data.DeveloperMode; } set { Data.DeveloperMode = value; } }
@@ -93,10 +94,11 @@ namespace BeefyGameStudio
         public string TempPath { get { return ProjectPath + "\\Temp"; } }
         public string ObjPath { get { return ProjectPath + "\\Obj"; } }
         public string BuildPath { get { return ProjectPath + "\\Build"; } }
-        public string EnginePath { get { return ProjectPath + "\\Engine"; } }
-        public string CurrentLevelPath { get { return LevelsPath + "\\" + CurrentLevelID; } }
+        public string EnginePath { get { return ProjectPath + "\\Engine"; } }        
+        public Dictionary<int, BeefyLevel> Levels { get; set; }
         ///Editing Info
         public string CurrentLevelID { get; set; }
+        public string CurrentLevelPath { get { return LevelsPath + "\\" + CurrentLevelID; } }
         ///Game Settings
         public bool PartialLoading { get; set; }
         public bool DeveloperMode { get; set; }
@@ -282,12 +284,6 @@ namespace BeefyGameStudio
                 Directory.CreateDirectory(project.EnginePath);
                 Directory.SetCurrentDirectory(project.ProjectPath);
                 CurrentProject.SetProjectData(project);
-                /*using (StreamWriter mainWriter = new StreamWriter(project.ProjectPath + "\\Main.cs"))
-                {
-                    string mainprg = Properties.Resources.Main;
-                    mainprg.Replace("|Name|", CurrentProject.ProjectName);
-                    mainWriter.Write(mainprg);
-                }*/
             }
             catch(Exception e)
             {

@@ -87,7 +87,7 @@
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.labelName);
             this.Controls.Add(this.textBoxName);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -96,6 +96,7 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Beefy Game Studio - Name Dialog";
+            this.Load += new System.EventHandler(this.NameDialog_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

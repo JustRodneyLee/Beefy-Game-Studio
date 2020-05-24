@@ -299,6 +299,8 @@ namespace BeefyGameEngine
 
         public string LevelID { get; internal set; }
 
+        public string Description { get; set; }
+
         public BeefyLevelSettings Settings { get; set; }
 
         public List<BeefyLayer> Layers { get; set; }

@@ -55,6 +55,7 @@
             this.textBoxName.Name = "textBoxName";
             this.textBoxName.Size = new System.Drawing.Size(400, 22);
             this.textBoxName.TabIndex = 1;
+            this.textBoxName.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxName_KeyPress);
             // 
             // labelPath
             // 
@@ -75,6 +76,7 @@
             this.comboBoxPath.Size = new System.Drawing.Size(400, 24);
             this.comboBoxPath.TabIndex = 3;
             this.comboBoxPath.SelectedValueChanged += new System.EventHandler(this.comboBoxPath_SelectedValueChanged);
+            this.comboBoxPath.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.comboBoxPath_KeyPress);
             // 
             // buttonCancel
             // 
@@ -125,7 +127,6 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Beefy Game Studio - New Project";
             this.Load += new System.EventHandler(this.NewProject_Load);
-            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.NewProject_KeyPress);
             this.ResumeLayout(false);
             this.PerformLayout();
 

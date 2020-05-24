@@ -190,6 +190,12 @@
     <Compile Include="NewProject.Designer.cs">
       <DependentUpon>NewProject.cs</DependentUpon>
     </Compile>
+    <Compile Include="OpenLevelDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OpenLevelDialog.Designer.cs">
+      <DependentUpon>OpenLevelDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="OutputConsole.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -280,6 +286,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="NewProject.resx">
       <DependentUpon>NewProject.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OpenLevelDialog.resx">
+      <DependentUpon>OpenLevelDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OutputConsole.resx">
       <DependentUpon>OutputConsole.cs</DependentUpon>

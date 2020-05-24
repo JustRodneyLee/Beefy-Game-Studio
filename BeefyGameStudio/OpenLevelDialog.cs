@@ -1,0 +1,48 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using BeefyGameEngine;
+
+namespace BeefyGameStudio
+{
+    public partial class OpenLevelDialog : Form
+    {
+        BGS studio;
+
+        public OpenLevelDialog(BGS editor)
+        {
+            InitializeComponent();
+            studio = editor;            
+        }
+
+        private void buttonConfirm_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void buttonCancel_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void listViewLevels_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //listViewLevels.SelectedItems.TO
+        }
+
+        private void OpenLevelDialog_Load(object sender, EventArgs e)
+        {
+            listViewLevels.Items.Clear();
+            foreach(KeyValuePair<int, BeefyLevel> bl in CurrentProject.Levels)
+            {
+                listViewLevels.Items.Add(new ListViewItem(new string[] { bl.Value.LevelID, bl.Key.ToString(), bl.Value.Description }));
+            }
+        }
+    }
+}

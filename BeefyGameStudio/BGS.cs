@@ -244,9 +244,9 @@ namespace BeefyGameStudio
                     {
                         MessageBox.Show("Import Failed!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
-                    break;
+                    break;                
                 case FileType.Level:
-
+                    //Deprecated
                     break;
             }
         }
@@ -307,8 +307,7 @@ namespace BeefyGameStudio
         private void OpenLvlToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DialogResult dr;
-            OpenFileDialog.Multiselect = false;
-            dr = OpenFileDialog.ShowDialog();
+            new OpenLevelDialog(this).ShowDialog();
         }
 
         /// <summary>
