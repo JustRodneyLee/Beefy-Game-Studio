@@ -11,4 +11,4 @@ The editor is now able to do basic level manipulation, including asset importing
 This project requires the .NET 4.7 Framework and MonoGame.Forms to run. (https://github.com/sqrMin1/MonoGame.Forms).
 
 # Cease of Development
-Due to the lack of time and adequate knowledge, I have encountered too many obstacles trying to finish this editor. I couldn't wrap my head around asset management, and the engine was once again poorly structured and could not accomodate scripting (thus game logic does not exist) and the remaining workload was overwhelmingly big. This project and its related projects will be indefinitely suspended from development.
+I have encountered too many obstacles trying to finish this editor. I couldn't wrap my head around asset management, and the engine was once again poorly structured and could not accomodate scripting (thus game logic does not exist) and the remaining workload was overwhelmingly big. Due to the lack of time and adequate knowledge, this project and its related projects will be indefinitely suspended from development.
