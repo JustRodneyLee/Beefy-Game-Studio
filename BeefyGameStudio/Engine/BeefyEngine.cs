@@ -99,6 +99,7 @@ namespace BeefyGameEngine
                 BAudio.Update(BL);
             }
             base.Update(gameTime);
+            Input.PostUpdate();
             BeefyDebugger.Update();            
         }
 

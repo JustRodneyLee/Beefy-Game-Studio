@@ -39,9 +39,9 @@ namespace BeefyGameStudio
         private void OpenLevelDialog_Load(object sender, EventArgs e)
         {
             listViewLevels.Items.Clear();
-            foreach(KeyValuePair<int, BeefyLevel> bl in CurrentProject.Levels)
+            foreach(string bl in CurrentProject.LevelIDs)
             {
-                listViewLevels.Items.Add(new ListViewItem(new string[] { bl.Value.LevelID, bl.Key.ToString(), bl.Value.Description }));
+                listViewLevels.Items.Add(new ListViewItem(new string[] { bl }));
             }
         }
     }

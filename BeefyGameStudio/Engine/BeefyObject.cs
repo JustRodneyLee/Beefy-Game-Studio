@@ -63,6 +63,7 @@ namespace BeefyGameEngine
         public bool IsAbstract { get; internal set; } //Determines if this Object is tangible
         public readonly List<IBeefyComponent> Components;
         public BeefyScript Script { get; internal set; }
+        public List<BeefyObject> Children { get; set; }
 
         private BeefyObject()
         {
@@ -77,7 +78,8 @@ namespace BeefyGameEngine
                 IsAbstract = true;
                 ObjectID = "Abstract";
             }
-            Components.Add(new BeefyTransform(this));            
+            Components.Add(new BeefyTransform(this));
+            Children = new List<BeefyObject>();
         }
 
         public BeefyObject(string id)
@@ -85,12 +87,14 @@ namespace BeefyGameEngine
             Components = new List<IBeefyComponent>();
             IsAbstract = false;
             ObjectID = id;
-            Components.Add(new BeefyTransform(this));            
+            Components.Add(new BeefyTransform(this));
+            Children = new List<BeefyObject>();
         }
 
         ~BeefyObject()
         {
             RemoveAllComponents();
+            Children.Clear();
         }
 
         #region Entity-Component-System (ECS)

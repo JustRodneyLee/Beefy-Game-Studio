@@ -7,7 +7,10 @@ using System.Reflection;
 using System.Collections;
 
 namespace BeefyGameEngine
-{
+{    
+    /// Try to use CodeDOM to generate scripts?
+ 
+
     public class BeefyScriptComponent : IBeefyComponent
     {
         //TODO

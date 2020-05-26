@@ -301,6 +301,8 @@ namespace BeefyGameEngine
 
         public string Description { get; set; }
 
+        public int Priority { get; set; }
+
         public BeefyLevelSettings Settings { get; set; }
 
         public List<BeefyLayer> Layers { get; set; }

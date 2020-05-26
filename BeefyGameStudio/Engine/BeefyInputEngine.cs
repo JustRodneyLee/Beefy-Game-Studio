@@ -419,8 +419,16 @@ namespace BeefyGameEngine
                 }
             }
             //Mouse
-            DeltaX = CurrentMouseState.X - LastMouseState.X;
-            DeltaY = CurrentMouseState.Y - LastMouseState.Y;
+            if (CurrentMouseState != LastMouseState)
+            {
+                DeltaX = CurrentMouseState.X - LastMouseState.X;
+                DeltaY = CurrentMouseState.Y - LastMouseState.Y;
+            }
+            else
+            {
+                DeltaX = 0;
+                DeltaY = 0;
+            }
             if (CurrentMouseState.LeftButton == ButtonState.Pressed)
                 LeftMouseButton.BtnDown = true;
             if (CurrentMouseState.LeftButton == ButtonState.Released && LastMouseState.LeftButton == ButtonState.Pressed)
@@ -450,8 +458,11 @@ namespace BeefyGameEngine
                 RightMouseButton.BtnUp = false;
             }
 
-            MouseScroll = CurrentMouseState.ScrollWheelValue - LastMouseState.ScrollWheelValue; //Subtracting the cumalative ScrollWheelValues yields the mouse scroll change for the last frame
+            MouseScroll = CurrentMouseState.ScrollWheelValue - LastMouseState.ScrollWheelValue; //Subtracting the cumalative ScrollWheelValues yields the mouse scroll change for the last frame            
+        }
 
+        public static void PostUpdate()
+        {
             LastKeyboardState = CurrentKeyboardState;
             LastMouseState = CurrentMouseState;
         }

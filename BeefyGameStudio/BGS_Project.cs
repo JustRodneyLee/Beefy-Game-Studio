@@ -27,7 +27,7 @@ namespace BeefyGameStudio
         {
             return listToClone.Select(item => (T)item.Clone()).ToList();
         }
-    }    
+    }
 
     public static class CurrentProject
     {
@@ -53,7 +53,6 @@ namespace BeefyGameStudio
         public static string CurrentLevelPath { get { return Data.CurrentLevelPath; } }
         ///Editing Info
         public static string CurrentLevelID { get { return Data.CurrentLevelID; } set { Data.CurrentLevelID = value; } }
-        public static Dictionary<int, BeefyLevel> Levels { get { return Data.Levels; } set { Data.Levels = value; } } //Level Priority + Level Id
         ///Game Settings
         public static bool PartialLoading { get { return Data.PartialLoading; } set { Data.PartialLoading = value; } }
         public static bool DeveloperMode { get { return Data.DeveloperMode; } set { Data.DeveloperMode = value; } }
@@ -94,8 +93,7 @@ namespace BeefyGameStudio
         public string TempPath { get { return ProjectPath + "\\Temp"; } }
         public string ObjPath { get { return ProjectPath + "\\Obj"; } }
         public string BuildPath { get { return ProjectPath + "\\Build"; } }
-        public string EnginePath { get { return ProjectPath + "\\Engine"; } }        
-        public Dictionary<int, BeefyLevel> Levels { get; set; }
+        public string EnginePath { get { return ProjectPath + "\\Engine"; } }
         ///Editing Info
         public string CurrentLevelID { get; set; }
         public string CurrentLevelPath { get { return LevelsPath + "\\" + CurrentLevelID; } }
@@ -417,8 +415,6 @@ namespace BeefyGameStudio
         {
             BuildAssets();
             StatusStrip.Text = "Building " + CurrentProject.ProjectName + "...";
-            //CSharpCodeProvider codeProvider = new CSharpCodeProvider();
-            //ICodeCompiler icc = codeProvider.CreateCompiler();
             CodeDomProvider codeProvider = CodeDomProvider.CreateProvider("CSharp");
             string output = CurrentProject.BuildPath + "\\" + CurrentProject.ProjectName + ".exe";
             CompilerParameters parameters = new CompilerParameters();
@@ -426,7 +422,14 @@ namespace BeefyGameStudio
             parameters.OutputAssembly = output;
             parameters.ReferencedAssemblies.Add("System.dll");
             parameters.ReferencedAssemblies.Add("MonoGame.Framework.dll");
-            parameters.ReferencedAssemblies.Add("Lidgren.Network.dll");
+            //Create CSharp files for compilation
+            /*foreach (string bl in CurrentProject.Levels)
+            {
+                using (StreamWriter writer = new StreamWriter(CurrentProject.BuildPath))
+                {
+
+                }
+            }*/
             CompilerResults results = codeProvider.CompileAssemblyFromFile(parameters, "//TODO");
             if (results.Errors.HasErrors)
             {
@@ -456,16 +459,60 @@ namespace BeefyGameStudio
 
         public bool SaveLevel(string path)
         {
-            if (MainViewport.SaveLevel(path))
+            bool success = true;
+            try
             {
-                lvlSaved = true;
-                lvlModified = false;
-                return true;
+                string lvlPath = path.Split('.').First();
+                Directory.CreateDirectory(lvlPath);
+                LevelData data = new LevelData(MainViewport.Level);
+                //Write level settings using XML serialiation
+                XmlSerializer serializer;
+                using (StreamWriter file = new StreamWriter(lvlPath + "\\" + MainViewport.Level.LevelID + ".bgl"))
+                {
+                    serializer = new XmlSerializer(typeof(LevelData));
+                    serializer.Serialize(file, data);
+                }
+                foreach (BeefyLayer bl in MainViewport.Level.Layers)
+                {
+                    string layerPath = lvlPath + "\\" + bl.LayerID;
+                    Directory.CreateDirectory(layerPath);
+                    foreach (BeefyObject bo in bl.BOC)
+                    {
+                        using (StreamWriter file = new StreamWriter(layerPath + "\\" + bo.ObjectID + ".bgo"))
+                        {
+                            foreach (IBeefyComponent ibc in bo.Components)
+                            {
+                                switch (ibc.ComponentID)
+                                {
+                                    case "Transform":
+                                        file.WriteLine();
+                                        break;
+                                    case "Physics":
+                                        break;
+                                    case "Renderer2D":
+                                        break;
+                                    case "InputController":
+                                        break;
+                                    case "Audio":
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }
             }
-            else
+            catch(Exception e)
             {
-                return false;
+                success = false;
             }
+            finally
+            {
+                if (success)
+                {                    
+                    lvlModified = false;
+                }
+            }
+            return success;
         }
     }
 }

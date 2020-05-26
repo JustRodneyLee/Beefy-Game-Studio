@@ -11,9 +11,8 @@ namespace BeefyGameStudio
     public partial class BGS : Form
     {
         FileType fileType;
-        ImportAction importAction;        
-        
-        bool lvlSaved;
+        ImportAction importAction;
+
         bool lvlModified;
 
         ScriptEditorForm scriptEditor;
@@ -46,10 +45,11 @@ namespace BeefyGameStudio
                     Text = "Beefy Game Studio v" + EditorSettings.Version + " - " + MainViewport.Level.LevelID;
                 else
                     Text = "Beefy Game Studio v" + EditorSettings.Version + " - " + CurrentProject.ProjectName + " - " + MainViewport.Level.LevelID;
+                if (lvlModified)
+                    Text += "*";
             }
             else
-                Text = "Beefy Game Studio v" + EditorSettings.Version;
-                
+                Text = "Beefy Game Studio v" + EditorSettings.Version;                
         }
 
         private void InitAssetLib()
@@ -62,20 +62,8 @@ namespace BeefyGameStudio
         private void InitGameViewport()
         {
             MainViewport.InternalLoad(new BeefyLevel("New Level"));
-            MainViewport.Editor.Initialize();                  
-            lvlSaved = false;
+            MainViewport.Editor.Initialize();            
             lvlModified = true;
-        }
-
-        private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (!lvlSaved)
-            {
-                SaveFileDialog.Title = "Beefy Game Studio - Save this Level";
-                SaveFileDialog.Filter = "Beefy Game Levels|*.bgl";
-                SaveFileDialog.DefaultExt = "bgl";
-                SaveFileDialog.ShowDialog();
-            }            
         }
 
         private void Hierarchy_MouseClick(object sender, MouseEventArgs e)
@@ -251,45 +239,21 @@ namespace BeefyGameStudio
             }
         }
 
-        private void SaveFileDialog_FileOk(object sender, CancelEventArgs e)
-        {
-            switch (fileType)
-            {
-                case FileType.Level: //Save Level
-                    if (!SaveLevel(SaveFileDialog.FileName))
-                    {
-                        MessageBox.Show("Level cannot be saved!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    else
-                    {
-                        lvlSaved = true;
-                        lvlModified = false;
-                    }
-                    break;
-                case FileType.Project: //Save Project
-                    SaveProject();
-                    break;
-            }
-        }
-
         private void NewLvlToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!lvlSaved || lvlModified)
+            if (lvlModified)
             {
                 DialogResult dr;
                 dr = MessageBox.Show("Do you want to save last changes?", "Beefy Game Studio", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
                 if (dr == DialogResult.Yes)
                 {
-                    if (lvlSaved)
+                    if (CurrentProject.LevelIDs.Contains(MainViewport.Level.LevelID))
                     {
                         SaveLevel(CurrentProject.CurrentLevelPath);
                     }
                     else
                     {
-                        SaveFileDialog.Title = "Beefy Game Studio - Save Level";
-                        SaveFileDialog.Filter = "Beefy Game Levels|*.bgl";
-                        SaveFileDialog.DefaultExt = "bgl";
-                        SaveFileDialog.ShowDialog();
+                        //TODO
                     }
                 }
                 else if (dr == DialogResult.No)
@@ -315,67 +279,7 @@ namespace BeefyGameStudio
         /// </summary>
         private void SaveCurrentLevel()
         {
-            if (CurrentProject.IsNull)
-            {
-                if (!lvlSaved)
-                {
-                    SaveFileDialog.Title = "Beefy Game Studio - Save Level";
-                    SaveFileDialog.Filter = "Beefy Game Levels|*.bgl";
-                    SaveFileDialog.DefaultExt = "bgl";
-                    fileType = FileType.Level;
-                    SaveFileDialog.ShowDialog();
-                }
-                else
-                {
-                    SaveLevel(CurrentProject.CurrentLevelPath);
-                    RefreshTitleText();
-                }
-            }
-            else
-            {
-                if (!lvlSaved)
-                {
-                    NameDialog nd = new NameDialog("Save Current Level");
-                    nd.ShowDialog();
-                    if (nd.DialogResult == DialogResult.OK)
-                    {
-                        if (CurrentProject.LevelIDs.Contains(nd.NameValue))
-                        {
-                            MessageBox.Show("A Level with this name already exists!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                        else
-                        {
-                            nd.Close();
-                            MainViewport.Level.LevelID = nd.NameValue;
-                            SaveLevel(CurrentProject.LevelsPath + "\\" + nd.NameValue + ".bgl");
-                            RefreshTitleText();
-                        }
-                    }
-                }
-                else
-                {
-                    SaveLevel(CurrentProject.CurrentLevelPath);
-                    RefreshTitleText();
-                }
-            }
-        }
-
-        private void SaveLvlToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SaveCurrentLevel();
-        }
-
-        private void SaveLvlAsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (CurrentProject.IsNull)
-            {
-                SaveFileDialog.Title = "Beefy Game Studio - Save Level As";
-                SaveFileDialog.Filter = "Beefy Game Levels|*.bgl";
-                SaveFileDialog.DefaultExt = "bgl";
-                fileType = FileType.Level;
-                SaveFileDialog.ShowDialog();
-            }
-            else
+            if (!CurrentProject.LevelIDs.Contains(MainViewport.Level.LevelID))
             {
                 NameDialog nd = new NameDialog("Save Current Level");
                 nd.ShowDialog();
@@ -390,8 +294,38 @@ namespace BeefyGameStudio
                         nd.Close();
                         MainViewport.Level.LevelID = nd.NameValue;
                         SaveLevel(CurrentProject.LevelsPath + "\\" + nd.NameValue + ".bgl");
+                        RefreshTitleText();
                     }
-                }                
+                }
+            }
+            else
+            {
+                SaveLevel(CurrentProject.CurrentLevelPath);
+                RefreshTitleText();
+            }
+        }
+
+        private void SaveLvlToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveCurrentLevel();
+        }
+
+        private void SaveLvlAsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            NameDialog nd = new NameDialog("Save Current Level");
+            nd.ShowDialog();
+            if (nd.DialogResult == DialogResult.OK)
+            {
+                if (CurrentProject.LevelIDs.Contains(nd.NameValue))
+                {
+                    MessageBox.Show("A Level with this name already exists!", "Beefy Game Studio - Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    nd.Close();
+                    MainViewport.Level.LevelID = nd.NameValue;
+                    SaveLevel(CurrentProject.LevelsPath + "\\" + nd.NameValue + ".bgl");
+                }
             }
         }
 
@@ -672,7 +606,6 @@ namespace BeefyGameStudio
         private void ExportToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //TODO
-            SaveFileDialog.ShowDialog();
         }
 
         private void ResetToolStripMenuItem_Click(object sender, EventArgs e)
@@ -800,7 +733,7 @@ namespace BeefyGameStudio
 
         private void CloseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (lvlSaved)
+            if (!lvlModified)
                 Close();
             else
             {
@@ -1029,6 +962,11 @@ namespace BeefyGameStudio
         }
 
         private void toolStripComboBox_Environment_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void lvlSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
         }

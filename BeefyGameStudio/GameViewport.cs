@@ -1230,12 +1230,25 @@ namespace BeefyGameStudio
                     using (StreamWriter file = new StreamWriter(layerPath + "\\" + bo.ObjectID + ".bgo"))
                     {
                         foreach (IBeefyComponent ibc in bo.Components)
-                        {                            
-                            //TODO
+                        {
+                            switch (ibc.ComponentID)
+                            {
+                                case "Transform":
+                                    file.WriteLine();
+                                    break;
+                                case "Physics":
+                                    break;
+                                case "Renderer2D":
+                                    break;
+                                case "InputController":
+                                    break;
+                                case "Audio":
+                                    break;
+                            }
                         }                        
                     }
                 }                
-            }            
+            }   
             return true;
         }
         #endregion
